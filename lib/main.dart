@@ -91,7 +91,7 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
   }
   return const Scaffold(
     backgroundColor: Colors.purple,
-  ).getRoute();
+  ).getRoute(); 
 }
 
 extension GetPath on Widget {

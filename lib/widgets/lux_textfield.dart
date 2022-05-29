@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 Color borderColor = HexColor("#E8E8E8").withOpacity(0.35);
 Color textfieldColor = HexColor("#FFFFFF");
@@ -328,6 +329,103 @@ extension IconOverride on Icon {
     return Icon(
       this.icon,
       color: color,
+    );
+  }
+}
+
+class LuxpayTextFieldNumber extends StatelessWidget {
+  final String? hint;
+  final TextEditingController? controller;
+
+    
+  final String? innerHint;
+  final Color? hintColour;
+  final FontWeight? hintWeight;
+  
+  final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? formatters;
+  final bool obscureText;
+  final Widget? suffixIcon;
+  final bool enabled;
+  final TextInputType? textInputType;
+  final bool multiline;
+  final int? maxLength;
+ 
+   LuxpayTextFieldNumber({ 
+    Key? key ,
+     required this.hint, required this.controller,
+       
+    this.multiline = false,
+   
+    this.formatters,
+    this.onChanged,
+    this.obscureText = false,
+    this.hintColour,
+    this.hintWeight,
+    this.innerHint,
+    this.suffixIcon,
+    this.enabled = true,
+    this.textInputType,
+    this.maxLength,
+     }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      
+      child:Column(
+ crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$hint",
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight:  FontWeight.w600,
+              color:HexColor("#1E1E1E")),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+
+           Container(
+          constraints: BoxConstraints(
+            maxHeight:  SizeConfig.blockSizeVertical! * 20 ,
+          ),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+              color: textfieldColor),
+          child:  IntlPhoneField(
+            controller: controller,
+             obscureText: obscureText,
+            
+            enabled: enabled,
+                  decoration: InputDecoration(
+                hintText: innerHint != null ? innerHint : "",
+                counterText: "",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: HexColor("#333333").withOpacity(0.25),
+                    fontWeight: FontWeight.w300),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                border: InputBorder.none,
+                //errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                errorStyle: const TextStyle(fontSize: 14),
+                fillColor: HexColor("#E8E8E8").withOpacity(0.35),
+                filled: true,
+                suffixIcon: suffixIcon != null ? suffixIcon : null),
+                  onChanged: (phone) {
+                    print(phone.completeNumber);
+                  },
+                  onCountryChanged: (country) {
+                    print('Country changed to: ' + country.name);
+                  },
+                  
+                )    
+              )
+      ],)
     );
   }
 }

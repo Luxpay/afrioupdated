@@ -5,6 +5,7 @@ import 'package:luxpay/services/authService.dart';
 import 'package:luxpay/services/locatorService.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/authPages/create_account.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/authPages/registration_page.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
@@ -178,11 +179,17 @@ class _WelcomePageState extends State<WelcomePage>
                         InkWell(
                             onTap: () async {
                               // _orthoUser = await MyConstants.getOrthoUser();
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RegistrationPage()));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) =>
+                              //             const RegistrationPage()));
+
+                               Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => CreateAccount()
+                                ),
+                              );
                             },
                             child: luxButton(HexColor("#D70A0A"), Colors.white,
                                 "Get Started", 350)),
