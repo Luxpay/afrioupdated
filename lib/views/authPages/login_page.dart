@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/authPages/create_account.dart';
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/authPages/login_view_model.dart';
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 
+import '../../services/local_auth.dart';
 import '../page_controller.dart';
+import 'password_change_confirm.dart';
 import 'registration_page.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginViewModel>((ref) {
@@ -72,11 +76,15 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  LuxTextField(
-                    hint: !isEmail ? "Phone number" : "Email",
-                    controller: controller,
-                    innerHint: !isEmail ? "090********" : "johndoe@mail.com",
-                  ),
+                  Container(
+                      child: !isEmail
+                          ? LuxTextField(
+                              hint: "Email",
+                              controller: controller,
+                              innerHint: "johndoe@mail.com",
+                            )
+                          : LuxpayTextFieldNumber(
+                              hint: "Phone Number", controller: controller)),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 2.2,
                   ),
@@ -183,10 +191,23 @@ class _LoginPageState extends State<LoginPage> {
                         )
                       ],
                     ),
-                    child: Image.asset(
-                      "assets/fprint.png",
-                      height: 50,
-                      width: 50,
+                    child: InkWell(
+                      onTap: () async {
+                        final isAuthenticated =
+                            await LocalAuthApi.authenticate();
+
+                        if (isAuthenticated) {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                                builder: (context) => CreateAccount()),
+                          );
+                        }
+                      },
+                      child: Image.asset(
+                        "assets/fprint.png",
+                        height: 50,
+                        width: 50,
+                      ),
                     ),
                   )),
                   SizedBox(
@@ -216,11 +237,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       InkWell(
                         onTap: () => {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) =>
+                          //             const RegistrationPage()))
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const RegistrationPage()))
+                                  builder: (context) => const CreateAccount()))
                         },
                         child: Text(
                           " Create account",
@@ -241,3 +266,16 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
+
+Widget buildText(String text, bool checked) => Container(
+      margin: EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          checked
+              ? Icon(Icons.check, color: Colors.green, size: 24)
+              : Icon(Icons.close, color: Colors.red, size: 24),
+          const SizedBox(width: 12),
+          Text(text, style: TextStyle(fontSize: 24)),
+        ],
+      ),
+    );

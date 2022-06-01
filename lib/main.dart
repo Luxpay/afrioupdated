@@ -49,7 +49,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       navigatorKey: navigatorKey,
-      theme: ThemeData(primarySwatch: colorCustom, fontFamily: "Mulish"),
+      theme: ThemeData(
+        //backgroundColor: Colors.white,
+        primarySwatch: colorCustom, fontFamily: "Mulish"),
       initialRoute: "/",
       onGenerateRoute: onGenerateRoute,
     );

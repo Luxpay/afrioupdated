@@ -6,6 +6,7 @@ import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/otfields.dart';
 
@@ -153,6 +154,10 @@ class _OTPVerificationState extends State<OTPVerification> {
                   ),
                   InkWell(
                     onTap: () async {
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreatePinPage()));
                       _isLoading = true;
                       if (mounted) {
                         setState(() {});

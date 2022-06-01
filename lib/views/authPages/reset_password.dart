@@ -7,6 +7,7 @@ import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/change_password.dart';
+import 'package:luxpay/views/authPages/create_new_password.dart';
 import 'package:luxpay/views/authPages/otp_verification_reset.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
@@ -75,11 +76,13 @@ class _ResetPasswordState extends State<ResetPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
+              margin: EdgeInsets.only(top: 30),
               decoration: BoxDecoration(
                   border: Border(
                 bottom: BorderSide(
@@ -114,7 +117,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   Row(
                     children: [
                       Text(
-                        "Enter Your Email Number",
+                        "Rest Your Password",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       ),
@@ -124,7 +127,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                     height: SizeConfig.safeBlockVertical! * 1,
                   ),
                   Text(
-                    "We would send a verification code to the e-mail address below.",
+                    "Create a new password. Password should be different from previous..",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -133,16 +136,17 @@ class _ResetPasswordState extends State<ResetPassword> {
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 3,
                   ),
-                  LuxTextField(
-                    hint: "Email",
-                    innerHint: "johndoe@gmail.com",
-                    controller: controller,
-                  ),
+                  LuxpayTextFieldNumber(
+                      hint: "Phone Number", controller: controller),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 7,
                   ),
                   InkWell(
                     onTap: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CreateNewPassword()));
                       _isLoading = true;
                       if (mounted) {
                         setState(() {});
