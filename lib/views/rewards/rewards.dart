@@ -5,6 +5,8 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/rewards/product_page.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 
+import '../../widgets/touchUp.dart';
+
 class RewardsPage extends StatefulWidget {
   const RewardsPage({Key? key}) : super(key: key);
 
@@ -13,236 +15,257 @@ class RewardsPage extends StatefulWidget {
 }
 
 class _RewardsPageState extends State<RewardsPage> {
+      Future<bool> _willPopCallback() async {
+    showDialog(
+        context: context,
+        useRootNavigator: false,
+        barrierDismissible: false,
+        builder: (context) {
+          return Dialog(
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            backgroundColor: Colors.black,
+            alignment: Alignment.center,
+            child: popUp(context),
+          );
+        });
+    return true; // return true if the route to be popped
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return WillPopScope(
+      onWillPop: _willPopCallback,
+      child: Scaffold(
         backgroundColor: Colors.white,
-        title: const Text(
-          "Rewards",
-          style: TextStyle(fontSize: 16, color: Colors.black),
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: const Text(
+            "Rewards",
+            style: TextStyle(fontSize: 16, color: Colors.black),
+          ),
+          elevation: 0,
+          centerTitle: false,
         ),
-        elevation: 0,
-        centerTitle: false,
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 7,
-            ),
-            // Invitation card
-            Container(
-              height: 110,
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 25),
-              padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
-              decoration: BoxDecoration(
-                color: HexColor("#771313"),
-                borderRadius: BorderRadius.circular(14),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 7,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Invite & earn".toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 7,
-                  ),
-                  RichText(
-                    text: const TextSpan(
-                        text: "Refer a friend and earn up to \n",
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
-                          height: 1.7,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "N620 ",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.greenAccent,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          TextSpan(
-                            text: "per referral daily.",
-                            style: TextStyle(fontSize: 13, color: Colors.white),
-                          )
-                        ]),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            buildDivider,
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            // checkin
-            Padding(
-              padding: const EdgeInsets.only(left: 25.0),
-              child: RichText(
-                text: TextSpan(
-                    text: "Get coupons or points : ",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: HexColor("#1E1E1E"),
-                      fontWeight: FontWeight.w600,
-                    ),
-                    children: const [
-                      TextSpan(
-                        text: "Check in for 7 days !",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      )
-                    ]),
-              ),
-            ),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 3,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: GridView(
-                shrinkWrap: true,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    childAspectRatio: 6 / 5,
-                    mainAxisSpacing: SizeConfig.blockSizeHorizontal! * 2,
-                    crossAxisSpacing: SizeConfig.blockSizeHorizontal! * 2),
-                children: [
-                  buildCheckinCard("1", "+5P", ""),
-                  buildCheckinCard("2", "N10", ""),
-                  buildCheckinCard("3", "+10P", ""),
-                  buildCheckinCard("4", "+15P", ""),
-                  buildCheckinCard("5", "N15", ""),
-                  buildCheckinCard("6", "N20", ""),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 1,
-            ),
-            buildCheckinCardSpan("7", "+25P", "N30", "", ""),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 3,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: luxButton(HexColor("#D70A0A"), Colors.white, "Check in",
-                  double.infinity,
-                  height: 50, fontSize: 16),
-            ),
-            // Earn points
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            buildDivider,
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            ListView.separated(
-              separatorBuilder: (context, index) => Divider(
-                color: HexColor("#E4E9F2"),
-              ),
-              itemBuilder: (context, index) => buildEarnings(
-                "",
-                "+10 points",
-                "Earn points",
-                Row(
-                  children: const [
+              // Invitation card
+              Container(
+                height: 110,
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 25),
+                padding: const EdgeInsets.fromLTRB(22, 14, 22, 22),
+                decoration: BoxDecoration(
+                  color: HexColor("#771313"),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      "Sign in",
-                      style: TextStyle(
-                        color: Colors.grey,
+                      "Invite & earn".toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 13,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
                       ),
-                    )
+                    ),
+                    const SizedBox(
+                      height: 7,
+                    ),
+                    RichText(
+                      text: const TextSpan(
+                          text: "Refer a friend and earn up to \n",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white,
+                            height: 1.7,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "N620 ",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.greenAccent,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "per referral daily.",
+                              style: TextStyle(fontSize: 13, color: Colors.white),
+                            )
+                          ]),
+                    ),
                   ],
                 ),
               ),
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 3,
-            ),
-            // redeem gifts
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            buildDivider,
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 2,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Gifts to redeem",
-                    style: TextStyle(
-                      color: HexColor("#1E1E1E"),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                  Text(
-                    "More",
-                    style: TextStyle(
-                      color: HexColor("#8D9091"),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
               ),
-            ),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 3,
-            ),
-            Container(
-              color: HexColor("#FBFBFB"),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
-              child: GridView(
+              buildDivider,
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
+              ),
+              // checkin
+              Padding(
+                padding: const EdgeInsets.only(left: 25.0),
+                child: RichText(
+                  text: TextSpan(
+                      text: "Get coupons or points : ",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: HexColor("#1E1E1E"),
+                        fontWeight: FontWeight.w600,
+                      ),
+                      children: const [
+                        TextSpan(
+                          text: "Check in for 7 days !",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        )
+                      ]),
+                ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 3,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: GridView(
+                  shrinkWrap: true,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      childAspectRatio: 6 / 5,
+                      mainAxisSpacing: SizeConfig.blockSizeHorizontal! * 2,
+                      crossAxisSpacing: SizeConfig.blockSizeHorizontal! * 2),
+                  children: [
+                    buildCheckinCard("1", "+5P", ""),
+                    buildCheckinCard("2", "N10", ""),
+                    buildCheckinCard("3", "+10P", ""),
+                    buildCheckinCard("4", "+15P", ""),
+                    buildCheckinCard("5", "N15", ""),
+                    buildCheckinCard("6", "N20", ""),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 1,
+              ),
+              buildCheckinCardSpan("7", "+25P", "N30", "", ""),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 3,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: luxButton(HexColor("#D70A0A"), Colors.white, "Check in",
+                    double.infinity,
+                    height: 50, fontSize: 16),
+              ),
+              // Earn points
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
+              ),
+              buildDivider,
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
+              ),
+              ListView.separated(
+                separatorBuilder: (context, index) => Divider(
+                  color: HexColor("#E4E9F2"),
+                ),
+                itemBuilder: (context, index) => buildEarnings(
+                  "",
+                  "+10 points",
+                  "Earn points",
+                  Row(
+                    children: const [
+                      Text(
+                        "Sign in",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 5 / 7,
-                    mainAxisSpacing: SizeConfig.blockSizeHorizontal! * 2,
-                    crossAxisSpacing: SizeConfig.blockSizeHorizontal! * 2),
-                children: [
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                  buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
-                      "80 pts", ""),
-                ],
+                itemCount: 3,
               ),
-            ),
-            SizedBox(
-              height: SizeConfig.blockSizeVertical! * 6,
-            ),
-          ],
+              // redeem gifts
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
+              ),
+              buildDivider,
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 2,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Gifts to redeem",
+                      style: TextStyle(
+                        color: HexColor("#1E1E1E"),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      "More",
+                      style: TextStyle(
+                        color: HexColor("#8D9091"),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 3,
+              ),
+              Container(
+                color: HexColor("#FBFBFB"),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25.0, vertical: 12),
+                child: GridView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 5 / 7,
+                      mainAxisSpacing: SizeConfig.blockSizeHorizontal! * 2,
+                      crossAxisSpacing: SizeConfig.blockSizeHorizontal! * 2),
+                  children: [
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                    buildCartItem("Apple Airpod Pro 3", "N95,100", "N128,400",
+                        "80 pts", ""),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical! * 6,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -35,10 +35,17 @@ class _PasswordChangeCongratulationState
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black)),
-            Flexible(
-                child: Text("Log in to your account",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey))),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                      child: Text("Log in to your account",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey))),
+                ],
+              ),
+            ),
             SizedBox(height: 50),
             InkWell(
               onTap: () {

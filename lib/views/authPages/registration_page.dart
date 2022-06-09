@@ -83,7 +83,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 2.2,
                   ),
-                  //email
+                  //emailvvv
                   LuxTextField(
                     hint: "Email address",
                     controller: emailController,
@@ -114,6 +114,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                             var password = passwordController.text.trim();
                             var phone = controller.text.trim();
                             var fullname = fullNameController.text.trim();
+                            print(email);
                             var validators = [
                               Validators.isValidEmail(email),
                               Validators.isValidPassword(password),
@@ -164,7 +165,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               ? luxButtonLoading(HexColor("#D70A0A"), width)
                               : luxButton(HexColor("#D70A0A"), Colors.white,
                                   "Create account", width,
-                                  fontSize: 16))),
+                                  fontSize: 16)
+                                  )
+                                  ),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 7.8,
                   ),

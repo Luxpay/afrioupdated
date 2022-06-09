@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luxpay/utils/hexcolor.dart';
@@ -19,6 +21,7 @@ class PinEntry extends ConsumerStatefulWidget {
 }
 
 class _PinEntryState extends ConsumerState<PinEntry> {
+  List<String> list = [];
   @override
   Widget build(BuildContext context) {
     var pinEntry = ref.watch(pinEntryProvier(widget.tag));
@@ -175,6 +178,7 @@ class _PinEntryState extends ConsumerState<PinEntry> {
     return InkWell(
       onTap: () {
         ref.read(pinEntryProvier(widget.tag).notifier).append(value);
+        list.add(value);
       },
       borderRadius: BorderRadius.circular(30),
       splashColor: HexColor("#D70A0A").withOpacity(0.35),

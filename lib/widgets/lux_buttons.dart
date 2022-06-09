@@ -51,7 +51,7 @@ Widget luxButton(Color? fillColour, Color textColour, String text, double width,
         BoxShadow(
           color: Colors.grey.withOpacity(0.5),
           blurRadius: 5.0,
-          spreadRadius: 1.0,
+          spreadRadius: 3.0,
           offset: Offset(
             0.0,
             1.0,

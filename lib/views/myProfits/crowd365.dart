@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/myProfits/crow365_referral.dart';
 import 'package:luxpay/views/myProfits/crowd365_packages.dart';
 import 'package:luxpay/views/myProfits/profit_rules.dart';
 
@@ -116,11 +117,12 @@ class _Crowd365State extends State<Crowd365> {
                   child: InkWell(
                       onTap: () => {
                             // Navigator.push(context, MaterialPageRoute(builder: (context) => const AppPageController()))
-                            Navigator.of(context)
-                                .pushNamed(Crowd365Packages.path)
+                            // Navigator.of(context)
+                            //     .pushNamed(Crowd365Packages.path)
+                            _crow365RefereBottomSheet(context)
                           },
                       child: luxButton(
-                          HexColor("#415CA0"), Colors.white, "Subscribe", 325,
+                          HexColor("#415CA0"), Colors.white, "Apply now", 325,
                           fontSize: 16, height: 50, radius: 8)),
                 ),
               ),
@@ -437,4 +439,19 @@ class _Crowd365State extends State<Crowd365> {
       ],
     );
   }
+}
+
+void _crow365RefereBottomSheet(context) {
+  showModalBottomSheet<dynamic>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.0),
+          topRight: Radius.circular(8.0),
+        ),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Crowd365Refere();
+      });
 }

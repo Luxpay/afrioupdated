@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/myProfits/crowd365_referral_code.dart';
 import 'package:luxpay/views/myProfits/profit_rules.dart';
 
 class Crowd365Dashboard extends StatefulWidget {
@@ -46,15 +47,12 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
                 ),
                 InkWell(
                   onTap: () => {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProfitRules()))
+                   _crow365ReferralCodeBottomSheet(context)
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 34.0),
+                  child: Container(
+                    margin: EdgeInsets.only(right: 20),
                     child: Text(
-                      "Rules",
+                      "Referral Code",
                       style: TextStyle(
                           fontSize: 13,
                           color: HexColor("#8D9091"),
@@ -304,3 +302,17 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
     );
   }
 }
+
+void _crow365ReferralCodeBottomSheet(context) {
+  showModalBottomSheet<dynamic>(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(8.0),
+          topRight: Radius.circular(8.0),
+        ),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return Crowd365ReferralCode();
+      });}

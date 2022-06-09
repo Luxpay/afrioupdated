@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/launchPages/welcome_page.dart';
@@ -31,8 +32,16 @@ class _SplashScreenTwoState extends State<SplashScreenTwo> {
 
   Future<void> openNextPage() async {
     await Future.delayed(const Duration(seconds: 1));
-    var prefs = await SharedPreferences.getInstance();
-    if (await prefs.getString(authToken) == null) {
+    final storage = new FlutterSecureStorage();
+    //String value = await storage.read(key: authToken);
+
+    //await storage.deleteAll();
+
+    // var prefs = await SharedPreferences.getInstance();
+    var data = await storage.read(key: authToken);
+    print(data);
+
+    if (await storage.read(key: authToken) == null) {
       Navigator.of(context)
           .pushNamedAndRemoveUntil(WelcomePage.path, (route) => false);
     } else {

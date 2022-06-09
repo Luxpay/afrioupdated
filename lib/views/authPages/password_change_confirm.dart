@@ -24,7 +24,14 @@ class _PasswordChangeConfirmState extends State<PasswordChangeConfirm> {
           },
           child: Image.asset("assets/successIcon.png",scale: 3,)),
         Text("Successful !", style:TextStyle(fontSize: 18, fontWeight: FontWeight.w600,color: Colors.black)),
-        Flexible(child: Text("Your transaction pin has successfully been created",style: TextStyle(color:Colors.grey)))
+        Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(child: Text("Your transaction pin has successfully been created",style: TextStyle(color:Colors.grey))),
+            ],
+          ),
+        )
       ],))
     );
   }

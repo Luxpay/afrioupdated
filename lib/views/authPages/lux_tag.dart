@@ -58,11 +58,17 @@ class _LuxTagState extends State<LuxTag> {
                     alignment: Alignment.topLeft,
                     child: Container(
                         margin: EdgeInsets.only(left: 30, top: 100,right:30),
-                        child: Flexible(
-                          child: Text(
-                            "A Luxpay Tag is a unique name you can use to send money to your friends and family without any hassle or the use of account details ",
-                            style: TextStyle(
-                              fontSize: 19)
+                        child: Container(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  "A Luxpay Tag is a unique name you can use to send money to your friends and family without any hassle or the use of account details ",
+                                  style: TextStyle(
+                                    fontSize: 19)
+                                ),
+                              ),
+                            ],
                           ),
                         ))),
               ],

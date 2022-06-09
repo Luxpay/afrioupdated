@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:luxpay/models/error.dart';
 import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/hexcolor.dart';
@@ -8,7 +10,9 @@ import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LogoutPopup extends StatelessWidget {
-  const LogoutPopup({Key? key}) : super(key: key);
+  LogoutPopup({Key? key}) : super(key: key);
+
+  String errors = 'something went wrong';
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +56,12 @@ class LogoutPopup extends StatelessWidget {
             padding: EdgeInsets.symmetric(
               horizontal: 12,
             ),
-            child: Row(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 GestureDetector(
-                  onTap: () => {Navigator.of(context).pop()},
+                  onTap: () =>
+                      {Navigator.of(context, rootNavigator: true).pop()},
                   child: Container(
                     height: 35,
                     width: 120,
@@ -76,23 +82,38 @@ class LogoutPopup extends StatelessWidget {
                     ),
                   ),
                 ),
-                Spacer(),
+                SizedBox(
+                  height: 25,
+                ),
                 GestureDetector(
                   onTap: () async {
-                    String? data = await logout();
-                    if (data != null) {
+                    final storage = await new FlutterSecureStorage();
+                    // var refresh = await storage.read(key: refreshToken);
+                    print(
+                        "Stored***********:${await storage.read(key: authToken)}");
+                    var data = await logout();
+
+                    print(data);
+                    if (!data) {
+                      Navigator.of(context, rootNavigator: true).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(data),
+                          content: Text(errors),
                         ),
                       );
                       return;
+                    } else {
+                      Navigator.of(context).pop();
+                      final storage = new FlutterSecureStorage();
+                      await storage.delete(key: authToken);
+                      await storage.delete(key: refreshToken);
+                      print("ALL Token Deleted");
+                      // Navigator.of(context).pushNamedAndRemoveUntil(
+                      //     LoginPage.path, (route) => false);
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => LoginPage()));
+                      print("LogOut");
                     }
-                    var pref = await SharedPreferences.getInstance();
-                    await pref.remove(authToken);
-                    await pref.remove(authToken);
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                        LoginPage.path, (route) => false);
                   },
                   child: Container(
                     height: 35,
@@ -123,24 +144,35 @@ class LogoutPopup extends StatelessWidget {
     );
   }
 
-  Future<String?> logout() async {
-    var pref = await SharedPreferences.getInstance();
-    var refresh = await pref.getString(refreshToken) ?? "";
-    Map<String, dynamic> body = {"refresh_token": refresh};
+  Future<bool> logout() async {
+    final storage = new FlutterSecureStorage();
+    // var refresh = await storage.read(key: refreshToken);
+    //print("Stored***********:${await storage.read(key: refreshToken)}");
+    Map<String, dynamic> body = {
+      "refresh": '${await storage.read(key: refreshToken)}'
+    };
+    print("Data: $body");
     try {
-      await dio.post(
-        "/api/auth/logout/",
+      var response = await dio.post(
+        "/api/user/logout/",
         data: body,
       );
-      return null;
+      debugPrint('${response.statusCode}');
+
+      return true;
     } on DioError catch (e) {
       if (e.response != null) {
-        return e.response?.data['message'] ?? "An error occurred";
+        debugPrint(' Error: ${e.response?.data}');
+        var errorData = e.response?.data;
+        var errorMessage = await ErrorMessages.fromJson(errorData);
+        errors = errorMessage.errors.message;
+        return false;
       } else {
-        return "An error occurred";
+        return false;
       }
     } catch (e) {
-      return "An error occurred";
+      debugPrint('${e}');
+      return false;
     }
   }
 }

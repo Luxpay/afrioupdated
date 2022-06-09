@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "538611387660",
+    "project_id": "luxpay-726f8",
+    "storage_bucket": "luxpay-726f8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538611387660:android:2c5cd7c6c957ec8e740d29",
+        "android_client_info": {
+          "package_name": "luxpay.luxpay.com.luxpay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538611387660-68npbnp3iad5queqs3279prclr47rpqr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqtqG4-_hiDM3r27zOgo-TirgbLK5fVEQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538611387660-68npbnp3iad5queqs3279prclr47rpqr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

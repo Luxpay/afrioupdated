@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,8 +24,8 @@ class HeaderInterceptor extends Interceptor {
 
   // create an async function that returns token from shared preferences called getAuthToken
   Future<String?> getAuthToken() async {
-    var prefs = await SharedPreferences.getInstance();
-    return await prefs.getString(authToken);
+    final storage = new FlutterSecureStorage();
+    return await storage.read(key: authToken);
   }
 
   @override
@@ -41,7 +42,7 @@ class HeaderInterceptor extends Interceptor {
   }
 }
 
-Dio dio = Dio(BaseOptions(baseUrl: "https://staging.luxpay.ng"))
+Dio dio = Dio(BaseOptions(baseUrl: "http://luxpay-api.herokuapp.com"))
   ..interceptors.addAll([HeaderInterceptor()]);
 
-Dio unAuthDio = Dio(BaseOptions(baseUrl: "https://staging.luxpay.ng"));
+Dio unAuthDio = Dio(BaseOptions(baseUrl: "http://luxpay-api.herokuapp.com"));

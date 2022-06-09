@@ -5,6 +5,8 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/widgets/logout_popup.dart';
 
+import '../widgets/touchUp.dart';
+
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
 
@@ -13,61 +15,83 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  Future<bool> _willPopCallback() async {
+    showDialog(
+        context: context,
+        useRootNavigator: false,
+        barrierDismissible: false,
+        builder: (context) {
+          return Dialog(
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            backgroundColor: Colors.black,
+            alignment: Alignment.center,
+            child: popUp(context),
+          );
+        });
+    return true; // return true if the route to be popped
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: double.infinity,
-      width: double.infinity,
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            ProfileAction(title: "My Profile", icon: IconlyLight.profile),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(
-                title: "Transaction Details", icon: IconlyLight.chart),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(
-                title: "Address Management", icon: IconlyLight.location),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(
-                title: "Authentication", icon: IconlyLight.shieldDone),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(title: "Help & Support", icon: Icons.help_outline),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(title: "Contacts", icon: IconlyLight.user3),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-            ProfileAction(
-              title: "Settings",
-              icon: IconlyLight.setting,
-              onTap: () => Navigator.of(context).pushNamed(
-                SettingsPage.path,
+    return WillPopScope(
+      onWillPop: _willPopCallback,
+      child: Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ProfileAction(title: "My Profile", icon: IconlyLight.profile),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(
+                  title: "Transaction Details", icon: IconlyLight.chart),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(
+                  title: "Address Management", icon: IconlyLight.location),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(
+                  title: "Authentication", icon: IconlyLight.shieldDone),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(title: "Help & Support", icon: Icons.help_outline),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(title: "Contacts", icon: IconlyLight.user3),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(
+                title: "Settings",
+                icon: IconlyLight.setting,
+                onTap: () => Navigator.of(context).pushNamed(
+                  SettingsPage.path,
+                ),
               ),
-            ),
-            SizedBox(height: SizeConfig.blockSizeVertical! * 4),
-            LogoutButton(onTap: () {
-              showDialog(
-                  context: context,
-                  useRootNavigator: false,
-                  barrierDismissible: false,
-                  builder: (context) {
-                    return Dialog(
-                      clipBehavior: Clip.antiAlias,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      backgroundColor: Colors.black,
-                      alignment: Alignment.bottomCenter,
-                      child: LogoutPopup(),
-                    );
-                  });
-            }),
-          ],
-        ),
-        padding: EdgeInsets.only(
-          bottom: 20,
-          left: 24,
-          right: 24,
-          top: SizeConfig.blockSizeVertical! * 4,
+              SizedBox(height: SizeConfig.blockSizeVertical! * 4),
+              LogoutButton(onTap: () {
+                showDialog(
+                    context: context,
+                    useRootNavigator: false,
+                    barrierDismissible: false,
+                    builder: (context) {
+                      return Dialog(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        backgroundColor: Colors.black,
+                        alignment: Alignment.bottomCenter,
+                        child: LogoutPopup(),
+                      );
+                    });
+              }),
+            ],
+          ),
+          padding: EdgeInsets.only(
+            bottom: 20,
+            left: 24,
+            right: 24,
+            top: SizeConfig.blockSizeVertical! * 4,
+          ),
         ),
       ),
     );

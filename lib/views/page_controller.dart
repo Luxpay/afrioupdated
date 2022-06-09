@@ -23,9 +23,10 @@ class _AppPageControllerState extends State<AppPageController> {
   static const int rewards = 2;
   static const int account = 3;
   Widget currentPage = const HomePage();
-
+  //SystemNavigator.pop()
   @override
   Widget build(BuildContext context) {
+    
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: HexColor("#D70A0A"),

@@ -1,9 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
 import 'package:luxpay/views/authPages/change_password.dart';
+import 'package:luxpay/views/authPages/create_account.dart';
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/authPages/registration_page.dart';
@@ -21,7 +23,7 @@ import 'services/locatorService.dart';
 
 void main() {
   setupLocator();
-  purge();
+  //purgeAll();
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -47,11 +49,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     MaterialColor colorCustom = MaterialColor(0xFFD70A0A, color);
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Luxpay',
       navigatorKey: navigatorKey,
       theme: ThemeData(
-        //backgroundColor: Colors.white,
-        primarySwatch: colorCustom, fontFamily: "Mulish"),
+          //backgroundColor: Colors.white,
+          primarySwatch: colorCustom,
+          fontFamily: "Mulish"),
       initialRoute: "/",
       onGenerateRoute: onGenerateRoute,
     );
@@ -93,7 +96,7 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
   }
   return const Scaffold(
     backgroundColor: Colors.purple,
-  ).getRoute(); 
+  ).getRoute();
 }
 
 extension GetPath on Widget {

@@ -106,6 +106,91 @@ class LuxTextField extends StatelessWidget {
   }
 }
 
+
+
+class LuxTextFieldNumber extends StatelessWidget {
+
+  final String? innerHint;
+  final Color? hintColour;
+  final FontWeight? hintWeight;
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? formatters;
+  final bool obscureText;
+  final Widget? suffixIcon;
+  final bool enabled;
+  final TextInputType? textInputType;
+  final bool multiline;
+  final int? maxLength;
+
+  const LuxTextFieldNumber({
+    Key? key,
+    
+    this.multiline = false,
+    this.controller,
+    this.formatters,
+    this.onChanged,
+    this.obscureText = false,
+    this.hintColour,
+    this.hintWeight,
+    this.innerHint,
+    this.suffixIcon,
+    this.enabled = true,
+    this.textInputType,
+    this.maxLength,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+    
+        Container(
+          constraints: BoxConstraints(
+            maxHeight: multiline ? SizeConfig.blockSizeVertical! * 12 : 50,
+          ),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: borderColor),
+              color: textfieldColor),
+          child: TextField(
+            maxLines: multiline ? null : 1,
+            controller: controller,
+            inputFormatters: formatters,
+            onChanged: (v) => onChanged?.call(v),
+            obscureText: obscureText,
+            enabled: enabled,
+            maxLength: maxLength,
+            keyboardType: textInputType,
+            expands: multiline,
+            decoration: InputDecoration(
+                hintText: innerHint != null ? innerHint : "",
+                counterText: "",
+                hintStyle: TextStyle(
+                    fontSize: 13,
+                    color: HexColor("#333333").withOpacity(0.25),
+                    fontWeight: FontWeight.w300),
+                contentPadding: suffixIcon != null
+                    ? EdgeInsets.only(left: 17, top: 12)
+                    : EdgeInsets.only(left: 17, top: multiline ? 10 : 0),
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                border: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                errorStyle: const TextStyle(fontSize: 14),
+                fillColor: HexColor("#E8E8E8").withOpacity(0.35),
+                filled: true,
+                suffixIcon: suffixIcon != null ? suffixIcon : null),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
 class LuxPicker extends StatelessWidget {
   final String? hint;
   final String? value;
@@ -417,10 +502,10 @@ class LuxpayTextFieldNumber extends StatelessWidget {
                 filled: true,
                 suffixIcon: suffixIcon != null ? suffixIcon : null),
                   onChanged: (phone) {
-                    print(phone.completeNumber);
+                    //print(phone.completeNumber);
                   },
                   onCountryChanged: (country) {
-                    print('Country changed to: ' + country.name);
+                    //print('Country changed to: ' + country.name);
                   },
                   
                 )    

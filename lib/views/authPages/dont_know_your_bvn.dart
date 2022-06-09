@@ -51,24 +51,36 @@ class _DontKnowUrBVNState extends State<DontKnowUrBVN> {
                   margin: EdgeInsets.only(top: 60, right: 40, left: 40),
                   child: Align(
                     alignment: Alignment.topCenter,
-                    child: Flexible(
-                        child: Text(
-                      "Dial the code below and follow all onscreen instructions to get your BVN number. ",
-                      textAlign: TextAlign.center,
-                    )),
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Flexible(
+                              child: Text(
+                            "Dial the code below and follow all onscreen instructions to get your BVN number. ",
+                            textAlign: TextAlign.center,
+                          )),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.only(top: 120, right: 40, left: 40),
                   child: Align(
                     alignment: Alignment.center,
-                    child: Flexible(
-                        child: Text(
-                      "*565*0#",
-                      textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    )),
+                    child: Container(
+                      child: Row(
+                        children: [
+                          Flexible(
+                              child: Text(
+                            "*565*0#",
+                            textAlign: TextAlign.center,
+                            style:
+                                TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                          )),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Container(

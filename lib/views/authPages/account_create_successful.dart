@@ -34,18 +34,25 @@ class _PasswordChangeCongratulationState
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: Colors.black)),
-            Flexible(
-                child: Text("Your have successfully created your account",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey))),
-                     SizedBox(height: 50),
-                    InkWell(
-                      onTap: () {
-                       // Navigator.push(context,MaterialPageRoute(builder: (context)=> PasswordChangeCongratulation()));
-                      },
-                      child: luxButton(HexColor("#D70A0A"), Colors.white,
-                          "Log in", 350),
-                    ),
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                      child: Text("Your have successfully created your account",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey))),
+                ],
+              ),
+            ),
+            SizedBox(height: 50),
+            InkWell(
+              onTap: () {
+                // Navigator.push(context,MaterialPageRoute(builder: (context)=> PasswordChangeCongratulation()));
+              },
+              child:
+                  luxButton(HexColor("#D70A0A"), Colors.white, "Log in", 350),
+            ),
           ],
         )));
   }

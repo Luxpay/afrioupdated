@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/hexcolor.dart';
 import 'splash_screen_page_two.dart';
 
@@ -14,7 +15,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   bool showLogin = true;
   @override
-  void initState(){
+  void initState() {
     super.initState();
     openSecondSplash();
   }
@@ -29,6 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> openSecondSplash() async {
     await Future.delayed(const Duration(seconds: 1));
-    Navigator.of(context).pushNamedAndRemoveUntil(SplashScreenTwo.path, (route) => false);
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil(SplashScreenTwo.path, (route) => false);
   }
 }

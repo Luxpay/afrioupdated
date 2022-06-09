@@ -16,7 +16,8 @@ class _NotificationPageState extends State<NotificationPage>
   late TabController tabController;
   List<Notifications> items = List.generate(
     6,
-        (index) => Notifications("You’ve earned some LuxPay points ! 🎉",
+    (index) => Notifications(
+        "You’ve earned some LuxPay points ! 🎉",
         "Congratulations! You have just received a welcome gift of N1,000 coupon points as a first time user",
         DateTime.now().add(Duration(minutes: index))),
   );
@@ -26,11 +27,12 @@ class _NotificationPageState extends State<NotificationPage>
     tabController = TabController(length: 3, vsync: this);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+    // final double width = MediaQuery.of(context).size.width;
+    // final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -39,24 +41,22 @@ class _NotificationPageState extends State<NotificationPage>
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 IconButton(
-                    onPressed: ()=>{
-                      Navigator.pop(context)
-                    },
+                    onPressed: () => {Navigator.pop(context)},
                     icon: const Icon(Icons.arrow_back_ios_new)),
                 SizedBox(
                   width: SizeConfig.safeBlockHorizontal! * 2.4,
                 ),
-                const Text("Notifications",style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600
-                ),)
+                const Text(
+                  "Notifications",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                )
               ],
             ),
             SizedBox(
               height: SizeConfig.safeBlockVertical! * 2.1,
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 25.0,right: 25.0),
+              padding: const EdgeInsets.only(left: 25.0, right: 25.0),
               child: TabBar(
                 controller: tabController,
                 indicatorColor: HexColor("#D70A0A"),
@@ -88,7 +88,9 @@ class _NotificationPageState extends State<NotificationPage>
                 color: HexColor("#FBFBFB"),
                 child: TabBarView(
                   children: [
-                    PaymentsNotification(items: items,),
+                    PaymentsNotification(
+                      items: items,
+                    ),
                     Text("data"),
                     Text("data"),
                   ],
