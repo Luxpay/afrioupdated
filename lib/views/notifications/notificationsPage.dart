@@ -4,6 +4,8 @@ import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/notifications/paymentsNotification.dart';
 
+import '../../services/notification_database.dart';
+
 class NotificationPage extends StatefulWidget {
   const NotificationPage({Key? key}) : super(key: key);
 
@@ -14,19 +16,28 @@ class NotificationPage extends StatefulWidget {
 class _NotificationPageState extends State<NotificationPage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  List<Notifications> items = List.generate(
-    6,
-    (index) => Notifications(
-        "You’ve earned some LuxPay points ! 🎉",
-        "Congratulations! You have just received a welcome gift of N1,000 coupon points as a first time user",
-        DateTime.now().add(Duration(minutes: index))),
-  );
+
+
+  List<Notifications> notification = [];
+
+    Future refreshNotes() async {
+    setState(() async {
+       await NotificationDatabase.instance.readAllNotification();
+    });
+  }
 
   @override
   void initState() {
     tabController = TabController(length: 3, vsync: this);
     super.initState();
+
+    setState(() {
+      refreshNotes();
+    });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +100,7 @@ class _NotificationPageState extends State<NotificationPage>
                 child: TabBarView(
                   children: [
                     PaymentsNotification(
-                      items: items,
+                      items: notification,
                     ),
                     Text("data"),
                     Text("data"),

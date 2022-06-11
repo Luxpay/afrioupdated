@@ -1,14 +1,18 @@
+
+
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:luxpay/services/local_notification_service.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
 import 'package:luxpay/views/authPages/change_password.dart';
-import 'package:luxpay/views/authPages/create_account.dart';
+
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
-import 'package:luxpay/views/authPages/registration_page.dart';
+
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page_two.dart';
@@ -18,10 +22,18 @@ import 'package:luxpay/views/myProfits/crowd365_packages.dart';
 import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/views/transfers/bank_transfer.dart';
 import 'package:luxpay/views/transfers/wallet_transfer.dart';
-
 import 'services/locatorService.dart';
 
-void main() {
+///Receive message when app is in background solution for on message
+Future<void> backgroundHandler(RemoteMessage message) async {
+
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(backgroundHandler);
+ 
   setupLocator();
   //purgeAll();
   runApp(ProviderScope(child: MyApp()));

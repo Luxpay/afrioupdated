@@ -1,7 +1,9 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/podos/user.dart';
+import 'package:luxpay/services/notification_database.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/views/finances.dart';
 import 'package:luxpay/views/myProfits/crowd365.dart';
@@ -10,6 +12,8 @@ import 'package:luxpay/views/raiseFunds.dart';
 import 'package:luxpay/views/rechargeAndBills/airtime.dart';
 import 'package:luxpay/views/rechargeAndBills/bill_payment_page.dart';
 
+import '../podos/notifications.dart';
+import '../services/local_notification_service.dart';
 import '../utils/colors.dart';
 import '../utils/sizeConfig.dart';
 import '../widgets/touchUp.dart';
@@ -28,13 +32,43 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    LocalNotificationService.initialize(context);
     User.getFromPrefs().then((user) {
       setState(() {
         name = user.full_name ?? "";
       });
     });
     super.initState();
+
+    ///gives you the message on which user taps
+    ///and it opened the app from terminated state
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message != null) {
+        print(message);
+       
+      }
+    });
+    
+
+    ///forground work
+    FirebaseMessaging.onMessage.listen((message) {
+      if (message.notification != null) {
+        print("message title ${message.notification!.title}");
+        print("message body ${message.notification!.body}");
+      }
+
+      LocalNotificationService.display(message);
+    });
+
+    ///When the app is in background but opened and user taps
+    ///on the notification
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => NotificationPage()));
+    });
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +172,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         IconButton(
                             onPressed: () => {
+                              
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -730,5 +765,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
 }

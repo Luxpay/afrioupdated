@@ -34,12 +34,8 @@ class _SplashScreenTwoState extends State<SplashScreenTwo> {
     await Future.delayed(const Duration(seconds: 1));
     final storage = new FlutterSecureStorage();
     //String value = await storage.read(key: authToken);
-
     //await storage.deleteAll();
-
     // var prefs = await SharedPreferences.getInstance();
-    var data = await storage.read(key: authToken);
-    print(data);
 
     if (await storage.read(key: authToken) == null) {
       Navigator.of(context)
