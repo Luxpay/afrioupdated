@@ -40,19 +40,27 @@ class _FinancesPageState extends State<FinancesPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: SizeConfig.safeBlockHorizontal! * 6,
-              bottom: SizeConfig.safeBlockVertical! * 8,
-              top: MediaQuery.of(context).padding.top,
-            ),
-            child: const Text(
-              "Transfer",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-                fontWeight: FontWeight.w600,
-              ),
+          Container(
+            margin: EdgeInsets.only(
+                left: 15, bottom: SizeConfig.safeBlockVertical! * 8, top: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                    onPressed: () => {Navigator.pop(context)},
+                    icon: const Icon(Icons.arrow_back_ios_new)),
+                SizedBox(
+                  width: SizeConfig.safeBlockHorizontal! * 10,
+                ),
+                const Text(
+                  "Transfer",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(

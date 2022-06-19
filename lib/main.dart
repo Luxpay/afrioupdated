@@ -1,5 +1,3 @@
-
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +24,7 @@ import 'services/locatorService.dart';
 
 ///Receive message when app is in background solution for on message
 Future<void> backgroundHandler(RemoteMessage message) async {
-
+   LocalNotificationService.display(message);
 }
 
 void main() async {
@@ -38,6 +36,8 @@ void main() async {
   //purgeAll();
   runApp(ProviderScope(child: MyApp()));
 }
+
+
 
 GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
 
@@ -97,8 +97,8 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
       return const ResetPassword().getRoute();
     case ChangePassword.path:
       return const ChangePassword().getRoute();
-    case Crowd365Packages.path:
-      return const Crowd365Packages().getRoute();
+    // case Crowd365Packages.path:
+    //   return const Crowd365Packages().getRoute();
     case Crowd365Dashboard.path:
       return const Crowd365Dashboard().getRoute();
     case BankTransfer.path:

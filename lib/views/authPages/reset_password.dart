@@ -14,7 +14,7 @@ import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:luxpay/widgets/touchUp.dart';
 
-import '../../models/error.dart';
+import '../../models/errors/error.dart';
 import '../../utils/validators.dart';
 import 'forgetPassworkOtp.dart';
 
@@ -225,17 +225,19 @@ class _ResetPasswordState extends State<ResetPassword> {
   }
 
   Future<bool> sendCode(String phone) async {
+    final storage = new FlutterSecureStorage();
     Map<String, dynamic> body = {
       "phone": "$phone",
     };
     print(phone);
+    await storage.write(key: 'phoneNumber', value: phone);
     try {
       var response = await unAuthDio.post(
         "/api/user/password/reset/",
         data: body,
       );
-      final storage = new FlutterSecureStorage();
-      await storage.write(key: "phone", value: "$phone");
+     // final storage = new FlutterSecureStorage();
+      //await storage.write(key: "phone", value: "$phone");
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');

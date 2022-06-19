@@ -319,61 +319,61 @@ class _Crowd365State extends State<Crowd365> {
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: SizeConfig.safeBlockVertical! * 2,
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        "Referral Code: ",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(
-                        width: SizeConfig.blockSizeHorizontal! * 3,
-                      ),
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            "6903803215",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: HexColor("#8D9091"),
-                            ),
-                          ),
-                          height: 30,
-                          decoration: BoxDecoration(
-                            color: HexColor("#ECECEC"),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          width: double.infinity,
-                        ),
-                      ),
-                      SizedBox(
-                        width: SizeConfig.blockSizeHorizontal! * 3,
-                      ),
-                      Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Copy",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: HexColor("#415CA0"),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        width: SizeConfig.blockSizeHorizontal! * 20,
-                      ),
-                    ],
-                  ),
+                  // SizedBox(
+                  //   height: SizeConfig.safeBlockVertical! * 2,
+                  // ),
+                  // Row(
+                  //   children: [
+                  //     Text(
+                  //       "Referral Code: ",
+                  //       style: TextStyle(
+                  //         color: Colors.black,
+                  //         fontSize: 13,
+                  //         fontWeight: FontWeight.w600,
+                  //       ),
+                  //     ),
+                  //     SizedBox(
+                  //       width: SizeConfig.blockSizeHorizontal! * 3,
+                  //     ),
+                  //     Expanded(
+                  //       child: Container(
+                  //         alignment: Alignment.center,
+                  //         child: Text(
+                  //           "6903803215",
+                  //           style: TextStyle(
+                  //             fontSize: 13,
+                  //             color: HexColor("#8D9091"),
+                  //           ),
+                  //         ),
+                  //         height: 30,
+                  //         decoration: BoxDecoration(
+                  //           color: HexColor("#ECECEC"),
+                  //           borderRadius: BorderRadius.circular(8),
+                  //         ),
+                  //         width: double.infinity,
+                  //       ),
+                  //     ),
+                  //     SizedBox(
+                  //       width: SizeConfig.blockSizeHorizontal! * 3,
+                  //     ),
+                  //     Container(
+                  //       alignment: Alignment.center,
+                  //       child: Text(
+                  //         "Copy",
+                  //         style: TextStyle(
+                  //           fontSize: 13,
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //       height: 30,
+                  //       decoration: BoxDecoration(
+                  //         color: HexColor("#415CA0"),
+                  //         borderRadius: BorderRadius.circular(8),
+                  //       ),
+                  //       width: SizeConfig.blockSizeHorizontal! * 20,
+                  //     ),
+                  //   ],
+                  // ),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 2,
                   ),

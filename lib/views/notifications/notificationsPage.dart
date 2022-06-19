@@ -17,12 +17,11 @@ class _NotificationPageState extends State<NotificationPage>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 
-
   List<Notifications> notification = [];
 
-    Future refreshNotes() async {
+  Future refreshNotes() async {
     setState(() async {
-       await NotificationDatabase.instance.readAllNotification();
+      await NotificationDatabase.instance.readAllNotification();
     });
   }
 
@@ -31,13 +30,8 @@ class _NotificationPageState extends State<NotificationPage>
     tabController = TabController(length: 3, vsync: this);
     super.initState();
 
-    setState(() {
-      refreshNotes();
-    });
+    refreshNotes();
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {

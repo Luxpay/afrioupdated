@@ -2,25 +2,24 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/error.dart';
+import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/models/loginUserModel.dart';
-
-import 'package:luxpay/models/userInfoModel.dart';
+import 'package:luxpay/models/refreshUser.dart';
 import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/utils/validators.dart';
 import 'package:luxpay/views/authPages/create_account.dart';
+import 'package:luxpay/views/authPages/create_new_pin_password_profile.dart';
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/authPages/login_view_model.dart';
+import 'package:luxpay/views/authPages/otp_verification.dart';
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../networking/dio.dart';
-import '../../services/local_auth.dart';
 import '../../utils/constants.dart';
+import '../../widgets/methods/getDeviceInfo.dart';
 import '../../widgets/touchUp.dart';
 import '../page_controller.dart';
 
@@ -40,12 +39,33 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool isEmail = true;
   bool _isLoading = false;
+  String? fcMessageToken;
 
   TextEditingController controller = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  String errors = "something went wrong";
+  var errors;
+
+  String? avatar,
+      first_name,
+      last_name,
+      gender,
+      date_of_birth,
+      email,
+      phone_number_data;
+  bool email_verified = false;
+  bool has_pin = false;
+  //String? is_verified;
+  bool phone_verified = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fcmToken(fcMessageToken);
+    getDeviceDetails();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     return Scaffold(
+      key: _formKey,
       backgroundColor: Colors.white,
       body: WillPopScope(
         onWillPop: _willPopCallback,
@@ -109,61 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                                   innerHint: "johndoe@mail.com",
                                 )
                               : Container(
-                                  // margin: EdgeInsets.only(left: 30, right: 30),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text(
-                                          "Phone Number",
-                                          style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: HexColor("#1E1E1E")),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 12,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            height: 45,
-                                            width: 100,
-                                            // margin: EdgeInsets.only(top: 2),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(3),
-                                                border: Border.all(
-                                                    color: borderColor),
-                                                color: HexColor("#E8E8E8")
-                                                    .withOpacity(0.35)),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                //  Image.asset(
-                                                //   "assets/nigeria.png",
-                                                //   scale: 0.2,
-                                                // ),
-                                                Text("(+234)"),
-                                                Icon(Icons.arrow_drop_down)
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(width: 5),
-                                          Expanded(
-                                            child: LuxTextFieldNumber(
-                                              controller: controller,
-                                              innerHint: "e.g 07012345678",
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                  child: PhoneNumberField(
+                                      controller: controller,
+                                      hint: "Phone Number")),
                         ),
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 2.2,
@@ -254,20 +223,32 @@ class _LoginPageState extends State<LoginPage> {
                               var response =
                                   await loginUser(password, controllerB, "");
                               print('login:$response');
-                              final storage = new FlutterSecureStorage();
-                              String? refresh =
-                                  await storage.read(key: refreshToken);
-                              print('confrim:$refresh');
                               if (!response) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(errors)));
+                                    SnackBar(
+                                        content: Text(
+                                            errors ?? "something went wrong")));
                                 setState(() {
                                   _isLoading = false;
                                 });
                               } else {
-                                var login_confirm = await loginConfrim(refresh);
-                                print('logincinfirm:$login_confirm');
-                                if (!login_confirm) {
+                                if (!phone_verified) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Complete your registration Thanks.")));
+                                  setState(() {
+                                    _isLoading = false;
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                OTPVerification(
+                                                    onVerified: () {},
+                                                    recipientAddress:
+                                                        phone_number_data!)));
+                                  });
+                                } else if (!has_pin) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
@@ -279,9 +260,36 @@ class _LoginPageState extends State<LoginPage> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 CreatePinPage()));
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
+                                  });
+                                }
+                                //else if (date_of_birth == null) {
+                                // ScaffoldMessenger.of(context).showSnackBar(
+                                //     SnackBar(
+                                //         content: Text(
+                                //             "Complete your registration Thanks.")));
+                                // setState(() {
+                                //   _isLoading = false;
+                                //   Navigator.push(
+                                //       context,
+                                //       MaterialPageRoute(
+                                //           builder: (context) =>
+                                //               AddBvnPage()));
+                                // });
+                                // }
+
+                                else if ((first_name == '' ||
+                                    last_name == '')) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              "Complete your registration Thanks.")));
+                                  setState(() {
+                                    _isLoading = false;
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                CreateNewPassword2Profile()));
                                   });
                                 } else {
                                   Navigator.push(
@@ -320,7 +328,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         SizedBox(
-                          height: SizeConfig.safeBlockVertical! * 4.8,
+                          height: 25,
                         ),
                         Center(
                             child: Container(
@@ -341,8 +349,9 @@ class _LoginPageState extends State<LoginPage> {
                             onTap: () async {},
                             child: Image.asset(
                               "assets/fprint.png",
-                              height: 120,
-                              width: 120,
+                              height: 70,
+                              width: 70,
+                              fit: BoxFit.cover,
                             ),
                           ),
                         )),
@@ -359,7 +368,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         SizedBox(
-                          height: SizeConfig.safeBlockVertical! * 4.8,
+                          height: 3,
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -386,7 +395,8 @@ class _LoginPageState extends State<LoginPage> {
                                     fontWeight: FontWeight.w500,
                                     color: HexColor("#144DDE")),
                               ),
-                            )
+                            ),
+                            SizedBox(height: 100)
                           ],
                         )
                       ],
@@ -403,11 +413,15 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<bool> loginUser(String password, String phone, String email) async {
     String token, refToken;
+    final storage = new FlutterSecureStorage();
     Map<String, dynamic> body = {
       'password': password,
       "phone": phone,
       "email": email,
+      "token": await storage.read(key: 'fcmToken'),
+      //"platform": await storage.read(key: "DeviceName")
     };
+    debugPrint("Body: ${body}");
     try {
       var response = await unAuthDio.post(
         "/api/user/login/",
@@ -418,19 +432,35 @@ class _LoginPageState extends State<LoginPage> {
         var data = response.data;
         debugPrint('${response.statusCode}');
         debugPrint('Data: ${data}');
-        var userData = await LoginData.fromJson(data);
 
-        final storage = new FlutterSecureStorage();
+        var userData = await LoginUser.fromJson(data);
+        debugPrint("I Stop Here");
+
         token = userData.data.tokens.access;
         refToken = userData.data.tokens.refresh;
         //phone = userData.data.user.phone;
-        print("Token: ${token}");
-        print("refreshToken: ${refToken}");
+        debugPrint("Token: ${token}");
+        debugPrint("refreshToken: ${refToken}");
 
         await storage.write(key: authToken, value: token);
         await storage.write(key: refreshToken, value: refToken);
 
-        print("Stored Reading.......:${await storage.read(key: refreshToken)}");
+        avatar = userData.data.user.avatar;
+        first_name = userData.data.user.firstName;
+        last_name = userData.data.user.lastName;
+        // gender = userData.data.user.gender;
+        phone_number_data = userData.data.user.phone;
+        email_verified = userData.data.user.emailVerified;
+        has_pin = userData.data.user.hasPin;
+        // is_verified = userData.data.user.isVerified;
+        //date_of_birth = userData.data.user.dateOfBirth;
+        phone_verified = userData.data.user.phoneVerified;
+
+        debugPrint("phoneVerification: ${phone_verified}");
+        debugPrint("myPhoneNumber: ${phone_number_data}");
+
+        // debugPrint(
+        //     "Stored Reading.......:${await storage.read(key: refreshToken)}");
 
         return true;
       } else {
@@ -442,44 +472,7 @@ class _LoginPageState extends State<LoginPage> {
 
     } on DioError catch (e) {
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
-        var errorData = e.response?.data;
-        var errorMessage = await ErrorMessages.fromJson(errorData);
-        errors = errorMessage.errors.message;
-        return false;
-      } else {
-        return false;
-      }
-    } catch (e) {
-      debugPrint('${e}');
-      return false;
-    }
-  }
-
-  Future<bool> loginConfrim(String? refresh) async {
-    Map<String, dynamic> body = {
-      'refresh': refresh,
-    };
-    try {
-      var response = await unAuthDio.post(
-        "/api/user/login/refresh/",
-        data: body,
-      );
-
-      debugPrint('Data: ${response.data}');
-
-      if (response.statusCode == 200) {
-        var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('Data: ${data}');
-        //var userData = await LoginData.fromJson(data);
-        return true;
-      } else {
-        return false;
-      }
-    } on DioError catch (e) {
-      if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
+        debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);
         errors = errorMessage.errors.message;

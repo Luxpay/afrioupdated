@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/error.dart';
+import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/hexcolor.dart';

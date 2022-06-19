@@ -79,91 +79,88 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   }
 }
 
-
-
 Widget popUp(context) {
-    return Container(
-      height: 130,
-      width: 300,
-      decoration: BoxDecoration(
-        color: white,
-        // borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Exit App",
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.w800,
-              fontSize: 18,
-            ),
+  return Container(
+    height: 130,
+    width: 300,
+    decoration: BoxDecoration(
+      color: white,
+      // borderRadius: BorderRadius.circular(12),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Exit App",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w800,
+            fontSize: 18,
           ),
-          SizedBox(height: 20),
-          Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: () => {Navigator.of(context).pop()},
-                  child: Container(
-                    height: 35,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.red,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "No",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    SystemNavigator.pop();
-                  },
-                  child: Container(
-                    height: 35,
-                    width: 100,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+        ),
+        SizedBox(height: 20),
+        Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              GestureDetector(
+                onTap: () => {Navigator.of(context).pop()},
+                child: Container(
+                  height: 35,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
                       color: Colors.red,
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Yes",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "No",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  SystemNavigator.pop();
+                },
+                child: Container(
+                  height: 35,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.red,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Yes",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            height: SizeConfig.blockSizeVertical! * 2.5,
-          ),
-        ],
-      ),
-    );
-  }
-
+        ),
+        SizedBox(
+          height: SizeConfig.blockSizeVertical! * 2.5,
+        ),
+      ],
+    ),
+  );
+}
 
 class CircleButton extends StatelessWidget {
   final GestureTapCallback onTap;
@@ -346,7 +343,7 @@ class PhoneNumberField extends StatelessWidget {
             children: [
               Container(
                 height: 45,
-                width: 100,
+                width: 105,
                 // margin: EdgeInsets.only(top: 2),
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
@@ -355,10 +352,17 @@ class PhoneNumberField extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    //  Image.asset(
-                    //   "assets/nigeria.png",
-                    //   scale: 0.2,
-                    // ),
+                    Container(
+                      height: 20,
+                      width: 20,
+                      child: Image.asset(
+                        "assets/nigeria.png",
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 3,
+                    ),
                     Text("(+234)"),
                     Icon(Icons.arrow_drop_down)
                   ],

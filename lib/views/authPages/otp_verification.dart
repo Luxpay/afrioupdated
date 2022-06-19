@@ -7,16 +7,15 @@ import 'package:luxpay/utils/colors.dart';
 
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/authPages/account_create_successfull.dart';
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/otfields.dart';
 
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-
-import '../../models/error.dart';
+import '../../models/errors/error.dart';
 import '../../utils/functions.dart';
-
 
 class OTPVerification extends StatefulWidget {
   final VoidCallback onVerified;
@@ -61,7 +60,9 @@ class _OTPVerificationState extends State<OTPVerification> {
         .replaceRange(2, widget.recipientAddress.length - 5, "****");
     setState(() {
       _isLoading = false;
+      sendOTP();
     });
+
   }
 
   @override
@@ -147,7 +148,6 @@ class _OTPVerificationState extends State<OTPVerification> {
 
                         PinCodeTextField(
                           appContext: context,
-
                           keyboardType: TextInputType.number,
                           length: 6,
                           obscureText: false,
@@ -230,51 +230,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                             return true;
                           },
                         )
-                        //OTPFields(
-                        //     count: 6,
-                        //     onVerified: (v) async {
-                        //       if (!controllerOtp.text.isEmpty) {
-                        //         v = controllerOtp.text;
-                        //       } else {
-                        //         otp = v;
-                        //       }
-                        //       print("Otp: $otp");
-                        //       setState(() {
-                        //         _isLoading = true;
-                        //       });
-                        //       print(otp);
-                        //       var validators = [
-                        //         otp.isEmpty ? "Please Enter Otp" : null,
-                        //         otp.length < 6 ? "Please Enter Otp" : null
-                        //       ];
-                        //       if (validators
-                        //           .any((element) => element != null)) {
-                        //         setState(() {
-                        //           _isLoading = false;
-                        //         });
-                        //         ScaffoldMessenger.of(context).showSnackBar(
-                        //             SnackBar(
-                        //                 content: Text(validators.firstWhere(
-                        //                         (element) => element != null) ??
-                        //                     "")));
-                        //         return;
-                        //       }
-                        //       var response = await verifyOTP(otp);
-                        //       setState(() {
-                        //         _isLoading = false;
-                        //       });
-                        //       if (response) {
-                        //         Navigator.push(
-                        //             context,
-                        //             MaterialPageRoute(
-                        //                 builder: (context) => CreatePinPage()));
-                        //       } else {
-                        //         ScaffoldMessenger.of(context).showSnackBar(
-                        //             SnackBar(
-                        //                 content: Text(
-                        //                     errors ?? "something went wrong")));
-                        //       }
-                        //     }),
                       ],
                     ),
                     SizedBox(
@@ -291,7 +246,8 @@ class _OTPVerificationState extends State<OTPVerification> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => CreatePinPage()));
+                                  builder: (context) =>
+                                      AccountCreateSuccefful()));
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(errors ?? "something went wrong")));
@@ -311,7 +267,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                         ? InkWell(
                             onTap: () async {
                               //var data = await resentOTP();
-                              await resentOTP();
+                              await sendOTP();
                               startCountdown();
                             },
                             child: Text(
@@ -362,7 +318,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     print("otp: $otp");
     try {
       var response = await dio.post(
-        "/api/user/signup/confirm/",
+        "/api/user/verification-otp/confirm/",
         data: body,
       );
 
@@ -389,23 +345,28 @@ class _OTPVerificationState extends State<OTPVerification> {
       return false;
     }
   }
-}
 
-Future<String?> resentOTP() async {
-  Map<String, dynamic> body = {"type": "email"};
-  try {
-    await dio.post(
-      "/api/user/signup/otp/",
-      data: body,
-    );
-    return null;
-  } on DioError catch (e) {
-    if (e.response != null) {
-      return e.response?.data['message'] ?? "An error occurred";
-    } else {
-      return "An error occurred";
+  Future<bool> sendOTP() async {
+    try {
+      await dio.post(
+        "/api/user/verification-otp/send/",
+      );
+      return true;
+    } on DioError catch (e) {
+      if (e.response != null) {
+        debugPrint(' Error: ${e.response?.data}');
+        var errorData = e.response?.data;
+        var errorMessage = await ErrorMessages.fromJson(errorData);
+        errors = errorMessage.errors.message;
+        return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
     }
-  } catch (e) {
-    return "An error occurred";
   }
+
+
 }

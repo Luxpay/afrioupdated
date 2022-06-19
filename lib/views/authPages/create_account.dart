@@ -1,21 +1,21 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/error.dart';
+import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/models/userInfoModel.dart';
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/authPages/otp_verification.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
-import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:luxpay/widgets/touchUp.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../networking/dio.dart';
 import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/validators.dart';
+import '../../widgets/methods/getDeviceInfo.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class _CreateAccountState extends State<CreateAccount> {
 
   bool _isLoading = false;
 
-  String? errors;
+  String? errors, fcMessageToken;
 
   @override
   void initState() {
@@ -42,18 +42,22 @@ class _CreateAccountState extends State<CreateAccount> {
 
     setState(() {
       _isLoading = false;
+      fcmToken(fcMessageToken);
+      getDeviceDetails();
     });
   }
 
   //TextEditingController passwordController;
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
+    final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
           child: SingleChildScrollView(
         child: Container(
-         //height: 900,
+          //height: 900,
           width: double.infinity,
           // margin: EdgeInsets.only(left: 30, right: 30),
           child: Column(
@@ -102,56 +106,9 @@ class _CreateAccountState extends State<CreateAccount> {
                 height: SizeConfig.safeBlockVertical! * 2.2,
               ),
               Container(
-                margin: EdgeInsets.only(left: 30, right: 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      child: Text(
-                        "Phone Number",
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: HexColor("#1E1E1E")),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 12,
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          height: 45,
-                          width: 100,
-                          // margin: EdgeInsets.only(top: 2),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(3),
-                              border: Border.all(color: borderColor),
-                              color: HexColor("#E8E8E8").withOpacity(0.35)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              //  Image.asset(
-                              //   "assets/nigeria.png",
-                              //   scale: 0.2,
-                              // ),
-                              Text("(+234)"),
-                              Icon(Icons.arrow_drop_down)
-                            ],
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Expanded(
-                          child: LuxTextFieldNumber(
-                            controller: phoneController,
-                            innerHint: "e.g 70332340",
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: PhoneNumberField(
+                      controller: phoneController, hint: "Phone Number")),
               SizedBox(
                 height: SizeConfig.safeBlockVertical! * 2.2,
               ),
@@ -181,56 +138,57 @@ class _CreateAccountState extends State<CreateAccount> {
                 height: 50,
               ),
               InkWell(
-                  onTap: () async {
-                    var password = passwordController.text.trim();
-                    var phoneNumber = phoneController.text.trim();
+                onTap: () async {
+                  var password = passwordController.text.trim();
+                  var phoneNumber = phoneController.text.trim();
 
-                    debugPrint(phoneNumber);
-                    debugPrint(password);
+                  debugPrint(phoneNumber);
+                  debugPrint(password);
 
-                    var validators = [
-                      Validators.isValidPassword(password),
-                      Validators.isValidPhoneNumber(phoneNumber),
-                    ];
-                    if (validators.any((element) => element != null)) {
-                      setState(() {
-                        _isLoading = false;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(validators
-                                  .firstWhere((element) => element != null) ??
-                              "")));
-                      return;
-                    }
-                    setState(() {
-                      _isLoading = true;
-                    });
-
-                    var response = await createUser(password, phoneNumber);
+                  var validators = [
+                    Validators.isValidPassword(password),
+                    Validators.isValidPhoneNumber(phoneNumber),
+                  ];
+                  if (validators.any((element) => element != null)) {
                     setState(() {
                       _isLoading = false;
                     });
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(validators
+                                .firstWhere((element) => element != null) ??
+                            "")));
+                    return;
+                  }
+                  setState(() {
+                    _isLoading = true;
+                  });
 
-                    if (response) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => OTPVerification(
-                                  onVerified: () async {},
-                                  recipientAddress:
-                                      obscureEmail(phoneNumber))));
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(errors ?? "something went wrong")));
-                    }
-                  },
-                  child: Container(
-                      //margin: EdgeInsets.only(left: 30, right: 30),
-                      child: _isLoading
-                          ? luxButtonLoading(HexColor("#D70A0A"), 360)
-                          : luxButton(HexColor("#D70A0A"), Colors.white,
-                              "Create account", 360,
-                              fontSize: 16))),
+                  var response = await createUser(password, phoneNumber);
+                  setState(() {
+                    _isLoading = false;
+                  });
+                  debugPrint("SignUp: $response");
+                  if (response) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OTPVerification(
+                                onVerified: () async {},
+                                recipientAddress: obscureEmail(phoneNumber))));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(errors ?? "something went wrong")));
+                  }
+                },
+                child: Container(
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: _isLoading
+                      ? luxButtonLoading(HexColor("#D70A0A"), width)
+                      : luxButton(HexColor("#D70A0A"), Colors.white,
+                          "Create Account", width,
+                          fontSize: 16),
+                ),
+              ),
               SizedBox(
                 height: 50,
               ),
@@ -265,10 +223,14 @@ class _CreateAccountState extends State<CreateAccount> {
 
   Future<bool> createUser(String password, String phone) async {
     late String token, refToken;
+    final storage = new FlutterSecureStorage();
     Map<String, dynamic> body = {
       'password': password,
       "phone": phone,
+      'token': await storage.read(key: 'fcmToken'),
+      // 'platform': await storage.read(key: 'DeviceName')
     };
+    debugPrint('Data : ${body.toString()}');
     try {
       var response = await unAuthDio.post(
         "/api/user/signup/",
@@ -281,7 +243,7 @@ class _CreateAccountState extends State<CreateAccount> {
         debugPrint('${response.statusCode}');
         debugPrint('${data}');
         var userData = await UserData.fromJson(data);
-        final storage = new FlutterSecureStorage();
+
         token = userData.data.tokens.access;
         refToken = userData.data.tokens.refresh;
         phone = userData.data.user.phone;
@@ -312,30 +274,30 @@ class _CreateAccountState extends State<CreateAccount> {
   }
 }
 
-void purgeALL() async {
-  Map<String, dynamic> body = {
-    'phone': "08118691299",
-  };
-  try {
-    await unAuthDio.delete(
-      "/api/user/purge/",
-      data: body,
-    );
+// void purgeALL() async {
+//   Map<String, dynamic> body = {
+//     'phone': "08118691299",
+//   };
+//   try {
+//     await unAuthDio.delete(
+//       "/api/user/purge/",
+//       data: body,
+//     );
 
-    print("Purge successful");
-    return null;
-  } on DioError catch (e) {
-    print(e.message);
-    if (e.response != null) {
-      return e.response?.data['message'] ?? "An error occurred";
-    } else {
-      return;
-    }
-  } catch (e) {
-    return;
-  } finally {
-    SharedPreferences.getInstance().then((pref) async {
-      await pref.clear();
-    });
-  }
-}
+//     print("Purge successful");
+//     return null;
+//   } on DioError catch (e) {
+//     print(e.message);
+//     if (e.response != null) {
+//       return e.response?.data['message'] ?? "An error occurred";
+//     } else {
+//       return;
+//     }
+//   } catch (e) {
+//     return;
+//   } finally {
+//     SharedPreferences.getInstance().then((pref) async {
+//       await pref.clear();
+//     });
+//   }
+// }

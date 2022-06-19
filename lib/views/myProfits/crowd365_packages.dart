@@ -1,222 +1,416 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:luxpay/models/errors/error.dart';
+import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/myProfits/crowd365_dashboard.dart';
+import 'package:luxpay/views/myProfits/crowd365_payment.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 
 class Crowd365Packages extends StatefulWidget {
   static const String path = "crowd365Packages";
-  const Crowd365Packages({Key? key}) : super(key: key);
+  List? referrerPackage;
+
+  Crowd365Packages({
+    Key? key,
+    required this.referrerPackage,
+  }) : super(key: key);
 
   @override
   State<Crowd365Packages> createState() => _Crowd365PackagesState();
 }
 
 class _Crowd365PackagesState extends State<Crowd365Packages> {
-  List<Map<String, dynamic>> items = [
-    {
-      "image": "assets/basic.png",
-      "header": {"name": "Basic Package", "price": "N1000"},
-      "items": [
-        {"name": "Welcome Bonus", "price": "N1000"},
-        {"name": "Reward", "price": "N1000"},
-        {"name": "Each Cycle", "price": "N1000"},
-      ]
-    },
-    {
-      "image": "assets/standard.png",
-      "header": {"name": "Standard Package", "price": "N3000"},
-      "items": [
-        {"name": "Welcome Bonus", "price": "N1,500"},
-        {"name": "Reward", "price": "N13,500"},
-        {"name": "Each Cycle", "price": "N15,000"},
-      ]
-    },
-    {
-      "image": "assets/premium.png",
-      "header": {"name": "Premium Package", "price": "N6000"},
-      "items": [
-        {"name": "Welcome Bonus", "price": "N3,000"},
-        {"name": "Reward", "price": "N27,000"},
-        {"name": "Each Cycle", "price": "N30,000"},
-      ]
-    },
+  final List<String> images = <String>[
+    "assets/premium.png",
+    "assets/standard.png",
+    "assets/basic.png",
+    "assets/basic.png"
   ];
 
-  int? selectedIndex;
+  int selectedIndex = -1;
+  List? itemPackage;
+  bool checkPackage = false;
+  bool _isLoading = false;
+  bool selectPackageCheck = false;
+  String errors = 'Something went wrong try again';
+  String? codeReferrer;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.referrerPackage!.isEmpty) {
+      setState(() {
+        checkPackage = true;
+      });
+    } else {
+      setState(() {
+        itemPackage = widget.referrerPackage;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(bottom: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
+          child: checkPackage == true
+              ? Center(
+                  child: CircularProgressIndicator(color: HexColor("#415CA0")))
+              : Stack(
                   children: [
-                    IconButton(
-                      onPressed: () => {Navigator.pop(context)},
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      color: Colors.black,
-                    ),
-                    SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 2.4,
-                    ),
-                    const Text(
-                      "Select Package",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 25,
-              ),
-              color: HexColor("#FBFBFB"),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        var item = items[index];
-                        return GestureDetector(
-                          onTap: () => setState(() {
-                            selectedIndex = index;
-                          }),
-                          child: AnimatedContainer(
-                            duration: Duration(
-                              milliseconds: 200,
-                            ),
-                            padding: EdgeInsets.only(
-                              top: 23,
-                              left: SizeConfig.blockSizeHorizontal! * 5,
-                              right: SizeConfig.blockSizeHorizontal! * 5,
-                              bottom: 17,
-                            ),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              border: selectedIndex == index
-                                  ? Border.all(
-                                      color: HexColor("#415CA0"),
-                                    )
-                                  : null,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.shade100.withOpacity(0.4),
-                                  offset: Offset(3, 3),
-                                )
-                              ],
-                            ),
+                    Container(
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.only(bottom: 16),
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Image.asset(item['image']),
-                                SizedBox(
-                                    width: SizeConfig.blockSizeHorizontal! * 4),
-                                Expanded(
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.only(
-                                          bottom: 16,
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              item['header']['name'],
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            Text(
-                                              item['header']['price'],
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      ...item["items"].map((e) {
-                                        return Container(
-                                          padding: EdgeInsets.only(
-                                            bottom: 10,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                e['name'],
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: HexColor("#8D9091"),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              Text(
-                                                e['price'],
-                                                style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: HexColor("#8D9091"),
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        );
-                                      }).toList()
-                                    ],
-                                  ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () => {Navigator.pop(context)},
+                                      icon:
+                                          const Icon(Icons.arrow_back_ios_new),
+                                      color: Colors.black,
+                                    ),
+                                    SizedBox(
+                                      width:
+                                          SizeConfig.safeBlockHorizontal! * 2.4,
+                                    ),
+                                    const Text(
+                                      "Select Package",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                      separatorBuilder: (context, index) => SizedBox(
-                        height: SizeConfig.blockSizeVertical! * 2,
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 25,
+                              ),
+                              color: HexColor("#FBFBFB"),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  children: [
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, index) {
+                                        //var item = items[index];
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(18),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.3),
+                                                spreadRadius: 2,
+                                                blurRadius: 5,
+                                                offset: Offset(0,
+                                                    1), // changes position of shadow
+                                              ),
+                                            ],
+                                          ),
+                                          child: GestureDetector(
+                                            onTap: () => setState(() {
+                                              selectedIndex = index;
+                                              selectPackageCheck = true;
+                                            }),
+                                            child: AnimatedContainer(
+                                              duration: Duration(
+                                                milliseconds: 200,
+                                              ),
+                                              padding: EdgeInsets.only(
+                                                top: 23,
+                                                left: SizeConfig
+                                                        .blockSizeHorizontal! *
+                                                    5,
+                                                right: SizeConfig
+                                                        .blockSizeHorizontal! *
+                                                    5,
+                                                bottom: 17,
+                                              ),
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                border: selectedIndex == index
+                                                    ? Border.all(
+                                                        color:
+                                                            HexColor("#415CA0"),
+                                                      )
+                                                    : null,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.grey.shade100
+                                                        .withOpacity(0.4),
+                                                    offset: Offset(3, 3),
+                                                  )
+                                                ],
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Image.asset(images[index]),
+                                                  SizedBox(
+                                                      width: SizeConfig
+                                                              .blockSizeHorizontal! *
+                                                          4),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            bottom: 16,
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                itemPackage![
+                                                                        index]
+                                                                    .name,
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "${itemPackage![index].priceCurrency} ${itemPackage![index].price}",
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 15,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        Container(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            bottom: 10,
+                                                          ),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "Welcome Bonus",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Reward",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Each Cycle",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "N500",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N4,500",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N5,000",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          SizedBox(
+                                        height:
+                                            SizeConfig.blockSizeVertical! * 2,
+                                      ),
+                                      itemCount: itemPackage!.length,
+                                    ),
+                                    SizedBox(
+                                      height: SizeConfig.blockSizeVertical! * 4,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      itemCount: items.length,
                     ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical! * 4,
-                    ),
-                    InkWell(
-                        onTap: () => {
-                              // Navigator.push(context, MaterialPageRoute(builder: (context) => const AppPageController()))
-                              Navigator.of(context)
-                                  .pushNamed(Crowd365Dashboard.path)
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        margin:
+                            EdgeInsets.only(left: 30, right: 30, bottom: 50),
+                        child: InkWell(
+                            onTap: () async {
+                              var validators = [
+                                selectPackageCheck == false
+                                    ? "Please Select a Package"
+                                    : null,
+                              ];
+                              if (validators
+                                  .any((element) => element != null)) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                _showChoiceDialog(
+                                    context,
+                                    validators.firstWhere(
+                                            (element) => element != null) ??
+                                        "");
+
+                                return;
+                              }
+                              String namePage =
+                                  await itemPackage![selectedIndex].name;
+                              String price =
+                                  await itemPackage![selectedIndex].price;
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          Crowd365PaymentMethod(
+                                              packageName: namePage,
+                                              packagePrice: price)));
+
+                              debugPrint(
+                                  "Package Selected ${itemPackage![selectedIndex].name}");
                             },
-                        child: luxButton(HexColor("#415CA0"), Colors.white,
-                            "Subscribe", double.infinity,
-                            fontSize: 16, height: 50, radius: 8)),
+                            child: _isLoading
+                                ? luxButtonLoading(
+                                    HexColor("#415CA0"), double.infinity)
+                                : luxButton(HexColor("#415CA0"), Colors.white,
+                                    "Get Package", double.infinity,
+                                    fontSize: 16, height: 50, radius: 8)),
+                      ),
+                    ),
                   ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      )),
+                )),
     );
+  }
+
+  Future<void> _showChoiceDialog(BuildContext context, content) async {
+    showCupertinoDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: Text(
+                "Crowd365",
+              ),
+              actions: [
+                CupertinoDialogAction(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("OK")),
+              ],
+              content: Text(content));
+        });
   }
 }

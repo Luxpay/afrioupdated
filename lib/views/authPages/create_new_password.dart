@@ -9,12 +9,13 @@ import 'package:luxpay/widgets/otfields.dart';
 import 'package:luxpay/widgets/touchUp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../models/error.dart';
+import '../../models/errors/error.dart';
 import '../../networking/dio.dart';
 import '../../utils/validators.dart';
 
 class CreateNewPassword extends StatefulWidget {
-  const CreateNewPassword({Key? key}) : super(key: key);
+  String? newOtp;
+  CreateNewPassword({Key? key, required this.newOtp}) : super(key: key);
 
   @override
   State<CreateNewPassword> createState() => _CreateNewPasswordState();
@@ -23,7 +24,7 @@ class CreateNewPassword extends StatefulWidget {
 class _CreateNewPasswordState extends State<CreateNewPassword> {
   var controllerPassword = TextEditingController();
   var controllerConfirmPassword = TextEditingController();
-  late String otp;
+
   String errors = "Something went wrong";
 
   bool _isLoading = false;
@@ -118,7 +119,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                               content: Text(validators.firstWhere(
                                       (element) => element != null) ??
                                   "")));
-                                    setState(() {
+                          setState(() {
                             _isLoading = false;
                           });
                           return;
@@ -162,18 +163,12 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
 
   Future<bool> updatePassword(String password) async {
     final storage = new FlutterSecureStorage();
-    String? phone = await storage.read(key: 'phone');
-
-    String? otp = await storage.read(key: 'otp');
-
-    print(phone);
-    print(otp);
     Map<String, dynamic> body = {
-      "phone": "$phone",
-      "otp": "$otp",
-      "password": "$password"
+      "otp": "${widget.newOtp}",
+      "password": "$password",
+      'phone': await storage.read(key: 'phoneNumber')
     };
-
+    debugPrint("DataB4send:${body}");
     try {
       var response = await unAuthDio.put(
         "/api/user/password/reset/confirm/",

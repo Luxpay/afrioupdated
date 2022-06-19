@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/models/error.dart';
+import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/create_account.dart';
-import 'package:luxpay/views/authPages/create_new_pin_password.dart';
+import 'package:luxpay/views/authPages/addBvn_page.dart';
+import 'package:luxpay/views/authPages/create_new_pin_password_profile.dart';
 import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/widgets/pin_entry.dart';
 
@@ -141,7 +142,7 @@ you'll have to make a request"""
                                     Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                CreateNewPassword()),
+                                                CreateNewPassword2Profile()),
                                         (route) => false);
                                   }
                                 }

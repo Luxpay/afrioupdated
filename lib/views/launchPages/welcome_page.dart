@@ -91,7 +91,7 @@ class _WelcomePageState extends State<WelcomePage>
                 child:
                     Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Expanded(
-                    flex: 5,
+                    flex: 6,
                     child: Column(
                       children: [
                         Spacer(),
@@ -185,10 +185,9 @@ class _WelcomePageState extends State<WelcomePage>
                               //         builder: (context) =>
                               //             const RegistrationPage()));
 
-                               Navigator.of(context).push(
+                              Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => CreateAccount()
-                                ),
+                                    builder: (context) => CreateAccount()),
                               );
                             },
                             child: luxButton(HexColor("#D70A0A"), Colors.white,

@@ -35,23 +35,19 @@ class UserData {
 class Data {
   Data({
     required this.user,
-    required this.next,
     required this.tokens,
   });
 
   User user;
-  String next;
   Tokens tokens;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
         user: User.fromJson(json["user"]),
-        next: json["next"],
         tokens: Tokens.fromJson(json["tokens"]),
       );
 
   Map<String, dynamic> toJson() => {
         "user": user.toJson(),
-        "next": next,
         "tokens": tokens.toJson(),
       };
 }
@@ -78,33 +74,53 @@ class Tokens {
 
 class User {
   User({
-    required this.username,
+    this.avatar,
     required this.firstName,
     required this.lastName,
     required this.phone,
-    required this.createdAt,
+    required this.phoneVerified,
+    required this.email,
+    required this.emailVerified,
+    required this.hasPin,
+    required this.isVerified,
+    required this.username,
   });
 
-  String username;
+  dynamic avatar;
   String firstName;
   String lastName;
   String phone;
-  DateTime createdAt;
+  bool phoneVerified;
+  dynamic email;
+  bool emailVerified;
+  bool hasPin;
+  bool isVerified;
+  String username;
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        username: json["username"],
+        avatar: json["avatar"],
         firstName: json["first_name"],
         lastName: json["last_name"],
         phone: json["phone"],
-        createdAt: DateTime.parse(json["created_at"]),
+        phoneVerified: json["phone_verified"],
+        email: json["email"],
+        emailVerified: json["email_verified"],
+        hasPin: json["has_pin"],
+        isVerified: json["is_verified"],
+        username: json["username"],
       );
 
   Map<String, dynamic> toJson() => {
-        "username": username,
+        "avatar": avatar,
         "first_name": firstName,
         "last_name": lastName,
         "phone": phone,
-        "created_at": createdAt.toIso8601String(),
+        "phone_verified": phoneVerified,
+        "email": email,
+        "email_verified": emailVerified,
+        "has_pin": hasPin,
+        "is_verified": isVerified,
+        "username": username,
       };
 }
 

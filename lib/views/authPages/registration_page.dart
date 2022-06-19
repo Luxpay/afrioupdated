@@ -219,7 +219,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       var pref = await SharedPreferences.getInstance();
       await pref.setString(authToken, data['access']);
       await pref.setString(refreshToken, data['refresh']);
-      await pref.setString(userPref, User.fromMap(data).toJson());
+      //await pref.setString(userPref, User.fromMap(data).toJson());
       return [null, data['email']];
     } on DioError catch (e) {
       print(e.response?.data);

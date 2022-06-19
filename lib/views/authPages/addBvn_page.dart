@@ -1,26 +1,36 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/create_account.dart';
 import 'package:luxpay/views/authPages/create_new_pin_password_profile.dart';
 import 'package:luxpay/views/authPages/dont_know_your_bvn.dart';
+import 'package:luxpay/views/authPages/login_page.dart';
+import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/touchUp.dart';
 
 import '../../utils/hexcolor.dart';
+import '../../widgets/lux_textfield.dart';
+import '../../widgets/util.dart';
 
-class CreateNewPassword extends StatefulWidget {
-  const CreateNewPassword({Key? key}) : super(key: key);
+class AddBvnPage extends StatefulWidget {
+  const AddBvnPage({Key? key}) : super(key: key);
 
   @override
-  State<CreateNewPassword> createState() => _CreateNewPasswordState();
+  State<AddBvnPage> createState() => _AddBvnPageState();
 }
 
-class _CreateNewPasswordState extends State<CreateNewPassword> {
+class _AddBvnPageState extends State<AddBvnPage> {
+  DateTime dateTime = DateTime.now();
+  String dateFormate = 'yyyy/MM/dd';
+  String? dateOfBirth;
   TextEditingController bvnController = TextEditingController();
+  TextEditingController dateOfBirthController = TextEditingController();
   Future<bool> _willPopCallback() async {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => CreateAccount()));
+        context, MaterialPageRoute(builder: (context) => LoginPage()));
     return true; // return true if the route to be popped
   }
 
@@ -66,7 +76,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("STEP 1 OF 2"),
+                      Text("STEP 2 OF 2"),
                       SizedBox(height: 20),
                       Text(
                         "Link your BVN",
@@ -84,6 +94,63 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                         ),
                       ),
                       SizedBox(height: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                              child: Text(
+                            "Date Of Birth",
+                            style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: HexColor("#1E1E1E")),
+                          )),
+                          SizedBox(height: 8),
+                          Container(
+                              height: 55,
+                              color: HexColor("#E8E8E8").withOpacity(0.35),
+                              child: InkWell(
+                                  onTap: () {
+                                    Utils.showSheet(
+                                      context,
+                                      child: buildDatePicker(),
+                                      onClicked: () {
+                                        final value = DateFormat('yyyy/MM/dd')
+                                            .format(dateTime);
+                                        // Utils.showSnackBar(
+                                        //     context, 'Selected "$value"');
+                                        setState(() {
+                                          dateOfBirth = value.toString();
+                                          debugPrint(
+                                              "Date Of Birth : $dateOfBirth");
+                                        });
+
+                                        Navigator.pop(context);
+                                      },
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.only(left: 20),
+                                        child: Text(
+                                          "Pick Date of Birth",
+                                          style: TextStyle(
+                                              color: Colors.red, fontSize: 15),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.only(right: 20),
+                                        child: Text(dateOfBirth ?? dateFormate,
+                                            style: TextStyle(fontSize: 18)),
+                                      )
+                                    ],
+                                  ))),
+                        ],
+                      ),
+                      SizedBox(height: 13),
                       PasswordTextField(hint: "BVN", controller: bvnController),
                       SizedBox(height: 20),
                       Container(
@@ -122,7 +189,7 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 550),
+                  margin: EdgeInsets.only(top: 650),
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Column(
@@ -156,10 +223,11 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                                             context,
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    CreateNewPassword2Profile()));
+                                                    AppPageController()));
                                       })
                               ]),
                         ),
+                        SizedBox(height: 20)
                       ],
                     ),
                   ),
@@ -171,6 +239,18 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
       ),
     );
   }
+
+  Widget buildDatePicker() => SizedBox(
+        height: 600,
+        child: CupertinoDatePicker(
+          minimumYear: 1440,
+          maximumYear: DateTime.now().year,
+          initialDateTime: dateTime,
+          mode: CupertinoDatePickerMode.date,
+          onDateTimeChanged: (dateTime) =>
+              setState(() => this.dateTime = dateTime),
+        ),
+      );
 }
 
 void _dontKnowUrBVNBottomSheet(context) {

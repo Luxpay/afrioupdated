@@ -26,7 +26,7 @@ class LoginViewModel extends ChangeNotifier {
       var pref = await SharedPreferences.getInstance();
       await pref.setString(authToken, data['access']);
       await pref.setString(refreshToken, data['refresh']);
-      await pref.setString(userPref, User.fromMap(data).toJson());
+     // await pref.setString(userPref, User.fromMap(data).toJson());
       return LoginAction(
         data: null,
         navType:

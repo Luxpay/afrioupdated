@@ -16,30 +16,30 @@ class PaymentsNotification extends StatefulWidget {
 
 class _PaymentsNotificationState extends State<PaymentsNotification> {
   Future refreshNotes() async {
-    setState(() async {
-      widget.items = await NotificationDatabase.instance.readAllNotification();
-    });
+    widget.items = await NotificationDatabase.instance.readAllNotification();
   }
 
-  Timer? timer;
+  //Timer? timer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 1), (_) {
-      setState(() {
-        refreshNotes();
-      });
-    });
+    // timer = Timer.periodic(Duration(seconds: 5), (_) {
+
+    refreshNotes();
+
+    //});
   }
 
-@override
+  @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     setState(() {
-      timer?.cancel();
+      // timer!.cancel();
+      // timer!.cancel();
+      print("cancelButton");
     });
   }
 
@@ -51,7 +51,6 @@ class _PaymentsNotificationState extends State<PaymentsNotification> {
               onTap: () {
                 setState(() {
                   refreshNotes();
-                  
                 });
               },
               child: Column(
