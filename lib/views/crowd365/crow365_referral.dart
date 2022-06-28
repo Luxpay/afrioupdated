@@ -1,21 +1,25 @@
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/models/packagesModel.dart';
-import 'package:luxpay/models/refreshUser.dart';
+
 import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/hexcolor.dart';
-import 'package:luxpay/views/myProfits/crowd365_packages.dart';
+
 import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:luxpay/widgets/touchUp.dart';
 
 import '../../models/errors/refferal.dart';
 import '../../networking/dio.dart';
 import '../../widgets/lux_buttons.dart';
+import '../../widgets/methods/showDialog.dart';
+import 'crowd365_packages.dart';
+
+
+
 
 class Crowd365Refere extends StatefulWidget {
   const Crowd365Refere({Key? key}) : super(key: key);
@@ -96,11 +100,11 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                _showChoiceDialog(
+                                showChoiceDialog(
                                     context,
                                     validators.firstWhere(
                                             (element) => element != null) ??
-                                        "");
+                                        "","Crowd365");
 
                                 return;
                               }
@@ -112,7 +116,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                _showChoiceDialog(context, errors);
+                                showChoiceDialog(context, errors,"Crowd365");
                               } else {
                                 setState(() {
                                   _isLoading = false;
@@ -146,7 +150,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoadingPackage = false;
                                 });
-                                _showChoiceDialog(context, errors);
+                                showChoiceDialog(context, errors,"Crowd365");
                               } else {
                                 setState(() {
                                   _isLoadingPackage = false;
@@ -215,7 +219,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
           return false;
         } else if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;
@@ -238,25 +242,6 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
     }
   }
 
-  Future<void> _showChoiceDialog(BuildContext context, content) async {
-    showCupertinoDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                "Crowd365",
-              ),
-              actions: [
-                CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("OK")),
-              ],
-              content: Text(content));
-        });
-  }
 
 //F6PN7W
   Future<bool> getPackage() async {
@@ -283,7 +268,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
         debugPrint(' Error: ${e.response?.data}');
         if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;

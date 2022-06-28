@@ -63,8 +63,8 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fcmToken(fcMessageToken);
-    getDeviceDetails();
+    //fcmToken(fcMessageToken);
+    //getDeviceDetails();
   }
 
   @override
@@ -418,7 +418,7 @@ class _LoginPageState extends State<LoginPage> {
       'password': password,
       "phone": phone,
       "email": email,
-      "token": await storage.read(key: 'fcmToken'),
+    // "token": await storage.read(key: 'fcmToken'),
       //"platform": await storage.read(key: "DeviceName")
     };
     debugPrint("Body: ${body}");
@@ -427,7 +427,6 @@ class _LoginPageState extends State<LoginPage> {
         "/api/user/login/",
         data: body,
       );
-
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
@@ -466,10 +465,6 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         return false;
       }
-
-      //await pref.setString(userPref, User.fromMap(data).toJson());
-      // return [null, data['email']];
-
     } on DioError catch (e) {
       if (e.response != null) {
         debugPrint(' Error Error: ${e.response?.data}');

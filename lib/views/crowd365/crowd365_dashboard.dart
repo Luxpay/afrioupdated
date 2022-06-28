@@ -3,14 +3,17 @@ import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/myProfits/crowd365_referral_code.dart';
+
 
 import '../../models/crowd36model.dart';
 import '../../models/errors/refferal.dart';
 import '../../networking/dio.dart';
 import '../../utils/constants.dart';
+import '../../widgets/methods/showDialog.dart';
+import 'crowd365_referral_code.dart';
 
 class Crowd365Dashboard extends StatefulWidget {
   static const String path = "crowd365Dashboard";
@@ -28,12 +31,6 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
   int? direct, indirect, cycles, refLest;
   String? total, today, payout, referral_code, name, price, price_currency;
   final storage = new FlutterSecureStorage();
-
-  // Future<void> notedBashBoad() async {
-  //   await storage.write(key: "Subscribe", value: "done");
-  //   var checkSub = await storage.read(key: "Subscribe");
-  //   debugPrint('DashBoard Subscribtion ${checkSub}');
-  // }
 
   @override
   void initState() {
@@ -170,10 +167,10 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
                                         onTap: () async {
                                           var cashoutResult = await cashOut();
                                           if (cashoutResult) {
-                                            _showChoiceDialog(
-                                                context, "Successfull");
+                                            showChoiceDialog(
+                                                context, "Successfull","Crowd365");
                                           } else {
-                                            _showChoiceDialog(context, errors);
+                                            showChoiceDialog(context, errors,"Crowd365");
                                           }
                                         })),
                             button(
@@ -181,9 +178,9 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
                                 hexColor: "#415CA0",
                                 active: false),
                             button(
-                                title: "Upgrade",
-                                hexColor: "#22B02E",
-                                active: false),
+                              title: "Upgrade",
+                              hexColor: "#22B02E",
+                            ),
                           ],
                         ),
                         SizedBox(
@@ -326,10 +323,10 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.4),
+                color: grey2.withOpacity(0.5),
                 spreadRadius: 3,
-                blurRadius: 2,
-                offset: Offset(0, 1), // changes position of shadow
+                blurRadius: 5,
+                offset: Offset(0, 3), // changes position of shadow
               ),
             ],
           ),
@@ -409,7 +406,7 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
           return false;
         } else if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;
@@ -475,7 +472,7 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
       if (e.response != null) {
         if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;
@@ -492,25 +489,7 @@ class _Crowd365DashboardState extends State<Crowd365Dashboard> {
     }
   }
 
-  Future<void> _showChoiceDialog(BuildContext context, content) async {
-    showCupertinoDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                "Crowd365",
-              ),
-              actions: [
-                CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("OK")),
-              ],
-              content: Text(content));
-        });
-  }
+
 
   void _crow365ReferralCodeBottomSheet(context) {
     showModalBottomSheet<dynamic>(

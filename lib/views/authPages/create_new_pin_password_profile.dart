@@ -44,7 +44,6 @@ class _CreateNewPassword2ProfileState extends State<CreateNewPassword2Profile> {
   @override
   Widget build(BuildContext context) {
     Future<void> _showChoiceDialog(BuildContext context) async {
-      if (Platform.isIOS) {
         showCupertinoDialog(
             context: context,
             barrierDismissible: true,
@@ -73,36 +72,6 @@ class _CreateNewPassword2ProfileState extends State<CreateNewPassword2Profile> {
                 ),
               );
             });
-      } else {
-        showDialog(
-            context: context,
-            barrierDismissible: true,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text(
-                  "Choose option",
-                ),
-                content: SingleChildScrollView(
-                  child: ListBody(
-                    children: [
-                      ListTile(
-                        onTap: () {
-                          _openGallery();
-                        },
-                        title: Text("Gallery"),
-                      ),
-                      ListTile(
-                        onTap: () {
-                          _openCamera(context);
-                        },
-                        title: Text("Camera"),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            });
-      }
     }
 
     Future<bool> _willPopCallback() async {

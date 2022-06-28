@@ -3,40 +3,42 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luxpay/services/local_notification_service.dart';
+import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
 import 'package:luxpay/views/authPages/change_password.dart';
-
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
-
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page_two.dart';
 import 'package:luxpay/views/launchPages/welcome_page.dart';
-import 'package:luxpay/views/myProfits/crowd365_dashboard.dart';
-import 'package:luxpay/views/myProfits/crowd365_packages.dart';
+
 import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/views/transfers/bank_transfer.dart';
 import 'package:luxpay/views/transfers/wallet_transfer.dart';
+import 'package:luxpay/widgets/methods/esayLoading.dart';
 import 'services/locatorService.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+import 'views/crowd365/crowd365_dashboard.dart';
 
 ///Receive message when app is in background solution for on message
 Future<void> backgroundHandler(RemoteMessage message) async {
-   LocalNotificationService.display(message);
+  LocalNotificationService.display(message);
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
- 
+
   setupLocator();
   //purgeAll();
   runApp(ProviderScope(child: MyApp()));
+  configLoading();
 }
-
 
 
 GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
@@ -60,7 +62,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     MaterialColor colorCustom = MaterialColor(0xFFD70A0A, color);
+
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Luxpay',
       navigatorKey: navigatorKey,
       theme: ThemeData(
@@ -69,6 +73,7 @@ class MyApp extends StatelessWidget {
           fontFamily: "Mulish"),
       initialRoute: "/",
       onGenerateRoute: onGenerateRoute,
+      builder: EasyLoading.init(),
     );
   }
 }

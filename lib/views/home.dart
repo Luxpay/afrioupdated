@@ -1,17 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/aboutUser.dart';
 import 'package:luxpay/models/walletsModel.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/views/finances.dart';
-import 'package:luxpay/views/myProfits/crowd365.dart';
-import 'package:luxpay/views/myProfits/crowd365_dashboard.dart';
 import 'package:luxpay/views/notifications/notificationsPage.dart';
 import 'package:luxpay/views/rechargeAndBills/airtime.dart';
 import 'package:luxpay/views/rechargeAndBills/bill_payment_page.dart';
@@ -26,6 +26,8 @@ import '../utils/constants.dart';
 import '../utils/sizeConfig.dart';
 import '../widgets/touchUp.dart';
 import '../widgets/wallet_balance.dart';
+import 'crowd365/crowd365.dart';
+import 'crowd365/crowd365_dashboard.dart';
 import 'request_money_from_others.dart';
 
 class HomePage extends StatefulWidget {
@@ -46,6 +48,7 @@ class _HomePageState extends State<HomePage> {
   List? walletInfo;
   bool checkdata = false;
   DioCacheManager? _dioCacheManager;
+  Timer? _timer;
 
   //final List<Color> colors = <Color>[blue1, , yellow1, red1];
 
@@ -76,15 +79,14 @@ class _HomePageState extends State<HomePage> {
 
     greeting();
     LocalNotificationService.initialize(context);
-    // User.getFromPrefs().then((user) {
-    //   setState(() {
-    //     name = user.full_name ?? "";
-    //   });
-    // });
-    // setState(() {
-    //   notify = false;
-    // });
     super.initState();
+    EasyLoading.addStatusCallback((status) {
+      print('EasyLoading Status $status');
+      if (status == EasyLoadingStatus.dismiss) {
+        _timer?.cancel();
+      }
+    });
+    EasyLoading.dismiss();
 
     ///gives you the message on which user taps
     ///and it opened the app from terminated state
@@ -120,8 +122,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    EasyLoading.dismiss();
+    username = null;
+    userAvatar = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     Future<bool> _willPopCallback() async {
+      EasyLoading.dismiss();
       showDialog(
           context: context,
           useRootNavigator: false,
@@ -189,18 +201,30 @@ class _HomePageState extends State<HomePage> {
                                   SizedBox(
                                     height: SizeConfig.safeBlockVertical! * 1,
                                   ),
-                                  // ClipOval(
-                                  //   child: CachedNetworkImage(
-                                  //     imageUrl: "${userAvatar}",
-                                  //     width: 100.0,
-                                  //     height: 80.0,
-                                  //   ),
-                                  // )
-                                  CircleAvatar(
-                                    radius: 30.5,
-                                    backgroundImage:
-                                        NetworkImage("${userAvatar}"),
-                                    backgroundColor: Colors.transparent,
+                                  Container(
+                                    child: userAvatar == null
+                                        ? Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              color: grey4,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                                child: Icon(
+                                                  Icons.person,
+                                                  size: 30,
+                                                  color: white,
+                                                )),
+                                          )
+                                        : CircleAvatar(
+                                            radius: 30.5,
+                                            backgroundImage:
+                                                NetworkImage("${userAvatar}"),
+                                            backgroundColor: Colors.transparent,
+                                          ),
                                   ),
                                 ],
                               ),
@@ -245,16 +269,17 @@ class _HomePageState extends State<HomePage> {
                                           : Colors.red),
                                 ),
                                 IconButton(
-                                    onPressed: () => {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const NotificationPage())),
-                                          setState(() {
-                                            notify = false;
-                                          })
-                                        },
+                                    onPressed: () {
+                                      EasyLoading.dismiss();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const NotificationPage()));
+                                      setState(() {
+                                        notify = false;
+                                      });
+                                    },
                                     icon: const Icon(IconlyLight.notification,
                                         color: Colors.white)),
                               ],
@@ -427,19 +452,27 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 InkWell(
                                   onTap: () async {
-                                    await crowd365_dashBoard();
-                                    if (packageName != null) {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Crowd365Dashboard()));
-                                    } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Crowd365()));
+                                    EasyLoading.show(status: 'loading...');
+                                    var checkCrowd365 =
+                                        await crowd365_dashBoard();
+
+                                    if (checkCrowd365) {
+                                      EasyLoading.dismiss();
+                                      if (packageName != null) {
+                                        EasyLoading.dismiss();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Crowd365Dashboard()));
+                                      } else {
+                                        EasyLoading.dismiss();
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Crowd365()));
+                                      }
                                     }
                                   },
                                   child: MenuWidget(
@@ -761,6 +794,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           packageName = crowd365Data.data.plan.name;
         });
+        EasyLoading.dismiss();
         return true;
       } else {
         return false;
@@ -768,10 +802,12 @@ class _HomePageState extends State<HomePage> {
     } on DioError catch (e) {
       if (e.response != null) {
         if (e.response?.statusCode == 401) {
+          EasyLoading.dismiss();
           errors = "Network issue, Try Again";
           _showChoiceDialog(context, errors);
           return false;
         } else {
+          EasyLoading.dismiss();
           var errorData = e.response?.data;
           var errorMessage = await ReferralError.fromJson(errorData);
           errors = errorMessage.errors.extra.error[0];

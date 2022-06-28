@@ -4,6 +4,7 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/views/account.dart';
 import 'package:luxpay/views/finances.dart';
 import 'package:luxpay/views/home.dart';
+import 'package:luxpay/views/referrer.dart';
 import 'package:luxpay/views/rewards/rewards.dart';
 
 import '../utils/hexcolor.dart';
@@ -26,7 +27,6 @@ class _AppPageControllerState extends State<AppPageController> {
   //SystemNavigator.pop()
   @override
   Widget build(BuildContext context) {
-    
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: HexColor("#D70A0A"),
@@ -64,7 +64,8 @@ class _AppPageControllerState extends State<AppPageController> {
           currentPage = const FinancesPage();
           break;
         case rewards:
-          currentPage = const RewardsPage();
+          //currentPage = const RewardsPage();
+          currentPage = const ReferreAndEarn();
           break;
         case account:
           currentPage = const AccountPage();

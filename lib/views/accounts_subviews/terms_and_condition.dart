@@ -16,6 +16,7 @@ class TermsAndConditions extends StatelessWidget {
           children: [
             Container(
               color: Colors.white,
+              margin: EdgeInsets.only(top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [

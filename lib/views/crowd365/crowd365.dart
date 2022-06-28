@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/myProfits/crow365_referral.dart';
-import 'package:luxpay/views/myProfits/crowd365_packages.dart';
-import 'package:luxpay/views/myProfits/profit_rules.dart';
+import 'package:luxpay/views/crowd365/profit_rules.dart';
+
 
 import '../../widgets/lux_buttons.dart';
+import 'crow365_referral.dart';
 
 class Crowd365 extends StatefulWidget {
   const Crowd365({Key? key}) : super(key: key);
@@ -24,7 +24,7 @@ class _Crowd365State extends State<Crowd365> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     return Scaffold(
-      backgroundColor: HexColor("#415CA0"),
+      backgroundColor: HexColor("#258F92"),
       body: SafeArea(
         bottom: false,
         child: Stack(
@@ -32,7 +32,7 @@ class _Crowd365State extends State<Crowd365> {
             Column(
               children: [
                 Container(
-                  color: HexColor("#415CA0"),
+                  color: HexColor("#258F92"),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -90,8 +90,13 @@ class _Crowd365State extends State<Crowd365> {
                     child: Column(
                       children: [
                         myProfit(),
+                        SizedBox(height: 20),
                         Container(
-                          color: Colors.white,
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20))),
                           child: howToEarn(),
                         ),
                         Container(
@@ -122,7 +127,7 @@ class _Crowd365State extends State<Crowd365> {
                             _crow365RefereBottomSheet(context)
                           },
                       child: luxButton(
-                          HexColor("#415CA0"), Colors.white, "Apply now", 325,
+                          HexColor("#F76502"), Colors.white, "Apply now", 325,
                           fontSize: 16, height: 50, radius: 8)),
                 ),
               ),
@@ -135,7 +140,7 @@ class _Crowd365State extends State<Crowd365> {
 
   Widget myProfit() {
     return Container(
-      color: HexColor("#415CA0"),
+      color: HexColor("#258F92"),
       child: SafeArea(
         child: Column(
           children: [
@@ -205,7 +210,7 @@ class _Crowd365State extends State<Crowd365> {
                 border: Border.all(color: Colors.white),
                 color: Colors.white),
             child: Padding(
-              padding: const EdgeInsets.only(left: 25.0, right: 25.0),
+              padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 30),
               child: Column(
                 children: [
                   SizedBox(

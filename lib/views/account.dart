@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/accountSettings/account_profile.dart';
+import 'package:luxpay/views/accountSettings/helpSupport.dart';
+import 'package:luxpay/views/accountSettings/my_address.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/widgets/logout_popup.dart';
 
 import '../widgets/touchUp.dart';
+import 'accountSettings/bio_auth.dart';
+import 'accountSettings/transaction_details.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -44,18 +49,56 @@ class _AccountPageState extends State<AccountPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ProfileAction(title: "My Profile", icon: IconlyLight.profile),
+              ProfileAction(
+                title: "My Profile",
+                icon: IconlyLight.profile,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AccountProfile()));
+                },
+              ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(
-                  title: "Transaction Details", icon: IconlyLight.chart),
+                title: "Transaction Details",
+                icon: IconlyLight.chart,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TransactionDetails()));
+                },
+              ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(
-                  title: "Address Management", icon: IconlyLight.location),
+                title: "Address Management",
+                icon: IconlyLight.location,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyAddress()));
+                },
+              ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(
-                  title: "Authentication", icon: IconlyLight.shieldDone),
+                title: "Authentication",
+                icon: IconlyLight.shieldDone,
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => BioAuth()));
+                },
+              ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
-              ProfileAction(title: "Help & Support", icon: Icons.help_outline),
+              ProfileAction(
+                title: "Help & Support",
+                icon: Icons.help_outline,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HelpandSupport()));
+                },
+              ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(title: "Contacts", icon: IconlyLight.user3),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),

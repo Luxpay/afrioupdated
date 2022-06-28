@@ -4,6 +4,8 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
 import 'package:luxpay/widgets/settings_item.dart';
 
+import 'luxpay_rate_social.dart';
+
 class AboutLuxPay extends StatelessWidget {
   static const String path = "/aboutLuxPay";
   const AboutLuxPay({Key? key}) : super(key: key);
@@ -16,6 +18,7 @@ class AboutLuxPay extends StatelessWidget {
         child: Container(
           width: double.infinity,
           height: double.infinity,
+          margin: EdgeInsets.only(top: 20),
           child: Column(
             children: [
               Container(
@@ -42,7 +45,7 @@ class AboutLuxPay extends StatelessWidget {
                   children: [
                     Divider(
                       color: HexColor("#FBFBFB"),
-                      thickness: 8,
+                      thickness: 3,
                     ),
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -67,12 +70,12 @@ class AboutLuxPay extends StatelessWidget {
                     ),
                     Divider(
                       color: HexColor("#FBFBFB"),
-                      thickness: 8,
+                      thickness: 3,
                     ),
                     SettingsItem(title: "To Store"),
                     Divider(
                       color: HexColor("#FBFBFB"),
-                      thickness: 4,
+                      thickness: 3,
                     ),
                     SettingsItem(
                       title: "Terms and Conditions",
@@ -82,7 +85,19 @@ class AboutLuxPay extends StatelessWidget {
                     ),
                     Divider(
                       color: HexColor("#FBFBFB"),
-                      thickness: 4,
+                      thickness: 3,
+                    ),
+                    SettingsItem(
+                        title: "Rate us",
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LuxPaySocial()));
+                        }),
+                    Divider(
+                      color: HexColor("#FBFBFB"),
+                      thickness: 3,
                     ),
                     SettingsItem(title: "Privacy Policy"),
                     Expanded(

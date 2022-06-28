@@ -6,9 +6,11 @@ import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/myProfits/crowd365_dashboard.dart';
-import 'package:luxpay/views/myProfits/crowd365_payment.dart';
+
 import 'package:luxpay/widgets/lux_buttons.dart';
+
+import '../../widgets/methods/showDialog.dart';
+import 'crowd365_payment.dart';
 
 class Crowd365Packages extends StatefulWidget {
   static const String path = "crowd365Packages";
@@ -358,11 +360,11 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                _showChoiceDialog(
+                                showChoiceDialog(
                                     context,
                                     validators.firstWhere(
                                             (element) => element != null) ??
-                                        "");
+                                        "","Crowd365");
 
                                 return;
                               }
@@ -392,25 +394,5 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                   ],
                 )),
     );
-  }
-
-  Future<void> _showChoiceDialog(BuildContext context, content) async {
-    showCupertinoDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                "Crowd365",
-              ),
-              actions: [
-                CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("OK")),
-              ],
-              content: Text(content));
-        });
   }
 }

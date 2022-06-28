@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/errors/error.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/myProfits/crowd365_dashboard.dart';
+
 import '../../models/walletsModel.dart';
 import '../../networking/dio.dart';
 import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../widgets/lux_buttons.dart';
 import '../../models/errors/refferal.dart';
+import '../../widgets/methods/showDialog.dart';
+import 'crowd365_dashboard.dart';
 
 class Crowd365PaymentMethod extends StatefulWidget {
   String? packageName, packagePrice;
@@ -183,7 +185,8 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                                         )
                                                       : Image.asset(
                                                           'assets/unselect_radio.png',
-                                                          color: Colors.grey)),
+                                                          color: Colors.grey)
+                                                          ),
                                             )
                                           ],
                                         ),
@@ -226,11 +229,11 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                   setState(() {
                                     _isLoading = false;
                                   });
-                                  _showChoiceDialog(
+                                  showChoiceDialog(
                                       context,
                                       validators.firstWhere(
                                               (element) => element != null) ??
-                                          "");
+                                          "","Crowd365");
                                   return;
                                 }
                                 var res = await packageSelected(
@@ -243,7 +246,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                   setState(() {
                                     _isLoading = false;
                                   });
-                                  _showChoiceDialog(context, errors);
+                                  showChoiceDialog(context, errors,"Crowd365");
                                 } else {
                                   setState(() {
                                     _isLoading = false;
@@ -319,7 +322,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
         debugPrint(' Error: ${e.response?.data}');
         if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;
@@ -373,7 +376,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
       if (e.response != null) {
         if (e.response?.statusCode == 401) {
           errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          showChoiceDialog(context, errors,"Crowd365");
           return false;
         } else {
           var errorData = e.response?.data;
@@ -390,23 +393,4 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
     }
   }
 
-  Future<void> _showChoiceDialog(BuildContext context, content) async {
-    showCupertinoDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                "Crowd365",
-              ),
-              actions: [
-                CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("OK")),
-              ],
-              content: Text(content));
-        });
-  }
 }

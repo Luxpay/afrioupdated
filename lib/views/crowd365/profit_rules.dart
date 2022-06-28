@@ -71,9 +71,10 @@ class _ProfitRulesState extends State<ProfitRules> {
                     ),
                     SizedBox(height: 20),
                     crowd360Rules(
-                      question: "How does EPIC works ?",
-                      answer: "",
-                    ),
+                        question: "How does EPIC works ?",
+                        answer:
+                            " 1 You are to register with as low N1,000. 2 branches are then automatically created, which you'll need to fill by inviting people through your invitation link. \n\n2 To attain the N5,000 reward, your 2 invitees will bring 2 more people each, thereby completing the 6 man matrix. \n\n3 After completing the matrix, your N5,000 reward would be eligible for withdrawal. \n\n4 Crowd365 also rewards you with N750 as a spillover for every time any of your downlines completes a cycle. \n\n5 After your matrix, you can resubscribe with N2,000 to complete another cycle; by doing this, you never stop earning. \n\n6 Epic also rewards its members with juicy offers like iPhones, home theaters, laptops, and much more.  "),
+                    SizedBox(height: 30),
                   ],
                 )),
           ),
