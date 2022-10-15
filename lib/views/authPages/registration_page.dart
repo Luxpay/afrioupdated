@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/networking/dio.dart';
-import 'package:luxpay/podos/user.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
@@ -13,6 +11,8 @@ import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../networking/DioServices/dio_client.dart';
+
 class RegistrationPage extends StatefulWidget {
   static const String path = "/login";
   const RegistrationPage({Key? key}) : super(key: key);
@@ -22,7 +22,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+ // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
@@ -33,7 +33,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+  //  final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -143,19 +143,19 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               setState(() {});
                             }
                             if (response[1] != null) {
-                              String email = response[1]!.replaceRange(
-                                  2, response[1]!.length - 5, "****");
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => OTPVerification(
-                                      onVerified: () async {
-                                        await Navigator.of(context)
-                                            .pushNamed(CreatePinPage.path);
-                                        Navigator.of(context).pop();
-                                      },
-                                      recipientAddress: obscureEmail(email)),
-                                ),
-                              );
+                              // String email = response[1]!.replaceRange(
+                              //     2, response[1]!.length - 5, "****");
+                              // Navigator.of(context).push(
+                              //   MaterialPageRoute(
+                              //     builder: (context) => OTPVerification(
+                              //         onVerified: () async {
+                              //           await Navigator.of(context)
+                              //               .pushNamed(CreatePinPage.path);
+                              //           Navigator.of(context).pop();
+                              //         },
+                              //         recipientAddress: obscureEmail(email)),
+                              //   ),
+                              // );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(response[0] ?? "")));
@@ -165,9 +165,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                               ? luxButtonLoading(HexColor("#D70A0A"), width)
                               : luxButton(HexColor("#D70A0A"), Colors.white,
                                   "Create account", width,
-                                  fontSize: 16)
-                                  )
-                                  ),
+                                  fontSize: 16))),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 7.8,
                   ),
@@ -218,7 +216,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       var data = response.data['data'];
       var pref = await SharedPreferences.getInstance();
       await pref.setString(authToken, data['access']);
-      await pref.setString(refreshToken, data['refresh']);
+      // await pref.setString(refreshToken, data['refresh']);
       //await pref.setString(userPref, User.fromMap(data).toJson());
       return [null, data['email']];
     } on DioError catch (e) {

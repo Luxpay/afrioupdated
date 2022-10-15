@@ -2,11 +2,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
+
+import '../../networking/DioServices/dio_client.dart';
 
 class WalletTransfer extends StatefulWidget {
   static const String path = '/wallet_transfer';
@@ -130,6 +131,7 @@ class _WalletTransferState extends State<WalletTransfer> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [

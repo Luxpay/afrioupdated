@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/accountSettings/bio_auth.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
-import 'package:luxpay/views/accounts_subviews/payment_settings.dart';
-import 'package:luxpay/views/accounts_subviews/unlock_settings.dart';
+import 'package:luxpay/views/accounts_subviews/change_luxpayPin.dart';
 import 'package:luxpay/widgets/settings_item.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -48,55 +46,63 @@ class SettingsPage extends StatelessWidget {
                       color: HexColor("#FBFBFB"),
                       thickness: 3,
                     ),
-                    SettingsItem(title: "LuxPay Pin"),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
                     SettingsItem(
-                      title: "Payment Settings",
+                      title: "LuxPay Pin",
                       onTap: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => PaymentSettings()));
+                                builder: (context) => ChangePinPage()));
                       },
                     ),
                     Divider(
                       color: HexColor("#FBFBFB"),
                       thickness: 3,
                     ),
-                    SettingsItem(
-                      title: "Unlock Settings",
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => UnlockSettings()));
-                      },
-                    ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
-                    SettingsItem(
-                      title: "Biometric Authentication",
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => BioAuth()));
-                      },
-                    ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
-                    SettingsItemToggle(
-                      title: "Notification",
-                    ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
+                    // SettingsItem(
+                    //   title: "Payment Settings",
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (context) => PaymentSettings()));
+                    //   },
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
+                    // SettingsItem(
+                    //   title: "Unlock Settings",
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (context) => UnlockSettings()));
+                    //   },
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
+                    // SettingsItem(
+                    //   title: "Biometric Authentication",
+                    //   onTap: () {
+                    //     Navigator.push(context,
+                    //         MaterialPageRoute(builder: (context) => BioAuth()));
+                    //   },
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
+                    // SettingsItemToggle(
+                    //   title: "Notification",
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
                     SettingsItem(
                       title: "About LuxPay",
                       onTap: () =>

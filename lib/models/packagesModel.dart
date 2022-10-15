@@ -11,72 +11,59 @@ String packagesToJson(Packages data) => json.encode(data.toJson());
 class Packages {
   Packages({
     required this.status,
-    required this.errors,
+    required this.code,
+    required this.message,
     required this.data,
   });
 
-  bool status;
-  Errors errors;
-  Data data;
+  String status;
+  int code;
+  String message;
+  List<Datum> data;
 
   factory Packages.fromJson(Map<String, dynamic> json) => Packages(
         status: json["status"],
-        errors: Errors.fromJson(json["errors"]),
-        data: Data.fromJson(json["data"]),
+        code: json["code"],
+        message: json["message"],
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
-        "errors": errors.toJson(),
-        "data": data.toJson(),
+        "code": code,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
       };
 }
 
-class Data {
-  Data({
-    required this.packages,
-  });
-
-  List<Package> packages;
-
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        packages: List<Package>.from(
-            json["packages"].map((x) => Package.fromJson(x))),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "packages": List<dynamic>.from(packages.map((x) => x.toJson())),
-      };
-}
-
-class Package {
-  Package({
+class Datum {
+  Datum({
     required this.name,
     required this.price,
-    required this.priceCurrency,
+    required this.welcomeBonus,
+    required this.reward,
+    required this.eachCycle,
   });
 
   String name;
   String price;
-  String priceCurrency;
+  String welcomeBonus;
+  String reward;
+  String eachCycle;
 
-  factory Package.fromJson(Map<String, dynamic> json) => Package(
+  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         name: json["name"],
         price: json["price"],
-        priceCurrency: json["price_currency"],
+        welcomeBonus: json["welcome_bonus"],
+        reward: json["reward"],
+        eachCycle: json["each_cycle"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "price": price,
-        "price_currency": priceCurrency,
+        "welcome_bonus": welcomeBonus,
+        "reward": reward,
+        "each_cycle": eachCycle,
       };
-}
-
-class Errors {
-  Errors();
-
-  factory Errors.fromJson(Map<String, dynamic> json) => Errors();
-
-  Map<String, dynamic> toJson() => {};
 }

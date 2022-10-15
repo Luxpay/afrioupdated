@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/launchPages/welcome_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreenTwo extends StatefulWidget {
   static const String path = "/splash";

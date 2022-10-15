@@ -37,18 +37,19 @@ dependencies:
   flutter_spinkit: ^5.0.0
   # Add toast lib
   fluttertoast: ^8.0.8
-  http: ^0.13.1
+
   intl: ^0.17.0
   #Carousel
   carousel_slider: ^4.0.0
   #for bio auth
-  local_auth: ^1.1.5
+  local_auth: ^2.1.2
   get_it: ^7.1.3
   #Add shared_preferences
   shared_preferences: ^2.0.6
   #Icons
   flutter_iconly: ^1.0.2
   url_launcher: ^6.0.20
+  device_info_plus: ^4.0.0
   dio: ^4.0.4
   flutter_riverpod: ^1.0.3
   iconly: ^1.0.1
@@ -65,8 +66,14 @@ dependencies:
   sqflite: ^2.0.2
   path_provider: ^2.0.2
   dio_http_cache: ^0.3.0
-  flutter_easyloading: ^3.0.5
+  
   expandable:
+  pretty_dio_logger: ^1.1.1
+  toggle_switch: ^2.0.1
+  webview_flutter: ^2.0.12
+ 
+
+
 
   
  
@@ -102,6 +109,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/btransfer.png
+    - assets/ptransfer.png
+    - assets/itransfer.png
+    - assets/wallet.png
     - assets/coolicon.png
     - assets/facebook.png
     - assets/ig.png
@@ -121,9 +132,9 @@ flutter:
     - assets/exclamation.png
     - assets/construction.png
     - assets/nigeria.png
-    - assets/basic.png
-    - assets/standard.png
-    - assets/premium.png
+    - assets/Basic.png
+    - assets/Standard.png
+    - assets/Premium.png
     - assets/lp.png
     - assets/moreToLife.png
     - assets/fprint.png

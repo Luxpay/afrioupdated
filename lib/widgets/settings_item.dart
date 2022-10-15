@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 
 class SettingsItem extends StatelessWidget {
@@ -54,7 +53,7 @@ class SettingsItemToggle extends StatefulWidget {
 class _SettingsItemToggleState extends State<SettingsItemToggle> {
   @override
   Widget build(BuildContext context) {
-    final storage = FlutterSecureStorage();
+    //final storage = FlutterSecureStorage();
     bool isSwitched = false;
     return GestureDetector(
       onTap: widget.onTap,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MenuWidget extends StatelessWidget {
-  String menuName;
-  String imageName;
+  final String menuName;
+  final String imageName;
   MenuWidget({Key? key, required this.menuName, required this.imageName})
       : super(key: key);
 

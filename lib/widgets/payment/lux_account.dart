@@ -4,9 +4,16 @@ import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/utils/toaster.dart';
 
-class LuxAccount extends StatelessWidget {
-  const LuxAccount({Key? key}) : super(key: key);
+class LuxAccount extends StatefulWidget {
+  final String? bankName, bankNumber;
+  const LuxAccount({Key? key, this.bankName, this.bankNumber})
+      : super(key: key);
 
+  @override
+  State<LuxAccount> createState() => _LuxAccountState();
+}
+
+class _LuxAccountState extends State<LuxAccount> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -31,7 +38,7 @@ class LuxAccount extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text("7010589059",
+              Text("${widget.bankNumber ?? 'N/A'}",
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
@@ -40,7 +47,8 @@ class LuxAccount extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 15.0),
                 child: InkWell(
                     onTap: () => {
-                          Clipboard.setData(ClipboardData(text: "7010589059")),
+                          Clipboard.setData(
+                              ClipboardData(text: "${widget.bankNumber}")),
                           LuxToast.show(msg: "Copied")
                         },
                     child: Image.asset(
@@ -55,7 +63,7 @@ class LuxAccount extends StatelessWidget {
             height: SizeConfig.safeBlockVertical! * 1.4,
           ),
           Text(
-            "Select WEMA as Bank ",
+            "Select ${widget.bankName ?? 'N/A'} ",
             style: TextStyle(color: HexColor("#8D9091"), fontSize: 13),
           ),
           SizedBox(

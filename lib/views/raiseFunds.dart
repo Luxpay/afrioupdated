@@ -16,8 +16,8 @@ class _RaiseFundsState extends State<RaiseFunds> {
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+    // final double width = MediaQuery.of(context).size.width;
+    // final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(

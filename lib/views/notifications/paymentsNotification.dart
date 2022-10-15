@@ -6,46 +6,34 @@ import 'package:luxpay/widgets/notificationWidget.dart';
 
 import '../../services/notification_database.dart';
 
+// ignore: must_be_immutable
 class PaymentsNotification extends StatefulWidget {
-  List<Notifications> items;
-  PaymentsNotification({Key? key, required this.items}) : super(key: key);
+ 
+  PaymentsNotification({Key? key, }) : super(key: key);
 
   @override
   _PaymentsNotificationState createState() => _PaymentsNotificationState();
 }
 
 class _PaymentsNotificationState extends State<PaymentsNotification> {
+   List<Notifications>? items;
   Future refreshNotes() async {
-    widget.items = await NotificationDatabase.instance.readAllNotification();
+    items = await NotificationDatabase.instance.readAllNotification();
   }
-
-  //Timer? timer;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // timer = Timer.periodic(Duration(seconds: 5), (_) {
 
-    refreshNotes();
-
-    //});
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    setState(() {
-      // timer!.cancel();
-      // timer!.cancel();
-      print("cancelButton");
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+      refreshNotes();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.items.isEmpty
+    return items == null
         ? Center(
             child: InkWell(
               onTap: () {
@@ -66,9 +54,9 @@ class _PaymentsNotificationState extends State<PaymentsNotification> {
             ),
           )
         : ListView.separated(
-            itemCount: widget.items.length,
+            itemCount: items!.length,
             itemBuilder: (BuildContext context, int position) {
-              return NotificationWidget(notification: widget.items[position]);
+              return NotificationWidget(notification: items![position]);
             },
             separatorBuilder: (context, index) {
               return SizedBox(

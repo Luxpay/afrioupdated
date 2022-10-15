@@ -1,20 +1,20 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/errors/error.dart';
-import 'package:luxpay/models/userInfoModel.dart';
+import 'package:luxpay/networking/DioServices/dio_client.dart';
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 import 'package:luxpay/views/authPages/otp_verification.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/touchUp.dart';
-import '../../networking/dio.dart';
+import '../../models/errors/authError.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/validators.dart';
+import '../../widgets/lux_textfield.dart';
 import '../../widgets/methods/getDeviceInfo.dart';
 
 class CreateAccount extends StatefulWidget {
@@ -27,7 +27,8 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends State<CreateAccount> {
   //TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  // TextEditingController fullNameController = TextEditingController();
+  TextEditingController controllerUsername = TextEditingController();
+  TextEditingController controllerEmail = TextEditingController();
   TextEditingController phoneController = TextEditingController();
 
   bool _isLoading = false;
@@ -39,11 +40,10 @@ class _CreateAccountState extends State<CreateAccount> {
     // ignore: todo
     // TODO: implement initState
     super.initState();
-
+    fcmToken();
+    getDeviceDetails();
     setState(() {
       _isLoading = false;
-      fcmToken(fcMessageToken);
-      getDeviceDetails();
     });
   }
 
@@ -51,220 +51,254 @@ class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
           child: SingleChildScrollView(
-        child: Container(
-          //height: 900,
-          width: double.infinity,
-          // margin: EdgeInsets.only(left: 30, right: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                height: 80,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    IconButton(
-                        onPressed: () => {Navigator.maybePop(context)},
-                        icon: const Icon(Icons.arrow_back_ios_new)),
-                    SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 10,
+        child: Center(
+          child: Container(
+            //height: 900,
+            width: double.infinity,
+            // margin: EdgeInsets.only(left: 30, right: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // IconButton(
+                      //     onPressed: () => {Navigator.maybePop(context)},
+                      //     icon: const Icon(Icons.arrow_back_ios_new)),
+                      // SizedBox(
+                      //   width: SizeConfig.safeBlockHorizontal! * 10,
+                      // ),
+                      const Text(
+                        "Create New Account",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 12),
+                  child: Center(
+                    child: Image.asset(
+                      "assets/moreToLife.png",
+                      scale: 1.6,
                     ),
-                    const Text(
-                      "Create New Account",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                child: Center(
-                  child: Image.asset("assets/moreToLife.png"),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 30, right: 30),
-                child: Container(
-                  child: Row(
-                    children: [
-                      Flexible(
-                          child: Text(
-                              "Please enter your registered phone number and a secured password that include the following criterias to proceed")),
-                    ],
                   ),
                 ),
-              ),
-              SizedBox(
-                height: SizeConfig.safeBlockVertical! * 2.2,
-              ),
-              Container(
+                SizedBox(
+                  height: 12,
+                ),
+                Container(
                   margin: EdgeInsets.only(left: 30, right: 30),
-                  child: PhoneNumberField(
-                      controller: phoneController, hint: "Phone Number")),
-              SizedBox(
-                height: SizeConfig.safeBlockVertical! * 2.2,
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 30, right: 30),
-                child: PasswordTextField(
-                  hint: "Password",
-                  controller: passwordController,
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
-                margin: EdgeInsets.only(left: 30, right: 30),
-                child: Container(
-                  child: Row(
-                    children: [
-                      Flexible(
-                          child: Text(
-                        "* Your password must be 8 or more characters long & contain a mix of upper & lower case letters, numbers & symbols.",
-                        style: TextStyle(color: Colors.grey),
-                      )),
-                    ],
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Flexible(
+                            child: Text(
+                                "Please enter your registered phone number and a secured password that include the following criterias to proceed")),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              InkWell(
-                onTap: () async {
-                  var password = passwordController.text.trim();
-                  var phoneNumber = phoneController.text.trim();
+                SizedBox(
+                  height: SizeConfig.safeBlockVertical! * 2.2,
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 30, right: 30),
+                    child: PhoneNumberField(
+                        boaderColor: HexColor("#D70A0A"),
+                        controller: phoneController,
+                        innerHint: "Phone Number")),
+                SizedBox(
+                  height: SizeConfig.safeBlockVertical! * 2.2,
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: LuxTextField(
+                    hint: "UserName",
+                    controller: controllerUsername,
+                    innerHint: "eg johnson",
+                    // prefixIcon: Icon(Icons.person),
+                    boaderColor: HexColor("#D70A0A"),
+                  ),
+                ),
+                SizedBox(
+                  height: SizeConfig.safeBlockVertical! * 2.2,
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: LuxTextField(
+                    hint: "Email",
+                    controller: controllerEmail,
+                    innerHint: "eg mike@gmail.com",
+                    // prefixIcon: Icon(Icons.person),
+                    boaderColor: HexColor("#D70A0A"),
+                  ),
+                ),
+                SizedBox(
+                  height: SizeConfig.safeBlockVertical! * 2.2,
+                ),
+                Container(
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: PasswordTextField(
+                    hint: "Password",
+                    controller: passwordController,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  margin: EdgeInsets.only(left: 30, right: 30),
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Flexible(
+                            child: Text(
+                          "* Your password must be 8 or more characters long & contain a mix of upper & lower case letters, numbers & symbols.",
+                          style: TextStyle(color: Colors.grey),
+                        )),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                InkWell(
+                  onTap: () async {
+                    String password = passwordController.text.trim();
+                    String phoneNumber = phoneController.text.trim();
+                    String username = controllerUsername.text.trim();
+                    String email = controllerEmail.text.trim();
 
-                  debugPrint(phoneNumber);
-                  debugPrint(password);
+                    debugPrint(phoneNumber);
+                    debugPrint(password);
 
-                  var validators = [
-                    Validators.isValidPassword(password),
-                    Validators.isValidPhoneNumber(phoneNumber),
-                  ];
-                  if (validators.any((element) => element != null)) {
+                    var validators = [
+                      Validators.forEmptyField(username),
+                      Validators.isValidPassword(password),
+                      Validators.isValidPhoneNumber(phoneNumber),
+                      Validators.isValidEmail(email),
+                    ];
+                    if (validators.any((element) => element != null)) {
+                      setState(() {
+                        _isLoading = false;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(validators
+                                  .firstWhere((element) => element != null) ??
+                              "")));
+                      return;
+                    }
+                    setState(() {
+                      _isLoading = true;
+                    });
+
+                    var response = await createUser(
+                        password, phoneNumber, username, email);
                     setState(() {
                       _isLoading = false;
                     });
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(validators
-                                .firstWhere((element) => element != null) ??
-                            "")));
-                    return;
-                  }
-                  setState(() {
-                    _isLoading = true;
-                  });
-
-                  var response = await createUser(password, phoneNumber);
-                  setState(() {
-                    _isLoading = false;
-                  });
-                  debugPrint("SignUp: $response");
-                  if (response) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => OTPVerification(
-                                onVerified: () async {},
-                                recipientAddress: obscureEmail(phoneNumber))));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(errors ?? "something went wrong")));
-                  }
-                },
-                child: Container(
-                  margin: EdgeInsets.only(left: 30, right: 30),
-                  child: _isLoading
-                      ? luxButtonLoading(HexColor("#D70A0A"), width)
-                      : luxButton(HexColor("#D70A0A"), Colors.white,
-                          "Create Account", width,
-                          fontSize: 16),
+                    debugPrint("SignUp: $response");
+                    if (response) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OTPVerification(
+                                  recipientAddressEmail: obscureEmail(email),
+                                  recipientAddress:
+                                      obscureEmail(phoneNumber))));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(errors ?? "something went wrong")));
+                    }
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: 30, right: 30),
+                    child: _isLoading
+                        ? luxButtonLoading(HexColor("#D70A0A"), width)
+                        : luxButton(HexColor("#D70A0A"), Colors.white,
+                            "Create Account", width,
+                            fontSize: 16),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              RichText(
-                text: TextSpan(
-                    text: 'Already have an account?',
-                    style: TextStyle(color: Colors.black, fontSize: 12),
-                    children: <TextSpan>[
-                      TextSpan(
-                          text: ' Log in',
-                          style: TextStyle(
-                              color: Color.fromARGB(255, 7, 139, 248),
-                              fontSize: 15),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginPage()));
-                            })
-                    ]),
-              ),
-              SizedBox(
-                height: 50,
-              )
-            ],
+                SizedBox(
+                  height: 50,
+                ),
+                RichText(
+                  text: TextSpan(
+                      text: 'Already have an account?',
+                      style: TextStyle(color: Colors.black, fontSize: 12),
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: ' Log in',
+                            style: TextStyle(
+                                color: HexColor("#D70A0A"), fontSize: 15),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()));
+                              })
+                      ]),
+                ),
+                SizedBox(
+                  height: 50,
+                )
+              ],
+            ),
           ),
         ),
       )),
     );
   }
 
-  Future<bool> createUser(String password, String phone) async {
-    late String token, refToken;
+  Future<bool> createUser(
+      String password, String phone, String username, String email) async {
     final storage = new FlutterSecureStorage();
+
     Map<String, dynamic> body = {
       'password': password,
       "phone": phone,
-      'token': await storage.read(key: 'fcmToken'),
-      // 'platform': await storage.read(key: 'DeviceName')
+      'username': username,
+      'email': email
+      //'token': await storage.read(key: 'fcmToken'),
+      //'platform': await storage.read(key: 'DeviceName')
     };
-    debugPrint('Data : ${body.toString()}');
     try {
       var response = await unAuthDio.post(
-        "/api/user/signup/",
+        "/auth/signup/",
         data: body,
       );
-      debugPrint('${response.toString()}');
-      debugPrint('${response.statusCode}');
+
       if (response.statusCode == 201) {
-        var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('${data}');
-        var userData = await UserData.fromJson(data);
-
-        token = userData.data.tokens.access;
-        refToken = userData.data.tokens.refresh;
-        phone = userData.data.user.phone;
-
-        await storage.write(key: authToken, value: token);
-        await storage.write(key: refreshToken, value: refToken);
-
-        print("Token Stored: ${await storage.read(key: authToken)}");
-        print("refreshToken stored: ${await storage.read(key: refreshToken)}");
+        // var data = response.data;
+        // var userData = await Signup.fromJson(data);
+        // phone = userData.data.phone;
+        // debugPrint("PhoneNumber Stored: ${phone}");
+        await storage.write(key: phoneNumber, value: phone);
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
+        debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
-        var errorMessage = await ErrorMessages.fromJson(errorData);
-        errors = errorMessage.errors.message;
+        debugPrint(' Error Error: ${errorData}');
+        var errorMessage = await AuthError.fromJson(errorData);
+        errors = errorMessage.message;
         return false;
       } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {
@@ -273,31 +307,3 @@ class _CreateAccountState extends State<CreateAccount> {
     }
   }
 }
-
-// void purgeALL() async {
-//   Map<String, dynamic> body = {
-//     'phone': "08118691299",
-//   };
-//   try {
-//     await unAuthDio.delete(
-//       "/api/user/purge/",
-//       data: body,
-//     );
-
-//     print("Purge successful");
-//     return null;
-//   } on DioError catch (e) {
-//     print(e.message);
-//     if (e.response != null) {
-//       return e.response?.data['message'] ?? "An error occurred";
-//     } else {
-//       return;
-//     }
-//   } catch (e) {
-//     return;
-//   } finally {
-//     SharedPreferences.getInstance().then((pref) async {
-//       await pref.clear();
-//     });
-//   }
-// }

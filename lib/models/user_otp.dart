@@ -9,49 +9,45 @@ UserOtp userOtpFromJson(String str) => UserOtp.fromJson(json.decode(str));
 String userOtpToJson(UserOtp data) => json.encode(data.toJson());
 
 class UserOtp {
-  UserOtp({
-    required this.status,
-    required this.errors,
-    required this.data,
-  });
+    UserOtp({
+        required this.status,
+        required this.code,
+        required this.data,
+        this.message,
+    });
 
-  bool status;
-  Errors errors;
-  Data data;
+    String status;
+    int code;
+    Data data;
+    dynamic message;
 
-  factory UserOtp.fromJson(Map<String, dynamic> json) => UserOtp(
+    factory UserOtp.fromJson(Map<String, dynamic> json) => UserOtp(
         status: json["status"],
-        errors: Errors.fromJson(json["errors"]),
+        code: json["code"],
         data: Data.fromJson(json["data"]),
-      );
+        message: json["message"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "status": status,
-        "errors": errors.toJson(),
+        "code": code,
         "data": data.toJson(),
-      };
+        "message": message,
+    };
 }
 
 class Data {
-  Data({
-    required this.otp,
-  });
+    Data({
+        required this.code,
+    });
 
-  String otp;
+    String code;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        otp: json["otp"],
-      );
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
+        code: json["code"],
+    );
 
-  Map<String, dynamic> toJson() => {
-        "otp": otp,
-      };
-}
-
-class Errors {
-  Errors();
-
-  factory Errors.fromJson(Map<String, dynamic> json) => Errors();
-
-  Map<String, dynamic> toJson() => {};
+    Map<String, dynamic> toJson() => {
+        "code": code,
+    };
 }

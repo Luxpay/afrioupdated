@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/crowd365/profit_rules.dart';
-
-
 import '../../widgets/lux_buttons.dart';
 import 'crow365_referral.dart';
 
@@ -20,119 +19,128 @@ class _Crowd365State extends State<Crowd365> {
     "Your invitees can only subscribe to your package; i.e., the Starter package accepts only Starter package referees.",
     "The My Profit system is a short-term campaign that requires only two-level, i.e., six partners. "
   ];
+
   @override
   Widget build(BuildContext context) {
-    SizeConfig().init(context);
-    return Scaffold(
-      backgroundColor: HexColor("#258F92"),
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                Container(
-                  color: HexColor("#258F92"),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          IconButton(
-                            onPressed: () => {Navigator.pop(context)},
-                            icon: const Icon(Icons.arrow_back_ios_new),
-                            color: Colors.white,
-                          ),
-                          SizedBox(
-                            width: SizeConfig.safeBlockHorizontal! * 2.4,
-                          ),
-                          const Text(
-                            "Crowd365",
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                      InkWell(
-                        onTap: () => {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const ProfitRules()))
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 34.0),
-                          child: Row(
-                            children: [
-                              Image.asset("assets/rules-question.png"),
-                              SizedBox(
-                                width: SizeConfig.safeBlockHorizontal! * 2.4,
-                              ),
-                              const Text(
-                                "Rules",
-                                style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              )
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
+    return AnnotatedRegion(
+      // Reset SystemUiOverlayStyle for PageOne.
+      // If this is not set, the status bar will use the style applied from another route.
+      value: SystemUiOverlayStyle(
+        statusBarColor: HexColor("#415CA0"),
+        statusBarBrightness: Brightness.light,
+      ),
+
+      child: Scaffold(
+        backgroundColor: HexColor("#415CA0"),
+        body: SafeArea(
+          bottom: false,
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Container(
+                    color: HexColor("#415CA0"),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        myProfit(),
-                        SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () => {Navigator.pop(context)},
+                              icon: const Icon(Icons.arrow_back_ios_new),
                               color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  topRight: Radius.circular(20))),
-                          child: howToEarn(),
+                            ),
+                            SizedBox(
+                              width: SizeConfig.safeBlockHorizontal! * 2.4,
+                            ),
+                            const Text(
+                              "Crowd365",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
                         ),
-                        Container(
-                          color: Colors.white,
-                          height: SizeConfig.safeBlockVertical! * 12.5,
-                        ),
+                        InkWell(
+                          onTap: () => {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const ProfitRules()))
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 34.0),
+                            child: Row(
+                              children: [
+                                Image.asset("assets/rules-question.png"),
+                                SizedBox(
+                                  width: SizeConfig.safeBlockHorizontal! * 2.4,
+                                ),
+                                const Text(
+                                  "Rules",
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                )
-              ],
-            ),
-            Positioned(
-              // top: SizeConfig.safeBlockVertical! * 100,
-              right: 0,
-              left: 0,
-              bottom: MediaQuery.of(context).padding.bottom + 25,
-              child: Container(
-                // width: MediaQuery.of(context).size.width,
-                // height: 72,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: InkWell(
-                      onTap: () => {
-                            // Navigator.push(context, MaterialPageRoute(builder: (context) => const AppPageController()))
-                            // Navigator.of(context)
-                            //     .pushNamed(Crowd365Packages.path)
-                            _crow365RefereBottomSheet(context)
-                          },
-                      child: luxButton(
-                          HexColor("#F76502"), Colors.white, "Apply now", 325,
-                          fontSize: 16, height: 50, radius: 8)),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          myProfit(),
+                          SizedBox(height: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20))),
+                            child: howToEarn(),
+                          ),
+                          Container(
+                            color: Colors.white,
+                            height: SizeConfig.safeBlockVertical! * 12.5,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Positioned(
+                // top: SizeConfig.safeBlockVertical! * 100,
+                right: 0,
+                left: 0,
+                bottom: MediaQuery.of(context).padding.bottom + 25,
+                child: Container(
+                  // width: MediaQuery.of(context).size.width,
+                  // height: 72,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                    child: InkWell(
+                        onTap: () => {
+                              // Navigator.push(context, MaterialPageRoute(builder: (context) => const AppPageController()))
+                              // Navigator.of(context)
+                              //     .pushNamed(Crowd365Packages.path)
+                              _crow365RefereBottomSheet(context)
+                            },
+                        child: luxButton(
+                            HexColor("#415CA0"), Colors.white, "Apply now", 325,
+                            fontSize: 16, height: 50, radius: 8)),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -140,7 +148,7 @@ class _Crowd365State extends State<Crowd365> {
 
   Widget myProfit() {
     return Container(
-      color: HexColor("#258F92"),
+      color: HexColor("#415CA0"),
       child: SafeArea(
         child: Column(
           children: [

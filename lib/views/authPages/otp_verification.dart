@@ -1,27 +1,28 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
-import 'package:luxpay/networking/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:luxpay/models/sent_otp.dart';
 import 'package:luxpay/utils/colors.dart';
-
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/authPages/account_create_successfull.dart';
-import 'package:luxpay/views/authPages/create_pin_page.dart';
+import 'package:luxpay/views/authPages/create_user_profile.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
-import 'package:luxpay/widgets/otfields.dart';
-
 import 'package:pin_code_fields/pin_code_fields.dart';
-
+import '../../models/errors/authError.dart';
 import '../../models/errors/error.dart';
+import '../../models/otp_verify.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
+import '../../utils/constants.dart';
 import '../../utils/functions.dart';
+import '../../widgets/methods/getDeviceInfo.dart';
 
 class OTPVerification extends StatefulWidget {
-  final VoidCallback onVerified;
-  final String recipientAddress;
+ 
+  final String recipientAddress,recipientAddressEmail;
   const OTPVerification(
-      {Key? key, required this.onVerified, required this.recipientAddress})
+      {Key? key, required this.recipientAddressEmail, required this.recipientAddress})
       : super(key: key);
 
   @override
@@ -34,8 +35,9 @@ class _OTPVerificationState extends State<OTPVerification> {
   String otp = "";
   late Timer timer;
   String? errors;
-  late String showPhone;
+  late String showPhone, phone, email;
   TextEditingController textEditingController = TextEditingController();
+  var event_id;
 
   void startCountdown() {
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
@@ -55,14 +57,25 @@ class _OTPVerificationState extends State<OTPVerification> {
   @override
   void initState() {
     startCountdown();
+    fcmToken();
+    getDeviceDetails();
     super.initState();
+
+    if (widget.recipientAddress != '') {
+    phone = widget.recipientAddress;
     showPhone = widget.recipientAddress
         .replaceRange(2, widget.recipientAddress.length - 5, "****");
+     sendOTP(widget.recipientAddress, "");
+    } else {
+          email = widget.recipientAddressEmail;
+    showPhone = widget.recipientAddressEmail
+        .replaceRange(2, widget.recipientAddress.length - 5, "****");
+     sendOTP("", widget.recipientAddressEmail);
+    }
+
     setState(() {
       _isLoading = false;
-      sendOTP();
     });
-
   }
 
   @override
@@ -145,7 +158,6 @@ class _OTPVerificationState extends State<OTPVerification> {
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 2,
                         ),
-
                         PinCodeTextField(
                           appContext: context,
                           keyboardType: TextInputType.number,
@@ -200,16 +212,22 @@ class _OTPVerificationState extends State<OTPVerification> {
                               return;
                             }
 
-                            var response = await verifyOTP(otp);
+                            bool response =
+                                await verifyOTP(otp);
                             setState(() {
                               _isLoading = false;
                             });
 
                             if (response) {
-                              Navigator.push(
-                                  context,
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => CreatePinPage()));
+                              Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                      builder: (context) => CreatePinPage()));
+                                      builder: (context) =>
+                                          CreateUserProfile()),
+                                  (route) => false);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -237,18 +255,29 @@ class _OTPVerificationState extends State<OTPVerification> {
                     ),
                     InkWell(
                       onTap: () async {
-                        var response = await verifyOTP(otp);
+                        
+                        bool response =
+                            await verifyOTP(otp);
                         _isLoading = false;
                         if (mounted) {
                           setState(() {});
                         }
                         if (response) {
-                          Navigator.push(
-                              context,
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => CreatePinPage()));
+                          Navigator.of(context).pushAndRemoveUntil(
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      AccountCreateSuccefful()));
+                                  builder: (context) => CreateUserProfile()),
+                              (route) => false);
                         } else {
+                          setState(() {
+                            _isLoading = false;
+                          });
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text(errors ?? "something went wrong")));
                         }
@@ -267,7 +296,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                         ? InkWell(
                             onTap: () async {
                               //var data = await resentOTP();
-                              await sendOTP();
+                              await sendOTP(phone, email);
                               startCountdown();
                             },
                             child: Text(
@@ -306,6 +335,8 @@ class _OTPVerificationState extends State<OTPVerification> {
   }
 
   Future<bool> verifyOTP(String otp) async {
+    String token;
+    final storage = new FlutterSecureStorage();
     otp = otp.replaceAll("\u200B", "");
     if (otp.isEmpty || otp.length != 6) {
       //print(otp.length);
@@ -313,12 +344,13 @@ class _OTPVerificationState extends State<OTPVerification> {
       return false;
     }
     Map<String, dynamic> body = {
-      "otp": "$otp",
+      "event_id": event_id,
+      "code": "$otp",
     };
     print("otp: $otp");
     try {
-      var response = await dio.post(
-        "/api/user/verification-otp/confirm/",
+      var response = await unAuthDio.post(
+        "/auth/devices/verify/",
         data: body,
       );
 
@@ -326,18 +358,24 @@ class _OTPVerificationState extends State<OTPVerification> {
         var data = response.data;
         debugPrint('${response.statusCode}');
         debugPrint('${data}');
+        var userData = await Otpverify.fromJson(data);
+        token = userData.data.token;
+        debugPrint("Token Stored: ${token}");
+        await storage.write(key: authToken, value: token);
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         debugPrint(' Error: ${e.response?.data}');
         var errorData = e.response?.data;
-        var errorMessage = await ErrorMessages.fromJson(errorData);
-        errors = errorMessage.errors.message;
+        var errorMessage = await AuthError.fromJson(errorData);
+        errors = errorMessage.message;
         return false;
       } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {
@@ -346,11 +384,32 @@ class _OTPVerificationState extends State<OTPVerification> {
     }
   }
 
-  Future<bool> sendOTP() async {
+  Future<bool> sendOTP(phone, email) async {
+ String url;
+    final storage = new FlutterSecureStorage();
     try {
-      await dio.post(
-        "/api/user/verification-otp/send/",
+      Map<String, dynamic> body = {
+        "phone": phone,
+        "email":email,
+        "token": await storage.read(key: 'fcmToken'),
+        "platform": await storage.read(key: "DeviceName")
+      };
+      if (phone.isEmpty) {
+        body.remove("phone");
+        url = "/auth/device/register-email/";
+      } else {
+        body.remove("email");
+        url = "/auth/device/register-phone/";
+      }
+      var result = await unAuthDio.post(
+        url,
+        data: body,
       );
+
+      var data = result.data;
+      var otpData = await SenOtpResponse.fromJson(data);
+      event_id = otpData.data.eventId;
+
       return true;
     } on DioError catch (e) {
       if (e.response != null) {
@@ -367,6 +426,4 @@ class _OTPVerificationState extends State<OTPVerification> {
       return false;
     }
   }
-
-
 }

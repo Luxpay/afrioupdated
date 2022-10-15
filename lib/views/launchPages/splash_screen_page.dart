@@ -1,7 +1,4 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/hexcolor.dart';
 import 'splash_screen_page_two.dart';
 
@@ -19,11 +16,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     openSecondSplash();
-   // fcmToken();
-    
+    // fcmToken();
   }
-
-
 
   @override
   Widget build(BuildContext context) {

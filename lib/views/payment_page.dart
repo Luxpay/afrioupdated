@@ -1,21 +1,60 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutterwave/flutterwave.dart';
 import 'package:flutterwave/models/responses/charge_response.dart';
 
 class PaymentWidget extends StatefulWidget {
+  final String? channel,
+      encryption_key,
+      public_key,
+      amount,
+      email,
+      tx_ref,
+      phone,
+      fullname;
+
+  const PaymentWidget(
+      {Key? key,
+      required this.encryption_key,
+      required this.public_key,
+      required this.email,
+      required this.tx_ref,
+      required this.phone,
+      required this.channel,
+      required this.fullname,
+      required this.amount})
+      : super(key: key);
   @override
   _PaymentWidgetState createState() => _PaymentWidgetState();
 }
 
 class _PaymentWidgetState extends State<PaymentWidget> {
-  final String txref = "My_unique_transaction_reference_123";
-  final String amount = "200";
+
+  bool constChannel = false;
   final String currency = FlutterwaveCurrency.NGN;
+  String? encryptionKey, publicKey, email, phoneNumber, txRef, fullName;
+  var errors;
+
+  bool checkChannel(String? channel) {
+    if (channel == "BANK") {
+      constChannel = true;
+      return true;
+    } else if (channel == "CARD") {
+      constChannel = true;
+      return true;
+    } else if (channel == 'USSD') {
+      constChannel = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   @override
   void initState() {
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      beginPayment();
+    //  beginPayment();
+      checkChannel(widget.channel);
     });
     super.initState();
   }
@@ -28,18 +67,18 @@ class _PaymentWidgetState extends State<PaymentWidget> {
   beginPayment() async {
     final Flutterwave flutterwave = Flutterwave.forUIPayment(
       context: this.context,
-      encryptionKey: "a905077546d2ff8a3e88fa6e",
-      publicKey: "FLWPUBK-2966e9a8cdd603a66935b76e6fa0d9c9-X",
+      encryptionKey: "${widget.encryption_key}",
+      publicKey: "${widget.public_key}",
       currency: this.currency,
-      amount: this.amount,
-      email: "valid@email.com",
-      fullName: "Valid Full Name",
-      txRef: this.txref,
+      amount: "${widget.amount}",
+      email: "${widget.amount}",
+      fullName: "${widget.fullname}",
+      txRef: "${widget.tx_ref}",
       isDebugMode: true,
-      phoneNumber: "0123456789",
-      acceptCardPayment: true,
-      acceptUSSDPayment: true,
-      acceptAccountPayment: true,
+      phoneNumber: "${widget.phone}",
+      acceptCardPayment: constChannel,
+      acceptUSSDPayment: constChannel,
+      acceptAccountPayment: constChannel,
       acceptFrancophoneMobileMoney: false,
       acceptGhanaPayment: false,
       acceptMpesaPayment: false,
@@ -61,13 +100,13 @@ class _PaymentWidgetState extends State<PaymentWidget> {
           // provide value to customer
         } else {
           // check message
-          print(response.message);
+          debugPrint(response.message);
 
           // check status
-          print(response.status);
+          debugPrint(response.status);
 
           // check processor error
-          print(response.data?.processorResponse);
+          debugPrint(response.data?.processorResponse);
         }
       }
     } catch (error) {
@@ -78,7 +117,9 @@ class _PaymentWidgetState extends State<PaymentWidget> {
   bool checkPaymentIsSuccessful(final ChargeResponse response) {
     return response.data?.status == FlutterwaveConstants.SUCCESSFUL &&
         response.data?.currency == this.currency &&
-        response.data?.amount == this.amount &&
-        response.data?.txRef == this.txref;
+        response.data?.amount == widget.amount &&
+        response.data?.txRef == widget.tx_ref;
   }
-}
+
+ }
+

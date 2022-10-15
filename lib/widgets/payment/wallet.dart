@@ -2,55 +2,81 @@ import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 
-class Wallet extends StatelessWidget {
-  const Wallet({Key? key}) : super(key: key);
+import '../../utils/constants.dart';
+
+class WalletLuxpay extends StatelessWidget {
+  final String? balance;
+  WalletLuxpay({
+    Key? key,
+    required this.balance,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
-    return Container(
-      color: HexColor("#FBFBFB"),
-      child: Column(
-        children: [
-          SizedBox(
-            height: SizeConfig.safeBlockVertical! * 3,
-          ),
-          const Text(
-            "Wallet Balance",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-          ),
-          SizedBox(
-            height: SizeConfig.safeBlockVertical! * 1.4,
-          ),
-          Text(
-            "N 905,000 ",
-            style: TextStyle(
-                color: HexColor("#1E1E1E"),
-                fontWeight: FontWeight.w600,
-                fontFamily: "Montserrat",
-                fontSize: 24),
-          ),
-          SizedBox(
-            height: SizeConfig.safeBlockVertical! * 1.4,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "LuxPay account is :",
-                style: TextStyle(color: HexColor("#8D9091"), fontSize: 13),
-              ),
-              Text("7010589059",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13))
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+            color: HexColor('ff0000'),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                blurRadius: 7,
+                offset: const Offset(0, 3),
+              )
             ],
-          ),
-          SizedBox(
-            height: SizeConfig.safeBlockVertical! * 3,
-          ),
-        ],
+            borderRadius: BorderRadius.circular(20)),
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              height: SizeConfig.safeBlockVertical! * 1,
+            ),
+            const Text(
+              "Available Balance",
+              style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white),
+            ),
+            SizedBox(
+              height: SizeConfig.safeBlockVertical! * 0.3,
+            ),
+            Flexible(
+              child: Text(
+                "N${balance!.replaceAllMapped(reg, mathFunc)}",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Montserrat",
+                    fontSize: 30),
+              ),
+            ),
+            SizedBox(
+              height: SizeConfig.safeBlockVertical! * 0.1,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "LuxPay ID :",
+                  style: TextStyle(color: Colors.white, fontSize: 13),
+                ),
+                Text("7010589059",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13))
+              ],
+            ),
+            SizedBox(
+              height: SizeConfig.safeBlockVertical! * 2,
+            ),
+          ],
+        ),
       ),
     );
   }

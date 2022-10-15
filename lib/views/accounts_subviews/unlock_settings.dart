@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/views/accounts_subviews/payment_settings.dart';
 
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
-import '../../widgets/settings_item.dart';
-import 'about_luxpay.dart';
-
 class UnlockSettings extends StatefulWidget {
   const UnlockSettings({Key? key}) : super(key: key);
 
@@ -91,7 +86,7 @@ class UnlockItemToggle extends StatefulWidget {
 class _UnlockItemToggle extends State<UnlockItemToggle> {
   @override
   Widget build(BuildContext context) {
-    final storage = FlutterSecureStorage();
+  
     bool isSwitched = false;
     return GestureDetector(
       onTap: widget.onTap,

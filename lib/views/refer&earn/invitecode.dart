@@ -1,11 +1,14 @@
-import 'dart:ui';
-
+import 'package:dio/dio.dart';
+import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:luxpay/utils/colors.dart';
 
+import '../../models/aboutUser.dart';
+import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
 
@@ -17,13 +20,21 @@ class InvitationCode extends StatefulWidget {
 }
 
 class _InvitationCodeState extends State<InvitationCode> {
-  String copyText = "@Kellyhandsome";
+  var username;
   Future<void> share(share) async {
     await FlutterShare.share(
         title: 'Share Luxpay',
         text: share,
         // linkUrl: 'https://flutter.dev/',
         chooserTitle: 'Luxpay Referral Code');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      aboutUser();
+    });
   }
 
   @override
@@ -70,7 +81,7 @@ class _InvitationCodeState extends State<InvitationCode> {
                         color: grey1,
                         child: Center(
                           child: Text(
-                            copyText,
+                            username ?? "Loading...",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -84,16 +95,17 @@ class _InvitationCodeState extends State<InvitationCode> {
                                     title: "Copy",
                                     hexColor: "#333333",
                                     onTap: () {
-                                      print("copied");
+                                      debugPrint("copied");
                                       Fluttertoast.showToast(
-                                        msg: copyText,
+                                        msg: username,
                                         toastLength: Toast.LENGTH_SHORT,
                                         gravity: ToastGravity
                                             .BOTTOM, // also possible "TOP" and "CENTER"
                                         backgroundColor: HexColor("#415CA0"),
                                       );
                                       Clipboard.setData(
-                                          ClipboardData(text: copyText));
+                                          ClipboardData(text: username));
+                                      debugPrint("copied");
                                     })),
                             SizedBox(
                               width: 50,
@@ -103,7 +115,7 @@ class _InvitationCodeState extends State<InvitationCode> {
                                     title: "Share",
                                     hexColor: "#144DDE",
                                     onTap: () {
-                                      share(copyText);
+                                      share(username);
                                     }))
                           ],
                         ),
@@ -147,5 +159,50 @@ class _InvitationCodeState extends State<InvitationCode> {
         ),
       ),
     );
+  }
+
+  Future<bool> aboutUser() async {
+    final storage = new FlutterSecureStorage();
+    DioCacheManager dioCacheManager;
+    dioCacheManager = DioCacheManager(CacheConfig());
+    Options _cacheOptions = buildCacheOptions(Duration(days: 7),
+        forceRefresh: true,
+        options: Options(headers: {
+          'Authorization': 'Bearer ${await storage.read(key: authToken) ?? ""}'
+        }));
+    Dio _dio = Dio();
+    _dio.interceptors.add(dioCacheManager.interceptor);
+    var response = await _dio.get(
+      base_url + "/v1/user/profile/",
+      options: _cacheOptions,
+    );
+    debugPrint('Data Code ${response.statusCode}');
+    try {
+      if (response.statusCode == 200) {
+        var data = response.data;
+        debugPrint('${response.statusCode}');
+        debugPrint('Check Data ${data}');
+        var user = await AboutUser.fromJson(data);
+        setState(() {
+          username = user.data.username;
+
+          debugPrint("name ${username}");
+        });
+
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        debugPrint(' Error: ${e.response?.data}');
+        return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
+    }
   }
 }

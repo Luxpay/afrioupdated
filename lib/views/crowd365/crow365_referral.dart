@@ -2,24 +2,21 @@ import 'package:dio/dio.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/errors/error.dart';
+import 'package:luxpay/models/errors/authError.dart';
+
 import 'package:luxpay/models/packagesModel.dart';
 
 import 'package:luxpay/utils/colors.dart';
-import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 
 import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:luxpay/widgets/touchUp.dart';
 
-import '../../models/errors/refferal.dart';
-import '../../networking/dio.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../widgets/lux_buttons.dart';
 import '../../widgets/methods/showDialog.dart';
 import 'crowd365_packages.dart';
-
-
-
 
 class Crowd365Refere extends StatefulWidget {
   const Crowd365Refere({Key? key}) : super(key: key);
@@ -30,7 +27,7 @@ class Crowd365Refere extends StatefulWidget {
 
 class _Crowd365RefereState extends State<Crowd365Refere> {
   TextEditingController controllerRefere = TextEditingController();
-  List? packageItems;
+  List<Datum> packageItems = [];
   bool _isLoading = false;
   bool _isLoadingPackage = false;
   var errors;
@@ -78,9 +75,9 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                       child: Column(
                         children: [
                           LuxTextField(
-                            hint: "Enter your referral code here",
+                            hint: "Enter your referral username here",
                             controller: controllerRefere,
-                            innerHint: "Enter card code name",
+                            innerHint: "Enter referral name",
                           ),
                           SizedBox(height: 20),
                           InkWell(
@@ -92,7 +89,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                               var referal = controllerRefere.text.trim();
                               var validators = [
                                 referal.isEmpty
-                                    ? "Please Enter Your Referral Code"
+                                    ? "Please Enter Your Referral Username"
                                     : null,
                               ];
                               if (validators
@@ -100,11 +97,12 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                showChoiceDialog(
+                                showErrorDialog(
                                     context,
                                     validators.firstWhere(
                                             (element) => element != null) ??
-                                        "","Crowd365");
+                                        "",
+                                    "Crowd365");
 
                                 return;
                               }
@@ -116,7 +114,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                showChoiceDialog(context, errors,"Crowd365");
+                                showErrorDialog(context, errors, "Crowd365");
                               } else {
                                 setState(() {
                                   _isLoading = false;
@@ -150,7 +148,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                                 setState(() {
                                   _isLoadingPackage = false;
                                 });
-                                showChoiceDialog(context, errors,"Crowd365");
+                                showErrorDialog(context, errors, "Crowd365");
                               } else {
                                 setState(() {
                                   _isLoadingPackage = false;
@@ -165,7 +163,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
                             },
                             child: _isLoadingPackage
                                 ? Text(
-                                    "Try again Loadin....",
+                                    "Packages Loadin....",
                                     style: TextStyle(
                                         color: HexColor("#415CA0"),
                                         fontSize: 16),
@@ -188,46 +186,49 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
     );
   }
 
-  Future<bool> referrerSend(String referalCode) async {
+  Future<bool> referrerSend(String referalName) async {
     final storage = new FlutterSecureStorage();
     await storage.delete(key: 'Crowd365ReferalCode');
-    debugPrint("Sponsor ReferalCode: $referalCode");
-    await storage.write(key: 'Crowd365ReferalCode', value: referalCode);
-
+    debugPrint("Sponsor ReferalCode: $referalName");
+    await storage.write(key: 'Crowd365ReferalCode', value: referalName);
+   
     try {
       var response =
-          await dio.get("/api/v1/crowd365/packages/?referrer=$referalCode");
+          await dio.get("/v1/crowd365/packages/?username=$referalName");
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
         debugPrint('${data}');
         var packageData = Packages.fromJson(data);
-        packageItems = packageData.data.packages;
-        await storage.delete(key: expiredToken);
+        packageItems = packageData.data;
+
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         setState(() {
           _isLoading = false;
         });
         debugPrint(' Error: ${e.response?.data}');
         if (e.response?.statusCode == 400) {
-          errors = "Invalid Code Check And Retry Again";
+          errors = "Username is required";
           return false;
         } else if (e.response?.statusCode == 401) {
-          errors = "Network issue, Try Again";
-          showChoiceDialog(context, errors,"Crowd365");
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
           return false;
         } else {
           var errorData = e.response?.data;
-          var errorMessage = await ReferralError.fromJson(errorData);
-          errors = errorMessage.errors.extra.error[0];
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
           return false;
         }
       } else {
+        errors = errorMessage;
+        showErrorDialog(context, errors, "Crowd365");
         setState(() {
           _isLoading = false;
         });
@@ -242,41 +243,44 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
     }
   }
 
-
 //F6PN7W
   Future<bool> getPackage() async {
     final storage = new FlutterSecureStorage();
     await storage.delete(key: 'Crowd365ReferalCode');
     try {
       var response = await dio.get(
-        "/api/v1/crowd365/packages/",
+        "/v1/crowd365/packages/",
       );
-      debugPrint('Error code${response.statusCode}');
+      debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
+        
         var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('${data}');
+       
         var packageData = Packages.fromJson(data);
-        packageItems = packageData.data.packages;
-
+     
+        packageItems = packageData.data;
+       
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         debugPrint(' Error: ${e.response?.data}');
         if (e.response?.statusCode == 401) {
-          errors = "Network issue, Try Again";
-          showChoiceDialog(context, errors,"Crowd365");
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
           return false;
         } else {
           var errorData = e.response?.data;
-          var errorMessage = await ErrorMessages.fromJson(errorData);
-          errors = errorMessage.errors.message;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
           return false;
         }
       } else {
+        errors = errorMessage;
+         showErrorDialog(context, errors, "Crowd365");
         return false;
       }
     } catch (e) {

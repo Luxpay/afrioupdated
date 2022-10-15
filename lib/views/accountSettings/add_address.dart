@@ -26,7 +26,6 @@ class _AddNewAddressState extends State<AddNewAddress> {
               height: 80,
               decoration: BoxDecoration(color: Colors.white),
               child: Container(
-                margin: EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -37,7 +36,7 @@ class _AddNewAddressState extends State<AddNewAddress> {
                       width: SizeConfig.safeBlockHorizontal! * 2,
                     ),
                     const Text(
-                      "My Address",
+                      "Add Address",
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                     ),

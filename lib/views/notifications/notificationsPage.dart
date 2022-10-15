@@ -29,8 +29,7 @@ class _NotificationPageState extends State<NotificationPage>
   void initState() {
     tabController = TabController(length: 3, vsync: this);
     super.initState();
-
-    refreshNotes();
+    // refreshNotes();
   }
 
   @override
@@ -93,11 +92,9 @@ class _NotificationPageState extends State<NotificationPage>
                 color: HexColor("#FBFBFB"),
                 child: TabBarView(
                   children: [
-                    PaymentsNotification(
-                      items: notification,
-                    ),
-                    Text("data"),
-                    Text("data"),
+                    PaymentsNotification(),
+                    Center(child: Text("No Notifications found")),
+                    Center(child: Text("No Notifications found")),
                   ],
                   controller: tabController,
                 ),

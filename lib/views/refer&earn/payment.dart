@@ -1,7 +1,4 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:luxpay/views/accounts_subviews/payment_settings.dart';
 import 'package:luxpay/views/refer&earn/successfull_payment.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 
@@ -22,19 +19,17 @@ class _SelectPaymentMethodState extends State<SelectPaymentMethod> {
   List<String> walletInfo = ["N,3000,000", 'N,3000,000"'];
   bool checkdata = false;
 
-  bool _isLoading = false;
+  //bool _isLoading = false;
   var errors;
   // String? price;
   // String? name;
 
   List<String> images = [
     "assets/paymentMethod/mastercard-logo.png",
-    "assets/basic.png"
   ];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -111,7 +106,7 @@ class _SelectPaymentMethodState extends State<SelectPaymentMethod> {
                                           padding: const EdgeInsets.only(
                                               left: 18.0, top: 13, bottom: 13),
                                           child: Image.asset(
-                                            images[index],
+                                            images[0],
                                             height: 24.67,
                                             width: 37,
                                           ),

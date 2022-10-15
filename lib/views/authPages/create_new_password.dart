@@ -1,21 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/password_change_congratulation.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
-import 'package:luxpay/widgets/otfields.dart';
 import 'package:luxpay/widgets/touchUp.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/errors/error.dart';
-import '../../networking/dio.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/validators.dart';
 
 class CreateNewPassword extends StatefulWidget {
-  String? newOtp;
-  CreateNewPassword({Key? key, required this.newOtp}) : super(key: key);
+  final String? idEvent;
+  const CreateNewPassword({Key? key, required this.idEvent}) : super(key: key);
 
   @override
   State<CreateNewPassword> createState() => _CreateNewPasswordState();
@@ -124,7 +122,8 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
                           });
                           return;
                         }
-                        var response = await updatePassword(confirmpassword);
+                        var response = await updatePassword(
+                            confirmpassword, widget.idEvent);
 
                         setState(() {
                           _isLoading = false;
@@ -161,36 +160,39 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
     );
   }
 
-  Future<bool> updatePassword(String password) async {
-    final storage = new FlutterSecureStorage();
+  Future<bool> updatePassword(
+    String password,
+    String? resetID,
+  ) async {
     Map<String, dynamic> body = {
-      "otp": "${widget.newOtp}",
-      "password": "$password",
-      'phone': await storage.read(key: 'phoneNumber')
+      "event_id": "$resetID",
+      "password": "$password"
     };
     debugPrint("DataB4send:${body}");
     try {
-      var response = await unAuthDio.put(
-        "/api/user/password/reset/confirm/",
+      var response = await unAuthDio.post(
+        "/auth/reset-password/",
         data: body,
       );
 
       if (response.statusCode == 200) {
-        var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('${data}');
+        // var data = response.data;
+        // debugPrint('${response.statusCode}');
+        // debugPrint('${data}');
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
+        debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);
         errors = errorMessage.errors.message;
         return false;
       } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {

@@ -1,18 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/errors/error.dart';
-import 'package:luxpay/networking/dio.dart';
-import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import '../networking/DioServices/dio_client.dart';
 
 class LogoutPopup extends StatelessWidget {
   LogoutPopup({Key? key}) : super(key: key);
 
-  String errors = 'something went wrong';
+  static String errors = 'something went wrong';
 
   @override
   Widget build(BuildContext context) {
@@ -87,10 +85,6 @@ class LogoutPopup extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    final storage = await new FlutterSecureStorage();
-                    // var refresh = await storage.read(key: refreshToken);
-                    print(
-                        "Stored***********:${await storage.read(key: authToken)}");
                     var data = await logout();
 
                     print(data);
@@ -104,12 +98,11 @@ class LogoutPopup extends StatelessWidget {
                       return;
                     } else {
                       Navigator.of(context).pop();
-                      final storage = new FlutterSecureStorage();
-                      await storage.delete(key: authToken);
-                      await storage.delete(key: refreshToken);
-                      print("ALL Token Deleted");
-                      // Navigator.of(context).pushNamedAndRemoveUntil(
-                      //     LoginPage.path, (route) => false);
+                      // final storage = new FlutterSecureStorage();
+                      // await storage.delete(key: authToken);
+
+                      // print("ALL Token Deleted");
+
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => LoginPage()));
                       print("LogOut");
@@ -145,17 +138,9 @@ class LogoutPopup extends StatelessWidget {
   }
 
   Future<bool> logout() async {
-    final storage = new FlutterSecureStorage();
-    // var refresh = await storage.read(key: refreshToken);
-    //print("Stored***********:${await storage.read(key: refreshToken)}");
-    Map<String, dynamic> body = {
-      "refresh": '${await storage.read(key: refreshToken)}'
-    };
-    print("Data: $body");
     try {
       var response = await dio.post(
-        "/api/user/logout/",
-        data: body,
+        "/v1/auth/logout/",
       );
       debugPrint('${response.statusCode}');
 

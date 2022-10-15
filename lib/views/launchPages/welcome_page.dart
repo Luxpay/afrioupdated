@@ -1,13 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:luxpay/services/authService.dart';
-import 'package:luxpay/services/locatorService.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/create_account.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
-import 'package:luxpay/views/authPages/registration_page.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,17 +45,17 @@ class WelcomePage extends StatefulWidget {
 class _WelcomePageState extends State<WelcomePage>
     with SingleTickerProviderStateMixin {
   int _current = 0;
-  static Color? _primaryColour;
-  static Color? _accentColour;
+  Color? primaryColour;
+  Color? accentColour;
   late String _title;
   late String _body;
-  final LocalAuthenticationService? _localAuth =
-      locator<LocalAuthenticationService>();
-  var localAuth = LocalAuthentication();
+  // final LocalAuthenticationService? _localAuth =
+  //     locator<LocalAuthenticationService>();
+  // var localAuth = LocalAuthentication();
   bool? didAuthenticate;
   late SharedPreferences prefs;
   // RestDatasource api = new RestDatasource();
-  String _btnText = "Next";
+  String btnText = "Next";
   bool showSkip = true;
   CarouselController carouselController = CarouselControllerImpl();
 
@@ -73,8 +69,8 @@ class _WelcomePageState extends State<WelcomePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _primaryColour = Theme.of(context).primaryColor;
-    _accentColour = Theme.of(context).colorScheme.secondary;
+    primaryColour = Theme.of(context).primaryColor;
+    accentColour = Theme.of(context).colorScheme.secondary;
   }
 
   @override
@@ -110,7 +106,7 @@ class _WelcomePageState extends State<WelcomePage>
                                   _body = bodyList[index];
                                   if (_current == 3) {
                                     showSkip = false;
-                                    _btnText = "Get Started";
+                                    btnText = "Get Started";
                                   }
                                 });
                               }),
@@ -191,7 +187,7 @@ class _WelcomePageState extends State<WelcomePage>
                               );
                             },
                             child: luxButton(HexColor("#D70A0A"), Colors.white,
-                                "Get Started", 350)),
+                                "Get Started", 150)),
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 4,
                         ),

@@ -130,7 +130,7 @@ class _UssdTransferState extends State<UssdTransfer> {
                         hintColour: HexColor("#8D9091"),
                         hintWeight: FontWeight.w400,
                         controller: amountController,
-                        innerHint: "N 5,000",
+                        innerHint: "N 5000",
                         textInputType: TextInputType.number,
                       ),
                     ),
@@ -174,7 +174,9 @@ class _UssdTransferState extends State<UssdTransfer> {
   Widget BankWidget({required Bank bank}) {
     return InkWell(
       onTap: () => {
-        if (amountController.text.isNotEmpty)
+        if (amountController.text.contains(","))
+          {LuxToast.show(msg: "Remove the comma sign ( , ) ")}
+        else if (amountController.text.isNotEmpty)
           {
             showModalBottomSheet(
               context: context,

@@ -11,6 +11,16 @@ class Validators {
     }
   }
 
+  static String? isValidAmount(String value) {
+    if (value.isEmpty) {
+      return " Enter Amount";
+    } else if (!RegExp(r'^\d+\.?\d{0,1}').hasMatch(value)) {
+      return "Please enter a valid amount";
+    } else {
+      return null;
+    }
+  }
+
   static String? validateTwoPassword(
       String newpassword, String confirmpassword) {
     if (newpassword.isEmpty && confirmpassword.isEmpty) {
@@ -34,6 +44,42 @@ class Validators {
     } else if (!RegExp(r".*[0-9].*").hasMatch(value) ||
         !RegExp(r".*[A-Za-z].*").hasMatch(value)) {
       return "Your password must be 8 or more characters long & contain a mix of upper & lower case letters, numbers & symbols";
+    } else {
+      return null;
+    }
+  }
+
+  static String? isValidBvn(String value) {
+    if (value.isEmpty) {
+      return "Bvn cannot be empty";
+    } else if (value.length < 11) {
+      return 'Your Bvn must be 11 numbers';
+    } else {
+      return null;
+    }
+  }
+
+  static String? forWithdrawal(String value) {
+    if (value.isEmpty) {
+      return "This field can't be empty";
+    } else {
+      return null;
+    }
+  }
+
+  
+
+  static String? forBank(String value) {
+    if (value.isEmpty) {
+      return "Please select a bank";
+    } else {
+      return null;
+    }
+  }
+
+    static String? forEmptyField(String value) {
+    if (value.isEmpty) {
+      return "Feild cannot be empty";
     } else {
       return null;
     }

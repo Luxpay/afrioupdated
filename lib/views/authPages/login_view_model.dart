@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/networking/dio.dart';
-import 'package:luxpay/podos/user.dart';
 import 'package:luxpay/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../networking/DioServices/dio_client.dart';
 
 class LoginViewModel extends ChangeNotifier {
   Future<LoginAction> login(String email, String password, bool isEmail) async {
@@ -25,7 +24,7 @@ class LoginViewModel extends ChangeNotifier {
       var data = response.data['data'];
       var pref = await SharedPreferences.getInstance();
       await pref.setString(authToken, data['access']);
-      await pref.setString(refreshToken, data['refresh']);
+      //await pref.setString(refreshToken, data['refresh']);
      // await pref.setString(userPref, User.fromMap(data).toJson());
       return LoginAction(
         data: null,

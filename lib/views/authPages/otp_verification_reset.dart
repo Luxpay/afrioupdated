@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/networking/dio.dart';
+
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/otfields.dart';
+
+import '../../networking/DioServices/dio_client.dart';
 
 class OTPVerificationReset extends StatefulWidget {
   final VoidCallback onVerified;
@@ -186,7 +188,7 @@ class _OTPVerificationResetState extends State<OTPVerificationReset> {
                   time == 0
                       ? InkWell(
                           onTap: () async {
-                            var data = await resentOTP();
+                            await resentOTP();
                             startCountdown();
                           },
                           child: Text(

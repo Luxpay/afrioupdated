@@ -11,18 +11,19 @@ Future<void> getDeviceDetails() async {
   try {
     if (Platform.isAndroid) {
       await storage.write(key: 'DeviceName', value: "android");
+       debugPrint("Device: ANROID");
     } else if (Platform.isIOS) {
       await storage.write(key: 'DeviceName', value: 'ios');
+      debugPrint("Device: IOS");
     }
   } on PlatformException {
     debugPrint("failed to get platform");
   }
 }
 
-Future<void> fcmToken(tokenFcm) async {
+Future<void> fcmToken() async {
   final storage = new FlutterSecureStorage();
   String? messageToken = await FirebaseMessaging.instance.getToken();
-  tokenFcm = messageToken;
   debugPrint("FCM token:${messageToken}");
   await storage.write(key: 'fcmToken', value: messageToken);
 }

@@ -7,8 +7,9 @@ import 'package:flutter_share/flutter_share.dart';
 import '../../utils/colors.dart';
 import '../../widgets/lux_buttons.dart';
 
+
 class Crowd365ReferralCode extends StatefulWidget {
-  String? referralCode;
+  final String? referralCode;
   Crowd365ReferralCode({Key? key, required this.referralCode})
       : super(key: key);
 
@@ -27,10 +28,12 @@ class _Crowd365ReferralCodeState extends State<Crowd365ReferralCode> {
         chooserTitle: 'Luxpay Referral Code');
   }
 
-  @override
+
+@override
   void initState() {
-    // TODO: implement initState
-    if (widget.referralCode == null) {
+   
+    super.initState();
+      if (widget.referralCode == null) {
       setState(() {
         copyText = "No referral code";
       });
@@ -40,6 +43,8 @@ class _Crowd365ReferralCodeState extends State<Crowd365ReferralCode> {
       });
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {

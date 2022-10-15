@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/accountSettings/account_profile.dart';
 import 'package:luxpay/views/accountSettings/helpSupport.dart';
 import 'package:luxpay/views/accountSettings/my_address.dart';
+import 'package:luxpay/views/accountSettings/transaction_details.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
+import 'package:luxpay/views/refer&earn/invitecode.dart';
 import 'package:luxpay/widgets/logout_popup.dart';
 
 import '../widgets/touchUp.dart';
+import 'accountSettings/account_profile.dart';
 import 'accountSettings/bio_auth.dart';
-import 'accountSettings/transaction_details.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -61,13 +62,24 @@ class _AccountPageState extends State<AccountPage> {
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(
+                title: "Luxpay Tag",
+                icon: IconlyLight.addUser,
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => InvitationCode()));
+                },
+              ),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 3),
+              ProfileAction(
                 title: "Transaction Details",
                 icon: IconlyLight.chart,
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => TransactionDetails()));
+                          builder: (context) => AccountTransactions()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -127,6 +139,7 @@ class _AccountPageState extends State<AccountPage> {
                       );
                     });
               }),
+              SizedBox(height: SizeConfig.blockSizeVertical! * 6),
             ],
           ),
           padding: EdgeInsets.only(

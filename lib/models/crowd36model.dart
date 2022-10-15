@@ -4,143 +4,106 @@
 
 import 'dart:convert';
 
-Crowd365Db crowd365DbFromJson(String str) =>
-    Crowd365Db.fromJson(json.decode(str));
+Crowd365Db crowd365DbFromJson(String str) => Crowd365Db.fromJson(json.decode(str));
 
 String crowd365DbToJson(Crowd365Db data) => json.encode(data.toJson());
 
 class Crowd365Db {
-  Crowd365Db({
-    required this.status,
-    required this.errors,
-    required this.data,
-  });
+    Crowd365Db({
+        required this.status,
+        required this.code,
+        required this.message,
+        required this.data,
+    });
 
-  bool status;
-  Errors errors;
-  Data data;
+    String status;
+    int code;
+    String message;
+    List<Datum> data;
 
-  factory Crowd365Db.fromJson(Map<String, dynamic> json) => Crowd365Db(
+    factory Crowd365Db.fromJson(Map<String, dynamic> json) => Crowd365Db(
         status: json["status"],
-        errors: Errors.fromJson(json["errors"]),
-        data: Data.fromJson(json["data"]),
-      );
+        code: json["code"],
+        message: json["message"],
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "status": status,
-        "errors": errors.toJson(),
-        "data": data.toJson(),
-      };
+        "code": code,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    };
 }
 
-class Data {
-  Data({
-    required this.canWithdraw,
-    required this.earnings,
-    required this.referrals,
-    required this.cycles,
-    required this.payout,
-    required this.referralCode,
-    required this.plan,
-  });
+class Datum {
+    Datum({
+        required this.package,
+        required this.directReferred,
+        required this.indirectReferred,
+        required this.canWithdraw,
+        required this.isActive,
+        required this.totalEarnings,
+        required this.todaysEarnings,
+    });
 
-  bool canWithdraw;
-  Earnings earnings;
-  Referrals referrals;
-  int cycles;
-  String payout;
-  String referralCode;
-  Plan plan;
+    Package package;
+    List<String> directReferred;
+    List<String> indirectReferred;
+    bool canWithdraw;
+    bool isActive;
+    String totalEarnings;
+    String todaysEarnings;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+        package: Package.fromJson(json["package"]),
+        directReferred: List<String>.from(json["direct_referred"].map((x) => x)),
+        indirectReferred: List<String>.from(json["indirect_referred"].map((x) => x)),
         canWithdraw: json["can_withdraw"],
-        earnings: Earnings.fromJson(json["earnings"]),
-        referrals: Referrals.fromJson(json["referrals"]),
-        cycles: json["cycles"],
-        payout: json["payout"],
-        referralCode: json["referral_code"],
-        plan: Plan.fromJson(json["plan"]),
-      );
+        isActive: json["is_active"],
+        totalEarnings: json["total_earnings"],
+        todaysEarnings: json["todays_earnings"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
+        "package": package.toJson(),
+        "direct_referred": List<dynamic>.from(directReferred.map((x) => x)),
+        "indirect_referred": List<dynamic>.from(indirectReferred.map((x) => x)),
         "can_withdraw": canWithdraw,
-        "earnings": earnings.toJson(),
-        "referrals": referrals.toJson(),
-        "cycles": cycles,
-        "payout": payout,
-        "referral_code": referralCode,
-        "plan": plan.toJson(),
-      };
+        "is_active": isActive,
+        "total_earnings": totalEarnings,
+        "todays_earnings": todaysEarnings,
+    };
 }
 
-class Earnings {
-  Earnings({
-    required this.total,
-    required this.today,
-  });
+class Package {
+    Package({
+        required this.name,
+        required this.price,
+        required this.welcomeBonus,
+        required this.reward,
+        required this.eachCycle,
+    });
 
-  String total;
-  String today;
+    String name;
+    String price;
+    String welcomeBonus;
+    String reward;
+    String eachCycle;
 
-  factory Earnings.fromJson(Map<String, dynamic> json) => Earnings(
-        total: json["total"],
-        today: json["today"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "total": total,
-        "today": today,
-      };
-}
-
-class Plan {
-  Plan({
-    required this.name,
-    required this.price,
-    required this.priceCurrency,
-  });
-
-  String name;
-  String price;
-  String priceCurrency;
-
-  factory Plan.fromJson(Map<String, dynamic> json) => Plan(
+    factory Package.fromJson(Map<String, dynamic> json) => Package(
         name: json["name"],
         price: json["price"],
-        priceCurrency: json["price_currency"],
-      );
+        welcomeBonus: json["welcome_bonus"],
+        reward: json["reward"],
+        eachCycle: json["each_cycle"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "name": name,
         "price": price,
-        "price_currency": priceCurrency,
-      };
-}
-
-class Referrals {
-  Referrals({
-    required this.direct,
-    required this.indirect,
-  });
-
-  int direct;
-  int indirect;
-
-  factory Referrals.fromJson(Map<String, dynamic> json) => Referrals(
-        direct: json["direct"],
-        indirect: json["indirect"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "direct": direct,
-        "indirect": indirect,
-      };
-}
-
-class Errors {
-  Errors();
-
-  factory Errors.fromJson(Map<String, dynamic> json) => Errors();
-
-  Map<String, dynamic> toJson() => {};
+        "welcome_bonus": welcomeBonus,
+        "reward": reward,
+        "each_cycle": eachCycle,
+    };
 }

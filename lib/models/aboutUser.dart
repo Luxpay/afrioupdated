@@ -9,85 +9,73 @@ AboutUser aboutUserFromJson(String str) => AboutUser.fromJson(json.decode(str));
 String aboutUserToJson(AboutUser data) => json.encode(data.toJson());
 
 class AboutUser {
-  AboutUser({
-    required this.status,
-    required this.errors,
-    required this.data,
-  });
+    AboutUser({
+        required this.status,
+        required this.code,
+        required this.message,
+        required this.data,
+    });
 
-  bool status;
-  Errors errors;
-  Data data;
+    String status;
+    int code;
+    String message;
+    Data data;
 
-  factory AboutUser.fromJson(Map<String, dynamic> json) => AboutUser(
+    factory AboutUser.fromJson(Map<String, dynamic> json) => AboutUser(
         status: json["status"],
-        errors: Errors.fromJson(json["errors"]),
+        code: json["code"],
+        message: json["message"],
         data: Data.fromJson(json["data"]),
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "status": status,
-        "errors": errors.toJson(),
+        "code": code,
+        "message": message,
         "data": data.toJson(),
-      };
+    };
 }
 
 class Data {
-  Data({
-   required this.avatar,
-    required this.firstName,
-    required this.lastName,
-    required this.phone,
-    required this.phoneVerified,
-    required this.email,
-    required this.emailVerified,
-    required this.hasPin,
-    required this.isVerified,
-    required this.username,
-  });
+    Data({
+        required this.username,
+        required this.phone,
+        required this.firstName,
+        required this.lastName,
+        required this.avatar,
+        required this.kycLevel,
+        required this.email,
+        required this.emailVerified,
+    });
 
-  String avatar;
-  String firstName;
-  String lastName;
-  String phone;
-  bool phoneVerified;
-  dynamic email;
-  bool emailVerified;
-  bool hasPin;
-  dynamic isVerified;
-  String username;
+    String username;
+    String phone;
+    String firstName;
+    String lastName;
+    String avatar;
+    int kycLevel;
+    String email;
+    bool emailVerified;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-        avatar: json["avatar"],
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
+        username: json["username"],
+        phone: json["phone"],
         firstName: json["first_name"],
         lastName: json["last_name"],
-        phone: json["phone"],
-        phoneVerified: json["phone_verified"],
+        avatar: json["avatar"],
+        kycLevel: json["kyc_level"],
         email: json["email"],
         emailVerified: json["email_verified"],
-        hasPin: json["has_pin"],
-        isVerified: json["is_verified"],
-        username: json["username"],
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
-        "avatar": avatar,
+    Map<String, dynamic> toJson() => {
+        "username": username,
+        "phone": phone,
         "first_name": firstName,
         "last_name": lastName,
-        "phone": phone,
-        "phone_verified": phoneVerified,
+        "avatar": avatar,
+        "kyc_level": kycLevel,
         "email": email,
         "email_verified": emailVerified,
-        "has_pin": hasPin,
-        "is_verified": isVerified,
-        "username": username,
-      };
-}
-
-class Errors {
-  Errors();
-
-  factory Errors.fromJson(Map<String, dynamic> json) => Errors();
-
-  Map<String, dynamic> toJson() => {};
+    };
 }

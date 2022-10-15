@@ -1,10 +1,13 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:luxpay/views/refer&earn/invitecode.dart';
-import 'package:luxpay/views/refer&earn/referrer_earning.dart';
+import 'package:luxpay/views/refer&earn/referearn_dashboard.dart';
 
+import '../../models/aboutUser.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 
 class InviteAndEarn extends StatefulWidget {
@@ -15,6 +18,23 @@ class InviteAndEarn extends StatefulWidget {
 }
 
 class _InviteAndEarnState extends State<InviteAndEarn> {
+  var username;
+  Future<void> share(share) async {
+    await FlutterShare.share(
+        title: 'Share Luxpay',
+        text: share,
+        // linkUrl: 'https://flutter.dev/',
+        chooserTitle: 'Luxpay Referral Code');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      aboutUser();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +134,7 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
                     children: [
                       Container(
                           margin: EdgeInsets.only(left: 30),
-                          child: Text("LuxPay")),
+                          child: Text("${username ?? "Luxpay"}")),
                       Container(
                           height: 80,
                           width: 55,
@@ -126,7 +146,7 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
                               onPressed: () {
                                 print("copied");
                                 Fluttertoast.showToast(
-                                  msg: "Luxpay",
+                                  msg: "$username",
                                   toastLength: Toast.LENGTH_SHORT,
                                   gravity: ToastGravity
                                       .BOTTOM, // also possible "TOP" and "CENTER"
@@ -171,10 +191,11 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
                         children: [
                           InkWell(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => InvitationCode()));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => InvitationCode()));
+                              share(username);
                             },
                             child: Container(
                               height: 50,
@@ -194,7 +215,8 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => ReferrerEarning()));
+                                      builder: (context) =>
+                                          ReferrerEarningDashoard()));
                             },
                             child: Container(
                               height: 50,
@@ -223,5 +245,39 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
         ),
       ),
     );
+  }
+
+  Future<bool> aboutUser() async {
+    var response = await dio.get(
+      base_url + "/v1/user/profile/",
+    );
+    debugPrint('Data Code ${response.statusCode}');
+    try {
+      if (response.statusCode == 200) {
+        var data = response.data;
+        debugPrint('${response.statusCode}');
+        debugPrint('Check Data ${data}');
+        var user = await AboutUser.fromJson(data);
+        setState(() {
+          username = user.data.username;
+
+          debugPrint("name ${username}");
+        });
+
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        debugPrint(' Error: ${e.response?.data}');
+        return false;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
+    }
   }
 }

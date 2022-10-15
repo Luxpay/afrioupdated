@@ -2,27 +2,30 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/user_otp.dart';
 import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/views/authPages/create_new_password.dart';
 
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/errors/error.dart';
-import '../../networking/dio.dart';
+import '../../models/sent_otp.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/sizeConfig.dart';
 import '../../widgets/lux_buttons.dart';
 
 class ForgetPasswordOtp extends StatefulWidget {
+  final String? eventID;
   const ForgetPasswordOtp(
-      {Key? key, required this.onVerified, required this.recipientAddress})
+      {Key? key,
+      required this.recipientAddressEmail,
+      required this.recipientAddress,
+      required this.eventID})
       : super(key: key);
-  final VoidCallback onVerified;
-  final String recipientAddress;
+
+  final String recipientAddress, recipientAddressEmail;
 
   @override
   State<ForgetPasswordOtp> createState() => _ForgetPasswordOtpState();
@@ -35,7 +38,9 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
   late Timer timer;
   String? showPhone;
   String errors = "";
-  String? newOtp;
+  String? newOtp, forgetEventID;
+
+  String? event_id;
 
   void startCountdown() {
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
@@ -56,11 +61,24 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
 
   @override
   void initState() {
+    super.initState();
     startCountdown();
+    forgetEventID = widget.eventID;
     setState(() {
       showPhone = widget.recipientAddress
           .replaceRange(2, widget.recipientAddress.length - 5, "****");
     });
+    if (widget.recipientAddress != '') {
+      setState(() {
+        showPhone = widget.recipientAddress
+            .replaceRange(2, widget.recipientAddress.length - 5, "****");
+      });
+    } else {
+      setState(() {
+        showPhone = widget.recipientAddressEmail
+            .replaceRange(2, widget.recipientAddressEmail.length - 5, "****");
+      });
+    }
   }
 
   @override
@@ -144,7 +162,6 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                           SizedBox(
                             height: SizeConfig.safeBlockVertical! * 2,
                           ),
-
                           PinCodeTextField(
                             appContext: context,
                             keyboardType: TextInputType.number,
@@ -184,18 +201,9 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
 
                               print(otp_number);
                               print(widget.recipientAddress);
-                              final storage = new FlutterSecureStorage();
-                              await storage.write(
-                                  key: "otp", value: "$otp_number");
-                              await storage.write(
-                                  key: "phone",
-                                  value: "${widget.recipientAddress}");
-                              print("${await storage.read(key: "otp")}");
-                              print("${await storage.read(key: "phone")}");
 
-                              var response = await verifyOTPandNumber(
-                                  otp_number,
-                                  widget.recipientAddress.toString());
+                              var response = await verifyOTP(
+                                  otp: otp_number, event_id: forgetEventID);
                               setState(() {
                                 _isLoading = false;
                               });
@@ -204,8 +212,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreateNewPassword(newOtp: newOtp)));
+                                        builder: (context) => CreateNewPassword(
+                                            idEvent: forgetEventID)));
                               } else {
                                 setState(() {
                                   _isLoading = false;
@@ -227,40 +235,6 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                               return true;
                             },
                           )
-                          // OTPFields(
-                          //     count: 6,
-                          //     onVerified: (v) async {
-                          //       otp = v;
-                          //       //print("Otp: $otp");
-                          //       setState(() {
-                          //         _isLoading = true;
-                          //       });
-                          //       print(otp);
-                          //       print(widget.recipientAddress);
-                          //       final storage = new FlutterSecureStorage();
-                          //       await storage.write(key: "otp", value: "$otp");
-                          //       await storage.write(key: "phone", value: "${widget.recipientAddress}");
-                          //       print("${await storage.read(key: "otp")}");
-                          //       print("${await storage.read(key: "phone")}");
-                          //       var response = await verifyOTPandNumber(
-                          //           otp, widget.recipientAddress.toString());
-                          //       setState(() {
-                          //         _isLoading = false;
-                          //       });
-                          //       if (response) {
-                          //         Navigator.push(
-                          //             context,
-                          //             MaterialPageRoute(
-                          //                 builder: (context) =>
-                          //                     CreateNewPassword()));
-                          //       } else {
-                          //         setState(() {
-                          //           _isLoading = false;
-                          //         });
-                          //         ScaffoldMessenger.of(context).showSnackBar(
-                          //             SnackBar(content: Text(errors)));
-                          //       }
-                          //     }),
                         ],
                       ),
                       SizedBox(
@@ -268,8 +242,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                       ),
                       InkWell(
                         onTap: () async {
-                          var response = await verifyOTPandNumber(
-                              otp_number, widget.recipientAddress.toString());
+                          var response = await verifyOTP(
+                              otp: otp_number, event_id: widget.eventID);
 
                           setState(() {
                             _isLoading = true;
@@ -279,8 +253,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        CreateNewPassword(newOtp: newOtp)));
+                                    builder: (context) => CreateNewPassword(
+                                        idEvent: forgetEventID)));
                           } else {
                             setState(() {
                               _isLoading = false;
@@ -303,7 +277,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
                           ? InkWell(
                               onTap: () async {
                                 //var data = await resentOTP();
-                                await resentOTP(widget.recipientAddress);
+                                await resentOTP(widget.recipientAddress,
+                                    widget.recipientAddressEmail);
                                 startCountdown();
                               },
                               child: Text(
@@ -342,47 +317,32 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
     );
   }
 
-  Future<bool> verifyOTPandNumber(String otp, String phone) async {
+  Future<bool> verifyOTP({otp, event_id}) async {
     otp = otp.replaceAll("\u200B", "");
-    // if ((otp.isEmpty || otp.length != 6) && (phone.isEmpty)) {
-    //   print(otp.length);
-    //   print("Data : $otp, $phone");
-    //   errors = "Please enter OTP";
-    //   return false;
-    // }
-    Map<String, dynamic> body = {
-      "otp": "$otp",
-      "phone": "$phone",
-    };
+
+    Map<String, dynamic> body = {"code": "$otp", 'event_id': "$event_id"};
 
     try {
       var response = await unAuthDio.post(
-        "/api/user/password/reset/verify/",
+        "/auth/reset-password/verify/",
         data: body,
       );
 
       if (response.statusCode == 200) {
-        var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('OTP : ${data}');
-
-        var dataOtp = await UserOtp.fromJson(data);
-
-        newOtp = dataOtp.data.otp;
-
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
+        debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);
         errors = errorMessage.errors.message;
-
         return false;
       } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {
@@ -391,26 +351,52 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
     }
   }
 
-  Future<String?> resentOTP(String phone) async {
-    Map<String, dynamic> body = {"type": phone};
+  Future<bool> resentOTP(String phone, email) async {
+    String url;
+    Map<String, dynamic> body = {"phone": "$phone", "email": email};
+    if (phone.isEmpty) {
+      body.remove("phone");
+      url = "/auth/reset-password/request-email/";
+    } else {
+      body.remove("email");
+      url = "/auth/reset-password/request-phone/";
+    }
+
     try {
       var response = await unAuthDio.post(
-        "/api/user/password/reset/",
+        url,
         data: body,
       );
-      var data = response.data;
-      print(response.statusCode);
-      print(data);
-      return null;
-    } on DioError catch (e) {
-      if (e.response != null) {
-        print(e.response?.data);
-        return e.response?.data['message'] ?? "An error occurred";
+      // final storage = new FlutterSecureStorage();
+      //await storage.write(key: "phone", value: "$phone");
+      if (response.statusCode == 201) {
+        var data = response.data;
+        var userData = await SenOtpResponse.fromJson(data);
+        ;
+        event_id = userData.data.eventId;
+        forgetEventID = event_id;
+
+        debugPrint('${response.statusCode}');
+        debugPrint('${data}');
+        return true;
       } else {
-        return "An error occurred";
+        return false;
+      }
+    } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
+      if (e.response != null) {
+        debugPrint(' Error Error: ${e.response?.data}');
+        var errorData = e.response?.data;
+        var errorMessage = await ErrorMessages.fromJson(errorData);
+        errors = errorMessage.errors.message;
+        return false;
+      } else {
+        errors = errorMessage;
+        return false;
       }
     } catch (e) {
-      return "An error occurred";
+      debugPrint('${e}');
+      return false;
     }
   }
 }

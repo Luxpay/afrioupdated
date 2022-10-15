@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
+
+import '../../networking/DioServices/dio_client.dart';
 
 class ChangePassword extends StatefulWidget {
   static const String path = "/change_password";

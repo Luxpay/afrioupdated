@@ -1,19 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/authPages/create_account.dart';
-import 'package:luxpay/views/authPages/create_new_pin_password_profile.dart';
+import 'package:luxpay/views/authPages/create_user_data.dart';
 import 'package:luxpay/views/authPages/dont_know_your_bvn.dart';
-import 'package:luxpay/views/authPages/login_page.dart';
-import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/touchUp.dart';
-
+import '../../models/errors/authError.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/hexcolor.dart';
-import '../../widgets/lux_textfield.dart';
-import '../../widgets/util.dart';
+import '../../utils/validators.dart';
 
 class AddBvnPage extends StatefulWidget {
   const AddBvnPage({Key? key}) : super(key: key);
@@ -23,234 +20,239 @@ class AddBvnPage extends StatefulWidget {
 }
 
 class _AddBvnPageState extends State<AddBvnPage> {
+  bool _isLoading = false;
+  var errors;
   DateTime dateTime = DateTime.now();
-  String dateFormate = 'yyyy/MM/dd';
+  String dateFormate = '';
   String? dateOfBirth;
   TextEditingController bvnController = TextEditingController();
   TextEditingController dateOfBirthController = TextEditingController();
-  Future<bool> _willPopCallback() async {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => LoginPage()));
-    return true; // return true if the route to be popped
-  }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _willPopCallback,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-            child: SingleChildScrollView(
-          child: Container(
-            child: Stack(
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Container(
-                    height: 80,
-                    decoration: BoxDecoration(
-                        border: Border(
-                      bottom: BorderSide(
-                        color: HexColor("#333333").withOpacity(0.3),
-                        width: 0.5,
-                      ),
-                    )),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: SizeConfig.safeBlockHorizontal! * 28,
-                        ),
-                        const Text(
-                          "Verify your Account",
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                        )
-                      ],
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+          child: SingleChildScrollView(
+        child: Container(
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                      border: Border(
+                    bottom: BorderSide(
+                      color: HexColor("#333333").withOpacity(0.3),
+                      width: 0.5,
                     ),
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 100, left: 30, right: 30),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("STEP 2 OF 2"),
-                      SizedBox(height: 20),
-                      Text(
-                        "Link your BVN",
+                      IconButton(
+                          onPressed: () => {Navigator.maybePop(context)},
+                          icon: const Icon(Icons.arrow_back_ios_new)),
+                      SizedBox(
+                        width: SizeConfig.safeBlockHorizontal! * 1,
+                      ),
+                      const Text(
+                        "Create your Account",
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(height: 15),
-                      Container(
-                        child: Row(
-                          children: [
-                            Flexible(
-                                child: Text(
-                                    "Enter your 11 digits BVN number to unlock various features on the Luxpay account")),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 60, left: 30, right: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("STEP 2 OF 3"),
+                    SizedBox(height: 20),
+                    Text(
+                      "Link your BVN",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(height: 15),
+                    Container(
+                      child: Row(
                         children: [
-                          Container(
+                          Flexible(
                               child: Text(
-                            "Date Of Birth",
-                            style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                                color: HexColor("#1E1E1E")),
-                          )),
-                          SizedBox(height: 8),
-                          Container(
-                              height: 55,
-                              color: HexColor("#E8E8E8").withOpacity(0.35),
-                              child: InkWell(
-                                  onTap: () {
-                                    Utils.showSheet(
-                                      context,
-                                      child: buildDatePicker(),
-                                      onClicked: () {
-                                        final value = DateFormat('yyyy/MM/dd')
-                                            .format(dateTime);
-                                        // Utils.showSnackBar(
-                                        //     context, 'Selected "$value"');
-                                        setState(() {
-                                          dateOfBirth = value.toString();
-                                          debugPrint(
-                                              "Date Of Birth : $dateOfBirth");
-                                        });
-
-                                        Navigator.pop(context);
-                                      },
-                                    );
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(left: 20),
-                                        child: Text(
-                                          "Pick Date of Birth",
-                                          style: TextStyle(
-                                              color: Colors.red, fontSize: 15),
-                                        ),
-                                      ),
-                                      Container(
-                                        margin: EdgeInsets.only(right: 20),
-                                        child: Text(dateOfBirth ?? dateFormate,
-                                            style: TextStyle(fontSize: 18)),
-                                      )
-                                    ],
-                                  ))),
+                                  "Enter your 11 digits BVN number to unlock various features on the Luxpay account")),
                         ],
                       ),
-                      SizedBox(height: 13),
-                      PasswordTextField(hint: "BVN", controller: bvnController),
-                      SizedBox(height: 20),
-                      Container(
-                        child: Row(
-                          children: [
-                            Flexible(
-                                child: Text(
-                                    "* Your BVN is confidential and won’t be disclosed to any third-party")),
-                          ],
-                        ),
+                    ),
+                    SizedBox(height: 13),
+                    PasswordTextField(hint: "BVN", controller: bvnController),
+                    SizedBox(height: 20),
+                    Container(
+                      child: Row(
+                        children: [
+                          Flexible(
+                              child: Text(
+                                  "* Your BVN is confidential and won’t be disclosed to any third-party")),
+                        ],
                       ),
-                      SizedBox(height: 15),
-                      Container(
-                        child: Row(
-                          children: [
-                            Flexible(
-                                child:
-                                    Text("* This is a one time verification")),
-                          ],
-                        ),
+                    ),
+                    SizedBox(height: 15),
+                    Container(
+                      child: Row(
+                        children: [
+                          Flexible(
+                              child: Text("* This is a one time verification")),
+                        ],
                       ),
-                      SizedBox(
-                        height: 70,
-                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 70,
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 400),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: InkWell(
+                      onTap: () async {
+                        var bvnNumber = bvnController.text.trim();
+
+                        var validators = [
+                          Validators.isValidBvn(bvnNumber),
+                        ];
+                        if (validators.any((element) => element != null)) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(validators.firstWhere(
+                                      (element) => element != null) ??
+                                  "")));
+                          return;
+                        }
+
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        var response = await createBvn(bvn: bvnNumber);
+
+                        if (!response) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(SnackBar(content: Text(errors)));
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        } else {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      CreateUserProfileData()));
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                      },
+                      child: _isLoading
+                          ? luxButtonLoading(HexColor("#D70A0A"), 360)
+                          : luxButton(HexColor("#D70A0A"), Colors.white,
+                              "Submit", 350)),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(top: 500),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Column(
+                    children: [
                       InkWell(
                           onTap: () {
-                            //Navigator.push(context,MaterialPageRoute(builder: (context)=> PasswordChangeConfirm()));
-                            // Navigator.push(context,MaterialPageRoute(builder: (context)=> OTPVerification()));
+                            _dontKnowUrBVNBottomSheet(context);
                           },
-                          child: luxButton(HexColor("#D70A0A"), Colors.white,
-                              "Submit", 350)),
+                          child: Text(
+                            "Don't know your BVN ?",
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w100),
+                          )),
                       SizedBox(
                         height: 40,
+                      ),
+                      RichText(
+                        text: TextSpan(
+                            text: 'Not Ready ?',
+                            style: TextStyle(color: Colors.black, fontSize: 12),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: ' Skip',
+                                  style: TextStyle(
+                                      color: Color.fromARGB(255, 7, 139, 248),
+                                      fontSize: 15),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CreateUserProfileData()));
+                                    })
+                            ]),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  margin: EdgeInsets.only(top: 650),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      children: [
-                        InkWell(
-                            onTap: () {
-                              _dontKnowUrBVNBottomSheet(context);
-                            },
-                            child: Text(
-                              "Don't know your BVN ?",
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w100),
-                            )),
-                        SizedBox(height: 60),
-                        RichText(
-                          text: TextSpan(
-                              text: 'Not Ready ?',
-                              style:
-                                  TextStyle(color: Colors.black, fontSize: 12),
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: ' Skip for ',
-                                    style: TextStyle(
-                                        color: Color.fromARGB(255, 7, 139, 248),
-                                        fontSize: 15),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    AppPageController()));
-                                      })
-                              ]),
-                        ),
-                        SizedBox(height: 20)
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        )),
-      ),
+        ),
+      )),
     );
   }
 
-  Widget buildDatePicker() => SizedBox(
-        height: 600,
-        child: CupertinoDatePicker(
-          minimumYear: 1440,
-          maximumYear: DateTime.now().year,
-          initialDateTime: dateTime,
-          mode: CupertinoDatePickerMode.date,
-          onDateTimeChanged: (dateTime) =>
-              setState(() => this.dateTime = dateTime),
-        ),
+  Future<bool> createBvn({
+    required String? bvn,
+  }) async {
+    Map<String, dynamic> body = {
+      'bvn': bvn,
+    };
+
+    try {
+      var response = await dio.post(
+        "/v1/finance/profile/create/",
+        data: body,
       );
+      if (response.statusCode == 201) {
+        var data = response.data;
+        debugPrint('${response.statusCode}');
+        debugPrint('${data}');
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
+      if (e.response != null) {
+        var errorData = e.response?.data;
+        var errorMessage = await AuthError.fromJson(errorData);
+        errors = errorMessage.message;
+        return false;
+      } else {
+        errors = errorMessage;
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
+    }
+  }
 }
 
 void _dontKnowUrBVNBottomSheet(context) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/utils/colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../utils/sizeConfig.dart';
 
@@ -12,6 +13,15 @@ class CustomerService extends StatefulWidget {
 }
 
 class _CustomerServiceState extends State<CustomerService> {
+  _launchURL() async {
+    const url = 'https://wa.me/message/DO3MUPT5ZFQCO1';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,25 +98,30 @@ class _CustomerServiceState extends State<CustomerService> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 40,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.white,
-                            border: Border.all(width: 1, color: grey3)),
-                        child: Center(
-                          child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(IconlyLight.chat, color: Colors.blue),
-                                SizedBox(
-                                  width: 6,
-                                ),
-                                Text(
-                                  "Live Chat",
-                                  style: TextStyle(color: Colors.blue),
-                                )
-                              ]),
+                      InkWell(
+                        onTap: () {
+                          _launchURL();
+                        },
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              color: Colors.white,
+                              border: Border.all(width: 1, color: grey3)),
+                          child: Center(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(IconlyLight.chat, color: Colors.blue),
+                                  SizedBox(
+                                    width: 6,
+                                  ),
+                                  Text(
+                                    "Live Chat",
+                                    style: TextStyle(color: Colors.blue),
+                                  )
+                                ]),
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -166,7 +181,7 @@ class _CustomerServiceState extends State<CustomerService> {
                                           size: 15,
                                         ),
                                         Text(
-                                          "support@luxpay.com",
+                                          "support@luxpay.ng",
                                           style: TextStyle(
                                               color: Colors.black,
                                               fontSize: 12),

@@ -14,10 +14,10 @@ class _LuxTagState extends State<LuxTag> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-     padding: MediaQuery.of(context).viewInsets,
+      padding: MediaQuery.of(context).viewInsets,
       child: Container(
           width: double.infinity,
-          height: 400,
+          height: 250,
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(8.0),
@@ -59,7 +59,8 @@ class _LuxTagState extends State<LuxTag> {
                   Align(
                       alignment: Alignment.topLeft,
                       child: Container(
-                          margin: EdgeInsets.only(left: 30, top: 100, right: 30),
+                          margin:
+                              EdgeInsets.only(left: 30, top: 100, right: 30),
                           child: Container(
                             child: Row(
                               children: [

@@ -73,7 +73,7 @@ CREATE TABLE $tableNotification (
   Future<List<Notifications>> readAllNotification() async {
     final db = await instance.database;
 
-    final orderBy = '${NotificationFields.time} ASC';
+    final orderBy = '${NotificationFields.time} DESC';
     final result =
         await db.rawQuery('SELECT * FROM $tableNotification ORDER BY $orderBy');
 
@@ -95,12 +95,13 @@ CREATE TABLE $tableNotification (
 
   Future<int> delete(int? id) async {
     final db = await instance.database;
-
+ print(id);
     return await db.delete(
       tableNotification,
       where: '${NotificationFields.id} = ?',
       whereArgs: [id],
     );
+    
   }
 
   // Future close() async {

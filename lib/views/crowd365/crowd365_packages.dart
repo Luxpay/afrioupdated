@@ -1,20 +1,15 @@
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/models/errors/error.dart';
-import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-
 import 'package:luxpay/widgets/lux_buttons.dart';
-
+import '../../models/packagesModel.dart';
 import '../../widgets/methods/showDialog.dart';
 import 'crowd365_payment.dart';
 
+
 class Crowd365Packages extends StatefulWidget {
   static const String path = "crowd365Packages";
-  List? referrerPackage;
+  final List<Datum> referrerPackage;
 
   Crowd365Packages({
     Key? key,
@@ -27,14 +22,13 @@ class Crowd365Packages extends StatefulWidget {
 
 class _Crowd365PackagesState extends State<Crowd365Packages> {
   final List<String> images = <String>[
-    "assets/premium.png",
-    "assets/standard.png",
-    "assets/basic.png",
-    "assets/basic.png"
+    "assets/Premium.png",
+    "assets/Standard.png",
+    "assets/Basic.png",
   ];
 
   int selectedIndex = -1;
-  List? itemPackage;
+  List<Datum> itemPackage = [];
   bool checkPackage = false;
   bool _isLoading = false;
   bool selectPackageCheck = false;
@@ -43,9 +37,8 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    if (widget.referrerPackage!.isEmpty) {
+    if (widget.referrerPackage.isEmpty) {
       setState(() {
         checkPackage = true;
       });
@@ -61,8 +54,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
     return Scaffold(
       body: SafeArea(
           child: checkPackage == true
-              ? Center(
-                  child: CircularProgressIndicator(color: HexColor("#415CA0")))
+              ? Center(child: Text("No Package Found"))
               : Stack(
                   children: [
                     Container(
@@ -187,7 +179,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     .spaceBetween,
                                                             children: [
                                                               Text(
-                                                                itemPackage![
+                                                                itemPackage[
                                                                         index]
                                                                     .name,
                                                                 style:
@@ -199,7 +191,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                 ),
                                                               ),
                                                               Text(
-                                                                "${itemPackage![index].priceCurrency} ${itemPackage![index].price}",
+                                                                "N${itemPackage[index].price}",
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 15,
@@ -273,7 +265,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "N500",
+                                                                    "N${itemPackage[index].welcomeBonus}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -286,7 +278,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N4,500",
+                                                                    "N${itemPackage[index].reward}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -299,7 +291,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N5,000",
+                                                                    "N${itemPackage[index].eachCycle}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -330,7 +322,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                         height:
                                             SizeConfig.blockSizeVertical! * 2,
                                       ),
-                                      itemCount: itemPackage!.length,
+                                      itemCount: itemPackage.length,
                                     ),
                                     SizedBox(
                                       height: SizeConfig.blockSizeVertical! * 4,
@@ -360,28 +352,39 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                showChoiceDialog(
+                                showErrorDialog(
                                     context,
                                     validators.firstWhere(
                                             (element) => element != null) ??
-                                        "","Crowd365");
+                                        "",
+                                    "Crowd365");
 
                                 return;
                               }
                               String namePage =
-                                  await itemPackage![selectedIndex].name;
+                                  await itemPackage[selectedIndex].name;
                               String price =
-                                  await itemPackage![selectedIndex].price;
+                                  await itemPackage[selectedIndex].price;
+                              String welcomeBonus =
+                                  await itemPackage[selectedIndex].welcomeBonus;
+                              String reward =
+                                  await itemPackage[selectedIndex].reward;
+                              String eachCycle =
+                                  await itemPackage[selectedIndex].eachCycle;
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
                                           Crowd365PaymentMethod(
-                                              packageName: namePage,
-                                              packagePrice: price)));
+                                            packageName: namePage,
+                                            packagePrice: price,
+                                            packageEachCycle: eachCycle,
+                                            packageWelcomeBonus: welcomeBonus,
+                                            packageReward: reward,
+                                          )));
 
                               debugPrint(
-                                  "Package Selected ${itemPackage![selectedIndex].name}");
+                                  "Package Selected ${itemPackage[selectedIndex].name}");
                             },
                             child: _isLoading
                                 ? luxButtonLoading(

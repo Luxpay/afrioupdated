@@ -82,12 +82,12 @@ class _FQAsState extends State<FQAs> {
 class Card1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -260,12 +260,12 @@ class Card1 extends StatelessWidget {
 class Card2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -381,12 +381,12 @@ class Card2 extends StatelessWidget {
 class Card3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -540,12 +540,12 @@ class Card3 extends StatelessWidget {
 class Card4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -642,12 +642,12 @@ class Card4 extends StatelessWidget {
 class Card5 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -763,12 +763,12 @@ class Card5 extends StatelessWidget {
 class Card6 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -942,12 +942,12 @@ class Card6 extends StatelessWidget {
 class Card7 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -1075,12 +1075,12 @@ class Card7 extends StatelessWidget {
 class Card8 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(
@@ -1195,12 +1195,12 @@ class Card8 extends StatelessWidget {
 class Card9 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
-      );
-    }
+    // buildItem(String label) {
+    //   return Padding(
+    //     padding: const EdgeInsets.all(10.0),
+    //     child: Text(label),
+    //   );
+    // }
 
     buildList() {
       return Column(

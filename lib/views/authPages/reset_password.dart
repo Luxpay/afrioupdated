@@ -1,20 +1,15 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/networking/dio.dart';
-import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/authPages/change_password.dart';
-import 'package:luxpay/views/authPages/create_new_password.dart';
-import 'package:luxpay/views/authPages/otp_verification_reset.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
-import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:luxpay/widgets/touchUp.dart';
-
 import '../../models/errors/error.dart';
+import '../../models/sent_otp.dart';
+import '../../networking/DioServices/dio_client.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/validators.dart';
 import 'forgetPassworkOtp.dart';
 
@@ -74,6 +69,7 @@ class _ResetPasswordState extends State<ResetPassword> {
   bool _isLoading = false;
   var controller = TextEditingController();
   String errors = "somthing went wrong";
+  String? event_id;
 
   @override
   void initState() {
@@ -93,7 +89,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                margin: EdgeInsets.only(top: 30),
+                height: 60,
                 decoration: BoxDecoration(
                     border: Border(
                   bottom: BorderSide(
@@ -108,7 +104,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         onPressed: () => {Navigator.maybePop(context)},
                         icon: const Icon(Icons.arrow_back_ios_new)),
                     SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 23,
+                      width: SizeConfig.safeBlockHorizontal! * 4,
                     ),
                     const Text(
                       "Forgot Password",
@@ -149,7 +145,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                       height: SizeConfig.safeBlockVertical! * 3,
                     ),
                     PhoneNumberField(
-                        controller: controller, hint: "Phone Number"),
+                        boaderColor: HexColor("#D70A0A"),
+                        controller: controller,
+                        innerHint: "Phone Number"),
                     SizedBox(
                       height: SizeConfig.safeBlockVertical! * 7,
                     ),
@@ -184,23 +182,15 @@ class _ResetPasswordState extends State<ResetPassword> {
                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text(errors)));
                         } else {
-                          // ResetPasswordData.instance.modify(email: phone);
-                          // await Navigator.of(context)
-                          //     .push(MaterialPageRoute(builder: (context) {
-                          //   return OTPVerificationReset(
-                          //       onVerified: () async {
-                          //         await Navigator.of(context)
-                          //             .pushNamed(ChangePassword.path);
-                          //         Navigator.of(context).pop();
-                          //       },
-                          //       recipientAddress: obscureEmail(phone));
-                          // }));
-                          // Navigator.of(context).pop();
+                          setState(() {
+                            _isLoading = false;
+                          });
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ForgetPasswordOtp(
-                                      onVerified: () {},
+                                      eventID: event_id,
+                                      recipientAddressEmail:"",
                                       recipientAddress: phone)));
                         }
                       },
@@ -233,13 +223,17 @@ class _ResetPasswordState extends State<ResetPassword> {
     await storage.write(key: 'phoneNumber', value: phone);
     try {
       var response = await unAuthDio.post(
-        "/api/user/password/reset/",
+        "/auth/reset-password/request-phone/",
         data: body,
       );
-     // final storage = new FlutterSecureStorage();
+      // final storage = new FlutterSecureStorage();
       //await storage.write(key: "phone", value: "$phone");
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         var data = response.data;
+        var userData = await SenOtpResponse.fromJson(data);
+        ;
+        event_id = userData.data.eventId;
+
         debugPrint('${response.statusCode}');
         debugPrint('${data}');
         return true;
@@ -247,13 +241,15 @@ class _ResetPasswordState extends State<ResetPassword> {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
+        debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);
         errors = errorMessage.errors.message;
         return false;
       } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {

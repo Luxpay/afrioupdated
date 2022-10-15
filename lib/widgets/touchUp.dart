@@ -43,35 +43,56 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                 fontWeight: FontWeight.w600,
                 color: HexColor("#1E1E1E")),
           ),
-          SizedBox(height: 15),
-          TextField(
-            controller: widget.controller,
-            onChanged: (value) {
-              hidePassword = !hidePassword;
-            },
-            obscureText: hidePassword,
-            decoration: InputDecoration(
-                //labelText: ' password',
-                hintText: "*************",
-                focusedBorder: InputBorder.none,
-                disabledBorder: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                errorBorder: InputBorder.none,
-                focusedErrorBorder: InputBorder.none,
-                fillColor: grey1,
-                filled: true,
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      hidePassword = !hidePassword;
-                    });
-                  },
-                  icon: Icon(
-                      hidePassword
-                          ? Icons.remove_red_eye_outlined
-                          : FontAwesomeIcons.eyeSlash,
-                      size: hidePassword ? 20 : 15),
-                )),
+          SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: borderColor),
+                color: textfieldColor),
+            child: TextField(
+              controller: widget.controller,
+              onChanged: (value) {
+                hidePassword = !hidePassword;
+              },
+              obscureText: hidePassword,
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(7),
+                    borderSide: BorderSide(
+                      color: HexColor("#1E1E1E").withOpacity(0.01),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(7),
+                    borderSide: BorderSide(
+                      color: HexColor("#D70A0A"),
+                    ),
+                  ),
+                  //labelText: ' password',
+                  hintText: "*************",
+                  hintStyle: TextStyle(
+                      fontSize: 13,
+                      color: HexColor("#333333").withOpacity(0.25),
+                      fontWeight: FontWeight.w300),
+                  contentPadding: EdgeInsets.only(left: 17, top: 12),
+                  disabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  fillColor: grey1,
+                  filled: true,
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        hidePassword = !hidePassword;
+                      });
+                    },
+                    icon: Icon(
+                        hidePassword
+                            ? Icons.remove_red_eye_outlined
+                            : FontAwesomeIcons.eyeSlash,
+                        size: hidePassword ? 20 : 15),
+                  )),
+            ),
           ),
         ],
       ),
@@ -272,11 +293,11 @@ Widget buildCircle({
     );
 
 class crowd360Rules extends StatelessWidget {
-  crowd360Rules({Key? key, required this.question, required this.answer})
+  const crowd360Rules({Key? key, required this.question, required this.answer})
       : super(key: key);
 
-  String question;
-  String answer;
+  final String question;
+  final String answer;
 
   @override
   Widget build(BuildContext context) {
@@ -316,9 +337,34 @@ class crowd360Rules extends StatelessWidget {
 }
 
 class PhoneNumberField extends StatelessWidget {
-  TextEditingController controller = TextEditingController();
-  String hint;
-  PhoneNumberField({Key? key, required this.controller, required this.hint})
+  final String? innerHint;
+  final Color? hintColour;
+  final FontWeight? hintWeight;
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? formatters;
+  final bool obscureText;
+  final Widget? suffixIcon;
+  final bool enabled;
+  final TextInputType? textInputType;
+  final bool multiline;
+  final int? maxLength;
+  final Color? boaderColor;
+  const PhoneNumberField(
+      {Key? key,
+      this.multiline = false,
+      this.controller,
+      this.formatters,
+      this.onChanged,
+      this.obscureText = false,
+      this.hintColour,
+      this.hintWeight,
+      this.innerHint,
+      this.suffixIcon,
+      this.enabled = true,
+      this.textInputType,
+      this.maxLength,
+      this.boaderColor})
       : super(key: key);
 
   @override
@@ -329,7 +375,7 @@ class PhoneNumberField extends StatelessWidget {
         children: [
           Container(
             child: Text(
-              "$hint",
+              "$innerHint",
               style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -339,43 +385,78 @@ class PhoneNumberField extends StatelessWidget {
           SizedBox(
             height: 12,
           ),
-          Row(
-            children: [
-              Container(
-                height: 45,
-                width: 105,
-                // margin: EdgeInsets.only(top: 2),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: borderColor),
-                    color: HexColor("#E8E8E8").withOpacity(0.35)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      height: 20,
-                      width: 20,
-                      child: Image.asset(
-                        "assets/nigeria.png",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 3,
-                    ),
-                    Text("(+234)"),
-                    Icon(Icons.arrow_drop_down)
-                  ],
+          Container(
+            height: 48,
+            width: double.infinity,
+            // margin: EdgeInsets.only(top: 2),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(7),
+                border: Border.all(color: borderColor),
+                color: HexColor("#E8E8E8").withOpacity(0.35)),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    maxLines: multiline ? null : 1,
+                    controller: controller,
+                    inputFormatters: formatters,
+                    onChanged: (v) => onChanged?.call(v),
+                    obscureText: obscureText,
+                    enabled: enabled,
+                    maxLength: maxLength,
+                    keyboardType: TextInputType.number,
+                    expands: multiline,
+                    decoration: InputDecoration(
+                        hintText: innerHint != null ? innerHint : "",
+                        counterText: "",
+                        hintStyle: TextStyle(
+                            fontSize: 13,
+                            color: HexColor("#333333").withOpacity(0.25),
+                            fontWeight: FontWeight.w300),
+                        contentPadding: suffixIcon != null
+                            ? EdgeInsets.only(left: 17, top: 12)
+                            : EdgeInsets.only(
+                                left: 17, top: multiline ? 10 : 0),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(7),
+                          borderSide: BorderSide(
+                            color: HexColor("#1E1E1E").withOpacity(0.01),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(7),
+                          borderSide: BorderSide(
+                            color: boaderColor ??
+                                HexColor("#1E1E1E").withOpacity(0.01),
+                          ),
+                        ),
+                        border: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        errorStyle: const TextStyle(fontSize: 14),
+                        fillColor: HexColor("#E8E8E8").withOpacity(0.35),
+                        filled: true,
+                        prefixIcon:
+                            //  Container(
+                            //   height: 20,
+                            //   width: 20,
+                            //   child: Image.asset(
+                            //     "assets/nigeria.png",
+                            //     fit: BoxFit.cover,
+                            //   ),
+                            // ),
+
+                            Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Text("(+234)"),
+                        ),
+                        // Icon(Icons.arrow_drop_down)
+
+                        suffixIcon: suffixIcon != null ? suffixIcon : null),
+                  ),
                 ),
-              ),
-              SizedBox(width: 5),
-              Expanded(
-                child: LuxTextFieldNumber(
-                  controller: controller,
-                  innerHint: "e.g 07012345678",
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

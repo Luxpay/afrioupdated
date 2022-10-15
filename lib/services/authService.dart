@@ -1,28 +1,56 @@
-import 'package:flutter/services.dart';
-import 'package:local_auth/local_auth.dart';
+// import 'package:local_auth/local_auth.dart';
 
-class LocalAuthenticationService {
-  final _auth = LocalAuthentication();
-  bool _isProtectionEnabled = false;
+// class BiometricHelper {
+//   final LocalAuthentication _auth = LocalAuthentication();
 
-  bool get isProtectionEnabled => _isProtectionEnabled;
+//   Future<bool> hasEnrolledBiometrics() async {
+//     final List<BiometricType> availableBiometrics =
+//         await _auth.getAvailableBiometrics();
 
-  set isProtectionEnabled(bool enabled) => _isProtectionEnabled = enabled;
+//     if (availableBiometrics.isNotEmpty) {
+//       return true;
+//     }
+//     return false;
+//   }
 
-  bool isAuthenticated = false;
+//   Future<bool> checkBiometrics() async {
+//     late bool canCheckBiometrics;
+//     try {
+//       canCheckBiometrics = await _auth.canCheckBiometrics;
+//       return canCheckBiometrics;
+//     } catch (e) {
+//       canCheckBiometrics = false;
+//       print(e);
+//       return canCheckBiometrics;
+//     }
+//   }
 
-  Future<void> authenticate() async {
-    if (_isProtectionEnabled) {
-      try {
-        isAuthenticated = await _auth.authenticate(
-          localizedReason: 'authenticate to access',
-          useErrorDialogs: true,
-          stickyAuth: true,
-          biometricOnly: true,
-        );
-      } on PlatformException catch (e) {
-        print(e);
-      }
-    }
-  }
-}
+//   Future<bool> authenticateWithBiometrics() async {
+//     bool authenticate = false;
+//     try {
+//       authenticate = await _auth.authenticate(
+//         localizedReason:
+//             'Scan your fingerprint (or face or whatever) to authenticate',
+//         biometricOnly: true,
+//         useErrorDialogs: true,
+//         stickyAuth: true,
+//       );
+
+//       return authenticate;
+//     } catch (e) {
+//       print(e);
+//       authenticate = false;
+//       return authenticate;
+//     }
+//   }
+
+//   Future<bool> authenticate() async {
+//     final bool didAuthenticate = await _auth.authenticate(
+//       localizedReason: 'Please authenticate to proceed',
+//       biometricOnly: true,
+//       useErrorDialogs: true,
+//       stickyAuth: true,
+//     );
+//     return didAuthenticate;
+//   }
+// }

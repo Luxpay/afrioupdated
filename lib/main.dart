@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luxpay/services/local_notification_service.dart';
-import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
@@ -14,14 +14,9 @@ import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page.dart';
 import 'package:luxpay/views/launchPages/splash_screen_page_two.dart';
 import 'package:luxpay/views/launchPages/welcome_page.dart';
-
 import 'package:luxpay/views/page_controller.dart';
 import 'package:luxpay/views/transfers/bank_transfer.dart';
 import 'package:luxpay/views/transfers/wallet_transfer.dart';
-import 'package:luxpay/widgets/methods/esayLoading.dart';
-import 'services/locatorService.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-
 import 'views/crowd365/crowd365_dashboard.dart';
 
 ///Receive message when app is in background solution for on message
@@ -34,12 +29,15 @@ void main() async {
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(backgroundHandler);
 
-  setupLocator();
+  // setupLocator();
   //purgeAll();
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarBrightness: Brightness.light,
+  ));
   runApp(ProviderScope(child: MyApp()));
-  configLoading();
+  
 }
-
 
 GlobalKey<NavigatorState>? navigatorKey = GlobalKey<NavigatorState>();
 
@@ -57,23 +55,21 @@ class MyApp extends StatelessWidget {
     900: const Color.fromRGBO(215, 10, 10, 1),
   };
   MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     MaterialColor colorCustom = MaterialColor(0xFFD70A0A, color);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Luxpay',
       navigatorKey: navigatorKey,
       theme: ThemeData(
-          //backgroundColor: Colors.white,
-          primarySwatch: colorCustom,
-          fontFamily: "Mulish"),
+        //backgroundColor: Colors.white,
+        primarySwatch: colorCustom,
+        fontFamily: "Mulish",
+      ),
       initialRoute: "/",
       onGenerateRoute: onGenerateRoute,
-      builder: EasyLoading.init(),
     );
   }
 }
@@ -106,8 +102,8 @@ Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     //   return const Crowd365Packages().getRoute();
     case Crowd365Dashboard.path:
       return const Crowd365Dashboard().getRoute();
-    case BankTransfer.path:
-      return const BankTransfer().getRoute();
+    case BankTransfers.path:
+      return const BankTransfers().getRoute();
     case WalletTransfer.path:
       return const WalletTransfer().getRoute();
   }

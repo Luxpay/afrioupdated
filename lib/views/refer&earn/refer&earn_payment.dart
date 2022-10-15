@@ -1,161 +1,310 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:luxpay/views/refer&earn/referDebit.dart';
-
-import '../../podos/payment_methods.dart';
+import 'package:luxpay/models/errors/authError.dart';
+import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/refer&earn/referearn_pin.dart';
+import '../../models/about_wallet.dart';
+import '../../networking/DioServices/dio_client.dart';
 import '../../utils/hexcolor.dart';
-import '../../utils/sizeConfig.dart';
+import '../../widgets/lux_buttons.dart';
+import '../../widgets/methods/showDialog.dart';
 
 class ReferEarnPaymentMethod extends StatefulWidget {
-  const ReferEarnPaymentMethod({Key? key}) : super(key: key);
+  final String sponsor;
+
+  ReferEarnPaymentMethod({Key? key, required this.sponsor}) : super(key: key);
 
   @override
   State<ReferEarnPaymentMethod> createState() => _ReferEarnPaymentMethodState();
 }
 
 class _ReferEarnPaymentMethodState extends State<ReferEarnPaymentMethod> {
-  List<PaymentMethodObj> items = [
-    new PaymentMethodObj(
-        1,
-        "Wallet Balance",
-        "From bank app or internet banking",
-        "assets/paymentMethod/bank.png",
-        HexColor("#F4752E").withOpacity(.20)),
-    new PaymentMethodObj(2, "Debit Card", "Top up with a debit card",
-        "assets/paymentMethod/card.png", HexColor("#22B02E").withOpacity(.20)),
-    // new PaymentMethodObj(3, "USSD", "With your other bank’s USSD code",
-    //     "assets/paymentMethod/hash.png", HexColor("#144DDE").withOpacity(.20)),
-  ];
+  bool selectPackageCheck = false;
+  int selectedIndex = -1;
+  String? walletBalance;
+  bool checkdata = false;
+
+  bool _isLoading = false;
+  var errors;
+  String? sponsor;
+
+  @override
+  void initState() {
+    super.initState();
+    getWallets();
+  
+      sponsor = widget.sponsor;
+
+      debugPrint(sponsor);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+        body: SafeArea(
+      child: Stack(
+        children: [
+          Container(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  IconButton(
-                    onPressed: () => {Navigator.pop(context)},
-                    icon: const Icon(Icons.arrow_back_ios_new),
-                    color: Colors.black,
+                  Container(
+                    padding: EdgeInsets.only(bottom: 16, top: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            IconButton(
+                              onPressed: () => {Navigator.pop(context)},
+                              icon: const Icon(Icons.arrow_back_ios_new),
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: SizeConfig.safeBlockHorizontal! * 2.4,
+                            ),
+                            const Text(
+                              "Subscribe package",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  SizedBox(
-                    width: SizeConfig.safeBlockHorizontal! * 2.4,
-                  ),
-                  const Text(
-                    "Payment Method",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600),
+                  Container(
+                      margin: EdgeInsets.only(left: 30, top: 10),
+                      child: Text(
+                        "Subscribe",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w300),
+                      )),
+                  WalletCard(balance: walletBalance ?? "..."),
+                  SizedBox(height: 50),
+                  Container(
+                    margin: EdgeInsets.only(left: 20, right: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 1), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: () => setState(() {
+                        // selectedIndex = index;
+                        // selectPackageCheck = true;
+                      }),
+                      child: AnimatedContainer(
+                        duration: Duration(
+                          milliseconds: 200,
+                        ),
+                        padding: EdgeInsets.only(
+                          top: 23,
+                          left: SizeConfig.blockSizeHorizontal! * 5,
+                          right: SizeConfig.blockSizeHorizontal! * 5,
+                          bottom: 17,
+                        ),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          // border: Border.all(
+                          //   color: HexColor("#D70A0A"),
+                          // ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade100.withOpacity(0.4),
+                              offset: Offset(3, 3),
+                            )
+                          ],
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset(
+                              "assets/Standard.png",
+                              color: HexColor("#D70A0A"),
+                            ),
+                            SizedBox(
+                                width: SizeConfig.blockSizeHorizontal! * 4),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                      "Instant N500 Commission\nGet free N500 cash when your friends register and perform transactions on LuxPay using your Referral ID/link.\nThe more you refer, the more you earn.",
+                                      textAlign: TextAlign.center),
+                                  Text(
+                                      "Get 10% Instant Commission on Crowd365 Refer Program\nWhen your referrals subscribe to any of the packages on Crowd365, you immediately get a 10% bonus on your investments.\n(You can get up to N5000 on a N50,000 package on Crowd365 from referrals)",
+                                      textAlign: TextAlign.center),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              SizedBox(
-                height: SizeConfig.safeBlockVertical! * 1.6,
-              ),
-              Container(
-                color: HexColor("#FBFBFB"),
-                child: Column(
-                  children: [
-                    ListView.separated(
-                      shrinkWrap: true,
-                      separatorBuilder: (context, index) =>
-                          index == items.length - 1
-                              ? Container()
-                              : const SizedBox(
-                                  height: 16,
-                                ),
-                      padding: const EdgeInsets.symmetric(horizontal: 24).add(
-                        const EdgeInsets.only(top: 27, bottom: 32),
-                      ),
-                      itemBuilder: (context, index) => PaymentMethodWidget(
-                        paymentMethodObj: items[index],
-                      ),
-                      itemCount: items.length,
-                    )
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
-        ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              margin: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 60),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: InkWell(
+                        onTap: () async {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ReferEarnPin(sponsor: sponsor)));
+                        },
+                        child: _isLoading
+                            ? luxButtonLoading(
+                                HexColor("#D70A0A"), double.infinity)
+                            : luxButton(HexColor("#D70A0A"), Colors.white,
+                                "Pay", double.infinity,
+                                fontSize: 16, height: 50, radius: 8)),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  // Container(
+                  //     child: Image.asset(
+                  //   "assets/fprint_blue.png",
+                  //   height: 50,
+                  //   width: 50,
+                  //   fit: BoxFit.cover,
+                  // )),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-    );
+    ));
   }
 
-  PaymentMethodWidget({required PaymentMethodObj paymentMethodObj}) {
-    return InkWell(
-      onTap: () => {
-        if (paymentMethodObj.id == 1)
-          {
-            // Navigator.push(context,
-            //     MaterialPageRoute(builder: (context) => BankTransfer()))
-          }
-        else
-          {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ReferrerDebitCard()))
-          }
-        // else
-        //   {
-        //     // Navigator.push(context,
-        //     //     MaterialPageRoute(builder: (context) => UssdTransfer()))
-        //   }
-      },
-      child: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.only(
-              left: 20.0, top: 30.5, bottom: 30.5, right: 22.67),
-          child: Row(
+  Future<bool> getWallets() async {
+    try {
+      var response = await dio.get(
+        "/v1/wallets/details/",
+      );
+      debugPrint('${response.statusCode}');
+      if (response.statusCode == 200) {
+        var data = response.data;
+        debugPrint('${response.statusCode}');
+        debugPrint('${data}');
+        var walletData = await AboutWallet.fromJson(data);
+        setState(() {
+          checkdata = true;
+          walletBalance = walletData.data.balance;
+        });
+        //debugPrint('Wallet Data : ${walletData.data.length}');
+
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      if (e.response != null) {
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
+          return false;
+        }
+      } else {
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
+    }
+  }
+}
+
+class WalletCard extends StatelessWidget {
+  final String balance;
+  const WalletCard({Key? key, required this.balance}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    {
+      return Container(
+        margin: EdgeInsets.only(left: 20, top: 20, right: 20),
+        child: Container(
+          height: 100,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.3),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: Offset(0, 1), // changes position of shadow
+              ),
+            ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Stack(
             children: [
-              Container(
-                  height: 45,
-                  width: 45,
-                  decoration: BoxDecoration(
-                      color: paymentMethodObj.colour,
-                      borderRadius: BorderRadius.circular(16)),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  margin: EdgeInsets.only(left: 30),
                   child: Image.asset(
-                    "${paymentMethodObj.img}",
-                    scale: 2,
-                  )),
-              SizedBox(
-                width: 21,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("${paymentMethodObj.title}"),
-                  SizedBox(
-                    height: 8,
+                    "assets/fund-tag.png",
+                    width: 50,
+                    height: 50,
                   ),
-                  Text(
-                    "${paymentMethodObj.subTitle}",
-                    style: TextStyle(
-                        color: HexColor("#8D9091"),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500),
-                  )
-                ],
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: HexColor("#8D9091"),
-                      size: 14,
-                    ),
-                  ],
                 ),
-              )
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Wallet Balance",
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 5),
+                      Text(
+                        "${balance}",
+                        style: TextStyle(fontSize: 15),
+                      )
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

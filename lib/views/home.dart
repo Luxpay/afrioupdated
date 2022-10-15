@@ -1,33 +1,31 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/aboutUser.dart';
-import 'package:luxpay/models/walletsModel.dart';
 import 'package:luxpay/utils/hexcolor.dart';
-import 'package:luxpay/views/finances.dart';
+import 'package:luxpay/views/authPages/create_pin_page.dart';
+import 'package:luxpay/views/finances/transfer_toLuxpay.dart';
 import 'package:luxpay/views/notifications/notificationsPage.dart';
-import 'package:luxpay/views/rechargeAndBills/airtime.dart';
-import 'package:luxpay/views/rechargeAndBills/bill_payment_page.dart';
-import 'package:luxpay/widgets/alertDialog/alert_helper.dart';
 import 'package:luxpay/widgets/home_page_menu.dart';
+import '../models/about_wallet.dart';
 import '../models/crowd36model.dart';
-import '../models/errors/refferal.dart';
-import '../networking/dio.dart';
+import '../models/errors/authError.dart';
+import '../networking/DioServices/dio_client.dart';
+import '../networking/DioServices/dio_errors.dart';
 import '../services/local_notification_service.dart';
 import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/sizeConfig.dart';
+import '../widgets/methods/showDialog.dart';
 import '../widgets/touchUp.dart';
 import '../widgets/wallet_balance.dart';
 import 'crowd365/crowd365.dart';
 import 'crowd365/crowd365_dashboard.dart';
+import 'finances/transfer_withdraw.dart';
 import 'request_money_from_others.dart';
 
 class HomePage extends StatefulWidget {
@@ -41,16 +39,20 @@ class _HomePageState extends State<HomePage> {
   String name = "";
   bool notify = false;
   String time = "Good Day";
-  String? username, userAvatar;
   var errors;
-  String? packageName;
 
-  List? walletInfo;
   bool checkdata = false;
   DioCacheManager? _dioCacheManager;
-  Timer? _timer;
+  String? walletBalance,
+      dailyExpense,
+      checkPin,
+      dailyIncome,
+      username,
+      userAvatar,
+      packageName;
 
-  //final List<Color> colors = <Color>[blue1, , yellow1, red1];
+  String? statusCode;
+  var crowd365Data;
 
   String greeting() {
     var hour = DateTime.now().hour;
@@ -72,21 +74,25 @@ class _HomePageState extends State<HomePage> {
     return 'Evening';
   }
 
+  Future refreshChecks() async {
+    await getWallets();
+    await aboutUser();
+    greeting();
+  }
+
   @override
   void initState() {
-    getWallets();
-    aboutUser();
+    // WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    // });
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      getWallets();
+      aboutUser();
+      greeting();
+     //crowd365_dashBoard();
+    });
 
-    greeting();
     LocalNotificationService.initialize(context);
     super.initState();
-    EasyLoading.addStatusCallback((status) {
-      print('EasyLoading Status $status');
-      if (status == EasyLoadingStatus.dismiss) {
-        _timer?.cancel();
-      }
-    });
-    EasyLoading.dismiss();
 
     ///gives you the message on which user taps
     ///and it opened the app from terminated state
@@ -108,6 +114,9 @@ class _HomePageState extends State<HomePage> {
         });
         print("message title ${message.notification!.title}");
         print("message body ${message.notification!.body}");
+        // sendNotification(
+        //     title: message.notification!.title,
+        //     body: message.notification!.body);
       }
 
       LocalNotificationService.display(message);
@@ -122,18 +131,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    EasyLoading.dismiss();
-    username = null;
-    userAvatar = null;
-  }
-
-  @override
   Widget build(BuildContext context) {
     Future<bool> _willPopCallback() async {
-      EasyLoading.dismiss();
+      ;
       showDialog(
           context: context,
           useRootNavigator: false,
@@ -152,9 +152,23 @@ class _HomePageState extends State<HomePage> {
       return true; // return true if the route to be popped
     }
 
+    String capitalizeAllWord(String value) {
+      var result = value[0].toUpperCase();
+      for (int i = 1; i < value.length; i++) {
+        if (value[i - 1] == " ") {
+          result = result + value[i].toUpperCase();
+        } else {
+          result = result + value[i];
+        }
+      }
+      return result;
+    }
+
+    String usernameCapital = capitalizeAllWord(username ?? "loading...");
+
     SizeConfig().init(context);
     return RefreshIndicator(
-      onRefresh: getWallets,
+      onRefresh: refreshChecks,
       child: SingleChildScrollView(
         child: WillPopScope(
           onWillPop: _willPopCallback,
@@ -237,19 +251,19 @@ class _HomePageState extends State<HomePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Hello 👋🏿, ${time} !",
+                                      "Hello 👋 \n${time} ! ${usernameCapital}",
                                       style: TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 14,
                                           color: Colors.white),
                                     ),
-                                    Text(
-                                      username ?? "Loading...",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 15,
-                                          color: white),
-                                    )
+                                    // Text(
+                                    //   usernameCapital,
+                                    //   style: TextStyle(
+                                    //       fontWeight: FontWeight.w500,
+                                    //       fontSize: 15,
+                                    //       color: white),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -270,7 +284,6 @@ class _HomePageState extends State<HomePage> {
                                 ),
                                 IconButton(
                                     onPressed: () {
-                                      EasyLoading.dismiss();
                                       Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -292,30 +305,12 @@ class _HomePageState extends State<HomePage> {
                       height: SizeConfig.safeBlockVertical! * 2,
                     ),
                     Container(
-                        child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 180,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: checkdata == false ? 1 : walletInfo!.length,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            margin: EdgeInsets.only(left: 20.0, right: 20),
-                            child: WalletBalance(
-                              balance: checkdata == false
-                                  ? "0.000000"
-                                  : walletInfo![index].balance,
-                              currency: checkdata == false
-                                  ? "N"
-                                  : walletInfo![index].balanceCurrency,
-                            ),
-                          );
-                        },
-                      ),
-                    )
-
-                        //child: WalletBalance(),
-                        ),
+                      child: WalletBalance(
+                          balance: walletBalance ?? '0.00',
+                          currency: 'N',
+                          dIncome: dailyIncome ?? '0.00',
+                          dExpense: dailyExpense ?? '0.00'),
+                    ),
                     SizedBox(
                       height: SizeConfig.safeBlockVertical! * 2,
                     ),
@@ -342,7 +337,7 @@ class _HomePageState extends State<HomePage> {
                               height: 18,
                             ),
                             const Text(
-                              "Finances",
+                              "Finance",
                               style: TextStyle(
                                   fontSize: 16, fontWeight: FontWeight.w700),
                             ),
@@ -353,35 +348,28 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                MenuWidget(
-                                    menuName: "FundTag",
-                                    imageName: "assets/fund-tag.png"),
                                 GestureDetector(
                                   onTap: () => {
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Scaffold(
-                                            body: const FinancesPage()),
-                                      ),
-                                    ),
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const TransferToLuxpayAccount()))
                                   },
                                   child: MenuWidget(
-                                      menuName: "Transfer",
-                                      imageName: "assets/transfer.png"),
+                                      menuName: "Lux Tag",
+                                      imageName: "assets/fund-tag.png"),
                                 ),
                                 GestureDetector(
                                   onTap: () => {
                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Scaffold(
-                                            body: const FinancesPage()),
-                                      ),
-                                    ),
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const Withdrawal()))
                                   },
                                   child: MenuWidget(
-                                      menuName: "Withdraw",
+                                      menuName: "Send Money",
                                       imageName: "assets/withdraw.png"),
                                 ),
                                 InkWell(
@@ -452,52 +440,40 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 InkWell(
                                   onTap: () async {
-                                    EasyLoading.show(status: 'loading...');
-                                    var checkCrowd365 =
-                                        await crowd365_dashBoard();
-
-                                    if (checkCrowd365) {
-                                      EasyLoading.dismiss();
-                                      if (packageName != null) {
-                                        EasyLoading.dismiss();
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const Crowd365Dashboard()));
-                                      } else {
-                                        EasyLoading.dismiss();
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const Crowd365()));
-                                      }
-                                    }
+                                    _fetchCrowd365(context);
                                   },
                                   child: MenuWidget(
                                       menuName: "Crowd 365",
                                       imageName: "assets/profits.png"),
                                 ),
-                                InkWell(
-                                  onTap: () => {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             const RaiseFunds()))
-                                    DialogHelper.exit(context)
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(right: 16),
+                                Container(
+                                  margin: EdgeInsets.only(right: 16),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             const TransactionDetailsPage()));
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             const TopUpCongratulation()));
+                                      // DialogHelper.exit(context)
+                                      underConstruction(context);
+                                    },
                                     child: MenuWidget(
                                         menuName: "Raise Funds",
                                         imageName: "assets/piggy.png"),
                                   ),
                                 ),
-                                MenuWidget(
-                                    menuName: "Epic",
-                                    imageName: "assets/epic.png"),
+                                GestureDetector(
+                                  onTap: () => {underConstruction(context)},
+                                  child: MenuWidget(
+                                      menuName: "Epic",
+                                      imageName: "assets/epic.png"),
+                                ),
                               ],
                             ),
                             SizedBox(
@@ -546,11 +522,12 @@ class _HomePageState extends State<HomePage> {
                                 //Airtime
                                 InkWell(
                                   onTap: () => {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Airtime()))
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             const Airtime()))
+                                    underConstruction(context),
                                   },
                                   child: MenuWidget(
                                     menuName: "Airtime",
@@ -560,17 +537,18 @@ class _HomePageState extends State<HomePage> {
                                 //Electricity
                                 InkWell(
                                   onTap: () => {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const GenericBillPage(
-                                                  title: "Electricity",
-                                                  transactionIdHint:
-                                                      "Meter number",
-                                                  transactionIdInnerHint:
-                                                      "Enter meter number",
-                                                )))
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             const GenericBillPage(
+                                    //               title: "Electricity",
+                                    //               transactionIdHint:
+                                    //                   "Meter number",
+                                    //               transactionIdInnerHint:
+                                    //                   "Enter meter number",
+                                    //             )))
+                                    underConstruction(context),
                                   },
                                   child: MenuWidget(
                                     menuName: "Airtime",
@@ -581,17 +559,18 @@ class _HomePageState extends State<HomePage> {
                                 //TV
                                 InkWell(
                                   onTap: () => {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const GenericBillPage(
-                                                  title: "TV",
-                                                  transactionIdHint:
-                                                      "Decoder number",
-                                                  transactionIdInnerHint:
-                                                      "Enter decoder number",
-                                                )))
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) =>
+                                    //             const GenericBillPage(
+                                    //               title: "TV",
+                                    //               transactionIdHint:
+                                    //                   "Decoder number",
+                                    //               transactionIdInnerHint:
+                                    //                   "Enter decoder number",
+                                    //             )))
+                                    underConstruction(context),
                                   },
                                   child: MenuWidget(
                                     menuName: "TV",
@@ -606,17 +585,32 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                MenuWidget(
-                                  menuName: "Water",
-                                  imageName: "assets/homeIcons/water.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Water",
+                                    imageName: "assets/homeIcons/water.png",
+                                  ),
                                 ),
-                                MenuWidget(
-                                  menuName: "Data Bundle",
-                                  imageName: "assets/homeIcons/data.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Data Bundle",
+                                    imageName: "assets/homeIcons/data.png",
+                                  ),
                                 ),
-                                MenuWidget(
-                                  menuName: "Internet",
-                                  imageName: "assets/request.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Internet",
+                                    imageName: "assets/request.png",
+                                  ),
                                 ),
                               ],
                             ),
@@ -626,20 +620,35 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                MenuWidget(
-                                  menuName: "Betting",
-                                  imageName: "assets/homeIcons/betting.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Betting",
+                                    imageName: "assets/homeIcons/betting.png",
+                                  ),
                                 ),
                                 Container(
                                   margin: EdgeInsets.only(left: 10),
-                                  child: MenuWidget(
-                                    menuName: "Educatiom",
-                                    imageName: "assets/homeIcons/edu.png",
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      underConstruction(context);
+                                    },
+                                    child: MenuWidget(
+                                      menuName: "Educatiom",
+                                      imageName: "assets/homeIcons/edu.png",
+                                    ),
                                   ),
                                 ),
-                                MenuWidget(
-                                  menuName: "Transport",
-                                  imageName: "assets/homeIcons/transport.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Transport",
+                                    imageName: "assets/homeIcons/transport.png",
+                                  ),
                                 ),
                               ],
                             ),
@@ -649,13 +658,23 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                MenuWidget(
-                                  menuName: "Pay Ads",
-                                  imageName: "assets/homeIcons/ad.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Pay Ads",
+                                    imageName: "assets/homeIcons/ad.png",
+                                  ),
                                 ),
-                                MenuWidget(
-                                  menuName: "Event & Ticketing",
-                                  imageName: "assets/homeIcons/event.png",
+                                GestureDetector(
+                                  onTap: () {
+                                    underConstruction(context);
+                                  },
+                                  child: MenuWidget(
+                                    menuName: "Event & Ticketing",
+                                    imageName: "assets/homeIcons/event.png",
+                                  ),
                                 ),
                                 Container(
                                   width: 46,
@@ -680,33 +699,45 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> getWallets() async {
+    final storage = new FlutterSecureStorage();
+
+    _dioCacheManager = DioCacheManager(CacheConfig());
+    Options _cacheOptions = buildCacheOptions(Duration(days: 3),
+        forceRefresh: true,
+        options: Options(headers: {
+          'Authorization': 'Bearer ${await storage.read(key: authToken)}'
+        }));
+    Dio _dio = Dio();
+    _dio.interceptors.add(_dioCacheManager!.interceptor);
+    var response = await _dio.get(
+      base_url + "/wallet/",
+      options: _cacheOptions,
+    );
+    debugPrint('${response.statusCode}');
     try {
-      final storage = new FlutterSecureStorage();
-      aboutUser();
-      _dioCacheManager = DioCacheManager(CacheConfig());
-      Options _cacheOptions = buildCacheOptions(Duration(days: 7),
-          forceRefresh: true,
-          options: Options(headers: {
-            'Authorization':
-                'Bearer ${await storage.read(key: authToken) ?? ""}'
-          }));
-      Dio _dio = Dio();
-      _dio.interceptors.add(_dioCacheManager!.interceptor);
-      var response = await _dio.get(
-        base_url + "/api/v1/finance/",
-        options: _cacheOptions,
-      );
-      debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
         debugPrint('${data}');
-        var walletData = await MyWallets.fromJson(data);
+        var walletData = await AboutWallet.fromJson(data);
+
         setState(() {
           checkdata = true;
-          walletInfo = walletData.data;
+          // walletInfo = walletData.data.wallet.balance;
+
+          walletBalance = walletData.data.balance;
+          checkPin = "${walletData.data.hasPin}";
+          dailyIncome = walletData.data.dailySummary.income;
+          dailyExpense = walletData.data.dailySummary.expense;
         });
-        debugPrint('Wallet Data : ${walletData.data.length}');
+
+        if (checkPin == 'false') {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const CreatePinPage()));
+        }
+
+        debugPrint("wallet balance $walletBalance}");
+        debugPrint("wCheck Pin $checkPin}");
 
         return true;
       } else {
@@ -729,36 +760,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<bool> aboutUser() async {
+    final storage = new FlutterSecureStorage();
+
+    DioCacheManager dioCacheManager;
+    dioCacheManager = DioCacheManager(CacheConfig());
+    Options _cacheOptions = buildCacheOptions(Duration(days: 3),
+        forceRefresh: true,
+        options: Options(headers: {
+          'Authorization': 'Bearer ${await storage.read(key: authToken) ?? ""}'
+        }));
+    Dio _dio = Dio();
+    _dio.interceptors.add(dioCacheManager.interceptor);
+    var response = await _dio.get(
+      base_url + "/user/profile/",
+      options: _cacheOptions,
+    );
+    debugPrint('Data Code ${response.statusCode}');
     try {
-      final storage = new FlutterSecureStorage();
-      DioCacheManager dioCacheManager;
-      dioCacheManager = DioCacheManager(CacheConfig());
-      Options _cacheOptions = buildCacheOptions(Duration(days: 7),
-          forceRefresh: true,
-          options: Options(headers: {
-            'Authorization':
-                'Bearer ${await storage.read(key: authToken) ?? ""}'
-          }));
-      Dio _dio = Dio();
-      _dio.interceptors.add(dioCacheManager.interceptor);
-      var response = await _dio.get(
-        base_url + "/api/user/",
-        options: _cacheOptions,
-      );
-      debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
-        debugPrint('${data}');
+        debugPrint('Check Data ${data}');
         var user = await AboutUser.fromJson(data);
         setState(() {
           userAvatar = user.data.avatar;
           username = user.data.username;
-
-          debugPrint("Image ${userAvatar}");
-          debugPrint("name ${username}");
         });
-
+        debugPrint("name : ${username}");
+        debugPrint("avatar : ${userAvatar}");
         return true;
       } else {
         return false;
@@ -766,10 +795,6 @@ class _HomePageState extends State<HomePage> {
     } on DioError catch (e) {
       if (e.response != null) {
         debugPrint(' Error: ${e.response?.data}');
-
-        // var errorData = e.response?.data;
-        // var errorMessage = await ErrorMessages.fromJson(errorData);
-        // errors = errorMessage.errors.message;
         return false;
       } else {
         return false;
@@ -783,62 +808,110 @@ class _HomePageState extends State<HomePage> {
   Future<bool> crowd365_dashBoard() async {
     try {
       var response = await dio.get(
-        base_url + "/api/v1/crowd365/",
+        "/crowd365/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('${data}');
-        var crowd365Data = await Crowd365Db.fromJson(data);
-        setState(() {
-          packageName = crowd365Data.data.plan.name;
-        });
-        EasyLoading.dismiss();
+        crowd365Data = await Crowd365Db.fromJson(data);
+
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         if (e.response?.statusCode == 401) {
-          EasyLoading.dismiss();
-          errors = "Network issue, Try Again";
-          _showChoiceDialog(context, errors);
+          Navigator.of(context).pop();
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
           return false;
         } else {
-          EasyLoading.dismiss();
           var errorData = e.response?.data;
-          var errorMessage = await ReferralError.fromJson(errorData);
-          errors = errorMessage.errors.extra.error[0];
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
           return false;
         }
       } else {
+        Navigator.of(context).pop();
+        errors = errorMessage;
+        showErrorDialog(context, errors, "Crowd365");
+
         return false;
       }
     } catch (e) {
-      debugPrint('${e}');
       return false;
     }
   }
 
-  Future<void> _showChoiceDialog(BuildContext context, content) async {
-    showCupertinoDialog(
-        context: context,
+  void _fetchCrowd365(BuildContext context) async {
+    // show the loading dialog
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
         barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-              title: Text(
-                "Crowd365",
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  // The loading indicator
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  // Some text
+                  Text('Loading...')
+                ],
               ),
-              actions: [
-                CupertinoDialogAction(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("OK")),
-              ],
-              content: Text(content));
+            ),
+          );
         });
+
+    Future.delayed(const Duration(milliseconds: 100), () async {
+// Here you can write your code
+
+      await crowd365_dashBoard();
+      if (crowd365Data.data.isEmpty) {
+        Navigator.of(context).pop();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => const Crowd365()));
+      } else {
+        Navigator.of(context).pop();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const Crowd365Dashboard(from: "home")));
+      }
+    });
   }
+}
+
+void underConstruction(BuildContext context) async {
+  // show the loading dialog
+  showDialog(
+      // The user CANNOT close this dialog  by pressing outsite it
+      barrierDismissible: true,
+      context: context,
+      builder: (_) {
+        return Dialog(
+          // The background color
+          backgroundColor: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                // Some text
+                Center(child: Text('Still Under Construction'))
+              ],
+            ),
+          ),
+        );
+      });
 }

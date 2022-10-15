@@ -2,21 +2,22 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:luxpay/networking/dio.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 
-class BankTransfer extends StatefulWidget {
+import '../../networking/DioServices/dio_client.dart';
+
+class BankTransfers extends StatefulWidget {
   static const String path = '/bank_transfer';
-  const BankTransfer({Key? key}) : super(key: key);
+  const BankTransfers({Key? key}) : super(key: key);
 
   @override
-  State<BankTransfer> createState() => _BankTransferState();
+  State<BankTransfers> createState() => _BankTransfersState();
 }
 
-class _BankTransferState extends State<BankTransfer> {
+class _BankTransfersState extends State<BankTransfers> {
   List<LuxPickerData> data = [];
   LuxPickerData? selectedData;
   String userName = "";

@@ -5,8 +5,6 @@ import 'package:luxpay/views/account.dart';
 import 'package:luxpay/views/finances.dart';
 import 'package:luxpay/views/home.dart';
 import 'package:luxpay/views/referrer.dart';
-import 'package:luxpay/views/rewards/rewards.dart';
-
 import '../utils/hexcolor.dart';
 
 class AppPageController extends StatefulWidget {
@@ -24,7 +22,9 @@ class _AppPageControllerState extends State<AppPageController> {
   static const int rewards = 2;
   static const int account = 3;
   Widget currentPage = const HomePage();
+
   //SystemNavigator.pop()
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/payment_page.dart';
+import '../utils/constants.dart';
+import '../views/paymentMethod/payment_method.dart';
+
 
 class WalletBalance extends StatelessWidget {
-  WalletBalance({Key? key, required this.balance, required this.currency})
+  WalletBalance(
+      {Key? key,
+      required this.balance,
+      required this.currency,
+      required this.dIncome,
+      required this.dExpense})
       : super(key: key);
-  String? balance, currency;
+  final String? balance, currency, dIncome, dExpense;
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -18,7 +24,7 @@ class WalletBalance extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
-            spreadRadius: 5,
+            spreadRadius: 1,
             blurRadius: 10,
             offset: Offset(0, 1), // changes position of shadow
           ),
@@ -53,9 +59,8 @@ class WalletBalance extends StatelessWidget {
                                 fontWeight: FontWeight.w600,
                                 fontSize: 18),
                           ),
-                          SizedBox(width: 3),
                           Text(
-                            balance!,
+                            balance!.replaceAllMapped(reg, mathFunc),
                             style: TextStyle(
                                 color: HexColor("#22B02E"),
                                 fontWeight: FontWeight.w600,
@@ -70,7 +75,7 @@ class WalletBalance extends StatelessWidget {
                     children: [
                       Icon(
                         IconlyBold.wallet,
-                        color: HexColor("#144DDE"),
+                        color: Color.fromARGB(255, 114, 13, 6),
                         size: 20,
                       ),
                       SizedBox(
@@ -78,15 +83,23 @@ class WalletBalance extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => PaymentWidget()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => PaymentMethod()));
+
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) =>
+                          //             FlutterPaymentSdk('Top Up')));
                         },
                         child: Text(
-                          "Top up",
+                          "Add Money",
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
-                              color: HexColor("#144DDE")),
+                              color: Color.fromARGB(255, 114, 13, 6)),
                         ),
                       )
                     ],
@@ -96,52 +109,60 @@ class WalletBalance extends StatelessWidget {
               SizedBox(
                 height: SizeConfig.safeBlockVertical! * 2,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    children: [
-                      Text(
-                        "Today’s Income",
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: HexColor("#8D9091")),
-                      ),
-                      SizedBox(
-                        height: SizeConfig.safeBlockVertical! * 0.7,
-                      ),
-                      const Text(
-                        "N 0",
-                        style: TextStyle(
-                            fontFamily: "Montserrat",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      )
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      Text(
-                        "Today’s Expenses",
-                        style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: HexColor("#8D9091")),
-                      ),
-                      SizedBox(
-                        height: SizeConfig.safeBlockVertical! * 0.7,
-                      ),
-                      const Text(
-                        "N 0",
-                        style: TextStyle(
-                            fontFamily: "Montserrat",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                      )
-                    ],
-                  ),
-                ],
+              Container(
+                // color: Colors.amber,
+                height: 60,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          "Today’s Income",
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: HexColor("#8D9091")),
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 0.7,
+                        ),
+                        Text(
+                          "N${dIncome!.replaceAllMapped(reg, mathFunc)}",
+                          style: TextStyle(
+                              fontFamily: "Montserrat",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    ),
+                    VerticalDivider(
+                      color: Colors.grey,
+                      thickness: 1, //thickness of divier line
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Today’s Expenses",
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: HexColor("#8D9091")),
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 0.7,
+                        ),
+                        Text(
+                          "N${dExpense!.replaceAllMapped(reg, mathFunc)}",
+                          style: TextStyle(
+                              fontFamily: "Montserrat",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
               SizedBox(
                 height: SizeConfig.safeBlockVertical! * 2.4,

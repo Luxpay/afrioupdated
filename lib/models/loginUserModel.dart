@@ -9,125 +9,85 @@ LoginUser loginUserFromJson(String str) => LoginUser.fromJson(json.decode(str));
 String loginUserToJson(LoginUser data) => json.encode(data.toJson());
 
 class LoginUser {
-  LoginUser({
-    required this.status,
-    required this.errors,
-    required this.data,
-  });
+    LoginUser({
+        required this.status,
+        required this.code,
+        required this.message,
+        required this.data,
+    });
 
-  bool status;
-  Errors errors;
-  Data data;
+    String status;
+    int code;
+    String message;
+    Data data;
 
-  factory LoginUser.fromJson(Map<String, dynamic> json) => LoginUser(
+    factory LoginUser.fromJson(Map<String, dynamic> json) => LoginUser(
         status: json["status"],
-        errors: Errors.fromJson(json["errors"]),
+        code: json["code"],
+        message: json["message"],
         data: Data.fromJson(json["data"]),
-      );
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "status": status,
-        "errors": errors.toJson(),
+        "code": code,
+        "message": message,
         "data": data.toJson(),
-      };
+    };
 }
 
 class Data {
-  Data({
-    required this.user,
-    required this.tokens,
-  });
+    Data({
+        required this.user,
+        required this.token,
+    });
 
-  User user;
-  Tokens tokens;
+    User user;
+    String token;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory Data.fromJson(Map<String, dynamic> json) => Data(
         user: User.fromJson(json["user"]),
-        tokens: Tokens.fromJson(json["tokens"]),
-      );
+        token: json["token"],
+    );
 
-  Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toJson() => {
         "user": user.toJson(),
-        "tokens": tokens.toJson(),
-      };
-}
-
-class Tokens {
-  Tokens({
-    required this.access,
-    required this.refresh,
-  });
-
-  String access;
-  String refresh;
-
-  factory Tokens.fromJson(Map<String, dynamic> json) => Tokens(
-        access: json["access"],
-        refresh: json["refresh"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "access": access,
-        "refresh": refresh,
-      };
+        "token": token,
+    };
 }
 
 class User {
-  User({
-    required this.avatar,
-    required this.firstName,
-    required this.lastName,
-    required this.phone,
-    required this.phoneVerified,
-    required this.email,
-    required this.emailVerified,
-    required this.hasPin,
-    required this.isVerified,
-    required this.username,
-  });
+    User({
+        required this.id,
+        this.username,
+        required this.firstName,
+        required this.lastName,
+        required this.phone,
+        required this.createdAt,
+    });
 
-  String avatar;
-  String firstName;
-  String lastName;
-  String phone;
-  bool phoneVerified;
-  dynamic email;
-  bool emailVerified;
-  bool hasPin;
-  dynamic isVerified;
-  String username;
+    String id;
+    dynamic username;
+    String firstName;
+    String lastName;
+    String phone;
+    DateTime createdAt;
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-        avatar: json["avatar"],
+    factory User.fromJson(Map<String, dynamic> json) => User(
+        id: json["id"],
+        username: json["username"],
         firstName: json["first_name"],
         lastName: json["last_name"],
         phone: json["phone"],
-        phoneVerified: json["phone_verified"],
-        email: json["email"],
-        emailVerified: json["email_verified"],
-        hasPin: json["has_pin"],
-        isVerified: json["is_verified"],
-        username: json["username"],
-      );
+        createdAt: DateTime.parse(json["created_at"]),
+    );
 
-  Map<String, dynamic> toJson() => {
-        "avatar": avatar,
+    Map<String, dynamic> toJson() => {
+        "id": id,
+        "username": username,
         "first_name": firstName,
         "last_name": lastName,
         "phone": phone,
-        "phone_verified": phoneVerified,
-        "email": email,
-        "email_verified": emailVerified,
-        "has_pin": hasPin,
-        "is_verified": isVerified,
-        "username": username,
-      };
-}
-
-class Errors {
-  Errors();
-
-  factory Errors.fromJson(Map<String, dynamic> json) => Errors();
-
-  Map<String, dynamic> toJson() => {};
+        "created_at": createdAt.toIso8601String(),
+    };
 }

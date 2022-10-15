@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
@@ -50,22 +49,22 @@ class _BioAuthState extends State<BioAuth> {
                       color: HexColor("#FBFBFB"),
                       thickness: 3,
                     ),
+                    // BioAuthItemsToggle(
+                    //   title: "Touch ID unlock",
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
+                    // BioAuthItemsToggle(
+                    //   title: "Touch ID login",
+                    // ),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
                     BioAuthItemsToggle(
-                      title: "Touch ID unlock",
-                    ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
-                    BioAuthItemsToggle(
-                      title: "Touch ID login",
-                    ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
-                    BioAuthItemsToggle(
-                      title: "Touch ID for pay",
+                      title: "Finger print",
                     ),
                     Divider(
                       color: HexColor("#FBFBFB"),
@@ -95,7 +94,6 @@ class BioAuthItemsToggle extends StatefulWidget {
 class _UnlockItemToggle extends State<BioAuthItemsToggle> {
   @override
   Widget build(BuildContext context) {
-    final storage = FlutterSecureStorage();
     bool isSwitched = false;
     return GestureDetector(
       onTap: widget.onTap,

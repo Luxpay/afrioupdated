@@ -1,20 +1,32 @@
-import 'package:expandable/expandable.dart';
+import 'dart:math';
+import 'dart:ui';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:intl/intl.dart';
+
+import 'package:luxpay/networking/DioServices/dio_errors.dart';
 import 'package:luxpay/views/accountSettings/transaction_statement.dart';
 
+import '../../models/trans_history.dart';
+import '../../networking/DioServices/dio_client.dart';
 import '../../utils/colors.dart';
-import '../../utils/hexcolor.dart';
+import '../../utils/constants.dart';
 import '../../utils/sizeConfig.dart';
+import '../../widgets/methods/showDialog.dart';
+import '../../widgets/transfer_card.dart';
+import '../finances/transactionPage_details.dart';
 
-class TransactionDetails extends StatefulWidget {
-  const TransactionDetails({Key? key}) : super(key: key);
+class AccountTransactions extends StatefulWidget {
+  const AccountTransactions({Key? key}) : super(key: key);
 
   @override
-  State<TransactionDetails> createState() => _TransactionDetailsState();
+  State<AccountTransactions> createState() => _AccountTransactionsState();
 }
 
-class _TransactionDetailsState extends State<TransactionDetails> {
+class _AccountTransactionsState extends State<AccountTransactions> {
+  var errors;
   List<String> status = [
     "Any Status",
     "Successful",
@@ -37,6 +49,15 @@ class _TransactionDetailsState extends State<TransactionDetails> {
   int selected_cate = -1;
   bool checkCate = false;
   bool checkStatus = false;
+  List<Result> transferList = [];
+  bool fetchTransaction = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getTransactionHistory();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,10 +67,9 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              height: 80,
+              height: 70,
               decoration: BoxDecoration(color: Colors.white),
               child: Container(
-                margin: EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -90,11 +110,11 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           Align(
               alignment: Alignment.topCenter,
               child: Container(
-                  height: 70,
+                  height: 50,
                   width: MediaQuery.of(context).size.width,
                   color: Colors.white,
                   margin: EdgeInsets.only(
-                    top: 70,
+                    top: 50,
                   ),
                   child: Container(
                     margin: EdgeInsets.only(
@@ -128,11 +148,17 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           Align(
               alignment: Alignment.topCenter,
               child: Container(
-                margin: EdgeInsets.only(top: 110),
+                margin: EdgeInsets.only(top: 100),
                 child: SingleChildScrollView(
                   child: Container(
                     height: MediaQuery.of(context).size.height,
-                    child: ListView(children: [Card3(), SizedBox(height: 20)]),
+                    child: ListView(children: [
+                      MultipleItemsWidget(
+                        transferList: transferList,
+                        header: "All Transactions",
+                      ),
+                      SizedBox(height: 20)
+                    ]),
                   ),
                 ),
               ))
@@ -158,7 +184,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     ));
   }
 
-  // This is a block of Model Dialog
+  // Dialog for status
   anyStatus(context) {
     return showDialog(
       context: context,
@@ -227,6 +253,7 @@ class _TransactionDetailsState extends State<TransactionDetails> {
     );
   }
 
+// dialog for all categories
   allCategories(context) {
     return showDialog(
       context: context,
@@ -372,181 +399,142 @@ class _TransactionDetailsState extends State<TransactionDetails> {
           child: Text(cateName, style: TextStyle(color: grey7, fontSize: 13))),
     );
   }
-}
 
-class Card3 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    buildItem(String label) {
-      return Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Text(label),
+  Future<bool> getTransactionHistory() async {
+    try {
+      var response = await dio.get(
+        base_url + "/v1/wallets/history/",
       );
+      debugPrint('${response.statusCode}');
+      if (response.statusCode == 200) {
+        var data = response.data;
+        var transactionData = await TransactionHistory.fromJson(data);
+        setState(() {
+          transferList = transactionData.data.results;
+          fetchTransaction = true;
+        });
+        debugPrint("OutPut ${transactionData.data.results.length}");
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
+      if (e.response != null) {
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          // var errorData = e.response?.data;
+          //var errorMessage = await ReferralError.fromJson(errorData);
+          // errors = errorMessage.errors.extra.error[0];
+          return false;
+        }
+      } else {
+        errors = errorMessage;
+        showErrorDialog(context, errors, "Banks");
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
     }
-
-    buildList() {
-      return Column(
-        children: <Widget>[
-          Container(
-              height: MediaQuery.of(context).size.height - 300,
-              child: ListView(
-                children: [
-                  transactionCard(),
-                  transactionCard(),
-                  transactionCard(),
-                  transactionCard(),
-                  transactionCard()
-                ],
-              ))
-        ],
-      );
-    }
-
-    return ExpandableNotifier(
-        child: Container(
-      child: ScrollOnExpand(
-        child: Card(
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: <Widget>[
-              ExpandablePanel(
-                theme: const ExpandableThemeData(
-                  headerAlignment: ExpandablePanelHeaderAlignment.center,
-                  tapBodyToExpand: true,
-                  tapBodyToCollapse: true,
-                  hasIcon: false,
-                ),
-                header: Container(
-                  height: 55,
-                  color: grey1,
-                  child: Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: EdgeInsets.only(left: 15),
-                                child: Text(
-                                  "January, 2022",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyText1!
-                                      .copyWith(color: grey10),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              ExpandableIcon(
-                                theme: const ExpandableThemeData(
-                                  expandIcon: Icons.arrow_drop_down,
-                                  collapseIcon: Icons.arrow_drop_down,
-                                  iconColor: Colors.grey,
-                                  iconSize: 20.0,
-                                  //iconRotationAngle: math.pi / 2,
-                                  iconPadding: EdgeInsets.only(right: 5),
-                                  hasIcon: false,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(right: 20),
-                          child: Icon(IconlyLight.document),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                collapsed: Container(),
-                expanded: buildList(),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ));
   }
 }
 
-Widget transactionCard() {
-  return Column(
-    children: [
-      Container(
-        margin: EdgeInsets.only(
-          top: 15,
-          left: 15,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-              child: Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(right: 10),
-                    child: Image.asset(
-                      'assets/transactionwithdraw.png',
-                      height: 50,
-                      width: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Container(
-                      margin: EdgeInsets.only(
-                        left: 70,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Transfer to bank",
-                            style: TextStyle(fontSize: 17, color: black),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text("January 12, 20:18")
-                        ],
-                      ))
-                ],
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only(right: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Successful",
-                      style: TextStyle(
-                          color: green4,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w300)),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    "-5000",
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: black,
-                        fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      SizedBox(
-        height: 8,
-      ),
-      Divider(
-        color: HexColor("#FBFBFB"),
-        thickness: 5,
-      ),
-    ],
-  );
+class MultipleItemsWidget extends StatefulWidget {
+  final String header;
+  final List<Result> transferList;
+  const MultipleItemsWidget(
+      {Key? key, required this.header, required this.transferList})
+      : super(key: key);
+
+  @override
+  _MultipleItemsWidgetState createState() => _MultipleItemsWidgetState();
 }
+
+class _MultipleItemsWidgetState extends State<MultipleItemsWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+
+  @override
+  void initState() {
+    controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 300));
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: grey1,
+      child: ExpansionTile(
+        title: Text(
+          widget.header,
+          style: const TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 15,
+          ),
+        ),
+        childrenPadding: const EdgeInsets.symmetric(horizontal: 14.0),
+        iconColor: Colors.black,
+        onExpansionChanged: (v) {
+          if (v) {
+            controller.forward();
+          } else {
+            controller.reverse();
+          }
+        },
+        trailing: AnimatedBuilder(
+            animation: controller,
+            child: const Icon(Icons.chevron_right),
+            builder: (context, child) {
+              return Transform.rotate(
+                angle: lerpDouble(0, pi / 2, controller.value) ?? 0,
+                child: child,
+              );
+            }),
+        children: <Widget>[
+          Container(
+              height: MediaQuery.of(context).size.height,
+              child: ListView.separated(
+                itemCount: widget.transferList.length,
+                itemBuilder: (context, index) {
+                  var transfers = widget.transferList[index];
+                  var arr = transfers.amount.split('.');
+                  var amount = arr[0];
+                  var ref = transfers.reference;
+                  // DateFormat("h:mma");
+                  var dateValue = new DateFormat("yyyy-MM-dd HH:mm:ss")
+                      .parse("${transfers.createdAt}", true)
+                      .toLocal();
+                  String formattedDate =
+                      DateFormat("MMMd h:mma").format(dateValue);
+
+                  return TransferHistoryCard(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TransactionDetailsPage(
+                                      reference: ref,
+                                    )));
+                      },
+                      amount: amount,
+                      //channel: transfers.channel,
+                      status: transfers.status,
+                      date: formattedDate,
+                      type: transfers.type);
+                },
+                separatorBuilder: (context, index) {
+                  return Divider(color: Colors.black45);
+                },
+              ))
+        ],
+      ),
+    );
+  }
+}
+
