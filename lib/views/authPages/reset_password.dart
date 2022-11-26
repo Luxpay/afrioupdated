@@ -190,7 +190,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                               MaterialPageRoute(
                                   builder: (context) => ForgetPasswordOtp(
                                       eventID: event_id,
-                                      recipientAddressEmail:"",
+                                      recipientAddressEmail: "",
                                       recipientAddress: phone)));
                         }
                       },
@@ -238,12 +238,19 @@ class _ResetPasswordState extends State<ResetPassword> {
         debugPrint('${data}');
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
+        setState(() {
+          _isLoading = false;
+        });
         debugPrint(' Error Error: ${e.response?.data}');
+            handleStatusCode(e.response?.statusCode, context);
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);
         errors = errorMessage.errors.message;

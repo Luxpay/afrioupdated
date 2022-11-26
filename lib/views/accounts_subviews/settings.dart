@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/accounts_subviews/about_luxpay.dart';
-import 'package:luxpay/views/accounts_subviews/change_luxpayPin.dart';
 import 'package:luxpay/widgets/settings_item.dart';
+
+import '../../widgets/navigate_route.dart';
+import 'change_luxpayPin.dart';
 
 class SettingsPage extends StatelessWidget {
   static const String path = "/settings";
@@ -20,7 +22,6 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                margin: EdgeInsets.only(top: 20),
                 color: Colors.white,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -29,7 +30,7 @@ class SettingsPage extends StatelessWidget {
                         onPressed: () => {Navigator.maybePop(context)},
                         icon: const Icon(Icons.arrow_back_ios_new)),
                     SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 5,
+                      width: SizeConfig.safeBlockHorizontal! * 2,
                     ),
                     const Text(
                       "Settings",
@@ -50,9 +51,7 @@ class SettingsPage extends StatelessWidget {
                       title: "LuxPay Pin",
                       onTap: () {
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ChangePinPage()));
+                            context, SizeTransition4(ChangeLuxpayPin()));
                       },
                     ),
                     Divider(
@@ -104,10 +103,11 @@ class SettingsPage extends StatelessWidget {
                     //   thickness: 3,
                     // ),
                     SettingsItem(
-                      title: "About LuxPay",
-                      onTap: () =>
-                          Navigator.of(context).pushNamed(AboutLuxPay.path),
-                    ),
+                        title: "About LuxPay",
+                        onTap: () {
+                          Navigator.push(
+                              context, SizeTransition4(AboutLuxPay()));
+                        }),
                     Expanded(
                       child: Container(
                         width: double.infinity,

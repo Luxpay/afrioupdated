@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/finances/luxpayto_pin.dart';
@@ -10,6 +8,7 @@ import 'package:luxpay/widgets/payment/wallet.dart';
 import '../../models/about_wallet.dart';
 import '../../models/errors/authError.dart';
 
+import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/colors.dart';
 import '../../utils/constants.dart';
@@ -38,13 +37,16 @@ class _LuxpayConfirmState extends State<LuxpayConfirm> {
   String? save;
   var errors;
   bool checkdata = false;
-  DioCacheManager? _dioCacheManager;
+
   String? walletBalance;
 
   @override
   void initState() {
     super.initState();
-    getWallets();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getWallets();
+    });
 
     username = widget.username;
     amount = widget.amount;
@@ -143,8 +145,7 @@ class _LuxpayConfirmState extends State<LuxpayConfirm> {
                     SizedBox(height: 10),
                     earningStatus(
                         "REASON FOR WITHDRAWAL", "${reasons ?? 'N/A'}"),
-                    SizedBox(height: 10),
-                    earningStatus("Bank fee", "N100"),
+                 
                     SizedBox(height: 50),
                     Container(
                       child: Row(
@@ -152,16 +153,8 @@ class _LuxpayConfirmState extends State<LuxpayConfirm> {
                         children: [
                           Expanded(
                             child: InkWell(
-                                onTap: () async {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TransactionPinTransfer(
-                                                  username: username,
-                                                  amount: amount,
-                                                  reasons: reasons,
-                                                  save: save)));
+                                onTap: () {
+                                  checkBalance(context);
                                 },
                                 child: luxButton(HexColor("#D70A0A"),
                                     Colors.white, "Pay", 20,
@@ -212,22 +205,12 @@ class _LuxpayConfirmState extends State<LuxpayConfirm> {
   }
 
   Future<bool> getWallets() async {
-    final storage = new FlutterSecureStorage();
-    // aboutUser();
-    _dioCacheManager = DioCacheManager(CacheConfig());
-    Options _cacheOptions = buildCacheOptions(Duration(days: 7),
-        forceRefresh: true,
-        options: Options(headers: {
-          'Authorization': 'Bearer ${await storage.read(key: authToken) ?? ""}'
-        }));
-    Dio _dio = Dio();
-    _dio.interceptors.add(_dioCacheManager!.interceptor);
-    var response = await _dio.get(
-      base_url + "/v1/wallets/details/",
-      options: _cacheOptions,
-    );
-    debugPrint('${response.statusCode}');
     try {
+      var response = await dio.get(
+        "/wallet/",
+      );
+      debugPrint('${response.statusCode}');
+
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
@@ -268,5 +251,51 @@ class _LuxpayConfirmState extends State<LuxpayConfirm> {
       debugPrint('${e}');
       return false;
     }
+  }
+
+  void checkBalance(BuildContext context) async {
+    // show the loading dialog
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  // The loading indicator
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  // Some text
+                  Text('Loading...')
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(const Duration(milliseconds: 100), () async {
+// Here you can write your code
+
+      var response = await getWallets();
+      if (response) {
+        Navigator.of(context).pop();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TransactionPinTransfer(
+                    username: username,
+                    amount: amount,
+                    reasons: reasons,
+                    save: save)));
+      }
+    });
   }
 }

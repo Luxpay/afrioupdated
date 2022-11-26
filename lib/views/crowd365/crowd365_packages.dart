@@ -3,13 +3,13 @@ import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import '../../models/packagesModel.dart';
+import '../../utils/constants.dart';
 import '../../widgets/methods/showDialog.dart';
 import 'crowd365_payment.dart';
 
-
 class Crowd365Packages extends StatefulWidget {
   static const String path = "crowd365Packages";
-  final List<Datum> referrerPackage;
+  final List<Packs> referrerPackage;
 
   Crowd365Packages({
     Key? key,
@@ -28,7 +28,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
   ];
 
   int selectedIndex = -1;
-  List<Datum> itemPackage = [];
+  List<Packs> itemPackage = [];
   bool checkPackage = false;
   bool _isLoading = false;
   bool selectPackageCheck = false;
@@ -191,7 +191,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                 ),
                                                               ),
                                                               Text(
-                                                                "N${itemPackage[index].price}",
+                                                                "N${itemPackage[index].price.replaceAllMapped(reg, mathFunc)}",
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 15,
@@ -232,7 +232,20 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "Reward",
+                                                                    "Rewards:",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Per referral earning",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -245,7 +258,20 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "Each Cycle",
+                                                                    "Maximum referral earning",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Total earning",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -265,7 +291,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "N${itemPackage[index].welcomeBonus}",
+                                                                    "N${itemPackage[index].rewards.welcomeBonus.replaceAllMapped(reg, mathFunc)}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -278,7 +304,7 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N${itemPackage[index].reward}",
+                                                                    "",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -291,7 +317,33 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N${itemPackage[index].eachCycle}",
+                                                                    "N${itemPackage[index].rewards.perReferralEarning.replaceAllMapped(reg, mathFunc)}",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N${itemPackage[index].rewards.maxReferralEarning.replaceAllMapped(reg, mathFunc)}",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N${itemPackage[index].rewards.totalEarnings.replaceAllMapped(reg, mathFunc)}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -366,11 +418,21 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                               String price =
                                   await itemPackage[selectedIndex].price;
                               String welcomeBonus =
-                                  await itemPackage[selectedIndex].welcomeBonus;
-                              String reward =
-                                  await itemPackage[selectedIndex].reward;
-                              String eachCycle =
-                                  await itemPackage[selectedIndex].eachCycle;
+                                  await itemPackage[selectedIndex]
+                                      .rewards
+                                      .welcomeBonus;
+                              String maxReferralEarning =
+                                  await itemPackage[selectedIndex]
+                                      .rewards
+                                      .maxReferralEarning;
+                              String perReferralEarning =
+                                  await itemPackage[selectedIndex]
+                                      .rewards
+                                      .perReferralEarning;
+                              String totalEarning =
+                                  await itemPackage[selectedIndex]
+                                      .rewards
+                                      .totalEarnings;
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -378,9 +440,12 @@ class _Crowd365PackagesState extends State<Crowd365Packages> {
                                           Crowd365PaymentMethod(
                                             packageName: namePage,
                                             packagePrice: price,
-                                            packageEachCycle: eachCycle,
+                                            packageTotalEarning: totalEarning,
                                             packageWelcomeBonus: welcomeBonus,
-                                            packageReward: reward,
+                                            packageMaxRefEarning:
+                                                maxReferralEarning,
+                                            packagePerRefEarning:
+                                                perReferralEarning,
                                           )));
 
                               debugPrint(

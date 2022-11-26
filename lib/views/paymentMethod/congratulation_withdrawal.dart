@@ -5,7 +5,7 @@ import '../../utils/colors.dart';
 import '../../utils/hexcolor.dart';
 
 class CongratulationOnWithdrawal extends StatefulWidget {
-  final String? amount, from, to, fee, accountNumber, bankName;
+  final String? amount, from, to, fee, accountNumber, status, bankName;
   final DateTime? date;
   const CongratulationOnWithdrawal(
       {Key? key,
@@ -15,6 +15,7 @@ class CongratulationOnWithdrawal extends StatefulWidget {
       required this.fee,
       required this.accountNumber,
       required this.bankName,
+      required this.status,
       required this.date})
       : super(key: key);
 
@@ -86,10 +87,10 @@ class _CongratulationOnWithdrawalState
                           },
                           child: Image.asset(
                             "assets/successIcon.png",
-                            scale: 3,
+                            scale: 2,
                           )),
                       SizedBox(height: 30),
-                      Text("Your Transaction was successful",
+                      Text("Your Transaction is ${widget.status}",
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w600,
@@ -101,7 +102,7 @@ class _CongratulationOnWithdrawalState
                           children: [
                             Flexible(
                                 child: Text(
-                                    "  Your Transaction has been processed!\n Summary of transaction are included below",
+                                    "  Your Transaction is been process you will get a notification once its successfull or failed\n Summary of transaction are included below",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(color: Colors.grey))),
                           ],
@@ -117,7 +118,7 @@ class _CongratulationOnWithdrawalState
                       Text(" Luxpay",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              color: Colors.blue, fontWeight: FontWeight.bold)),
+                              color: Colors.red, fontWeight: FontWeight.bold)),
                       transactionStatus(
                           amount: "N${widget.amount}",
                           from: "${widget.from}",
@@ -237,41 +238,41 @@ class _CongratulationOnWithdrawalState
               ],
             ),
           ),
+          // const Divider(
+          //   color: Colors.black,
+          // ),
+          // Container(
+          //   margin: EdgeInsets.only(bottom: 10),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Text(
+          //         'ACCOUNT NUMBER',
+          //       ),
+          //       SizedBox(height: 7),
+          //       Text("$account_number")
+          //     ],
+          //   ),
+          // ),
           const Divider(
             color: Colors.black,
           ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'ACCOUNT NUMBER',
-                ),
-                SizedBox(height: 7),
-                Text("$account_number")
-              ],
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'BANK NAME',
-                ),
-                SizedBox(height: 7),
-                Text("$bank_name")
-              ],
-            ),
-          ),
-          const Divider(
-            color: Colors.black,
-          ),
+          // Container(
+          //   margin: EdgeInsets.only(bottom: 10),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Text(
+          //         'BANK NAME',
+          //       ),
+          //       SizedBox(height: 7),
+          //       Text("$bank_name")
+          //     ],
+          //   ),
+          // ),
+          // const Divider(
+          //   color: Colors.black,
+          // ),
           Container(
             margin: EdgeInsets.only(bottom: 10),
             child: Row(

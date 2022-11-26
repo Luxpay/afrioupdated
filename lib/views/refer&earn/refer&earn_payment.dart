@@ -32,11 +32,10 @@ class _ReferEarnPaymentMethodState extends State<ReferEarnPaymentMethod> {
   void initState() {
     super.initState();
     getWallets();
-  
-      sponsor = widget.sponsor;
 
-      debugPrint(sponsor);
+    sponsor = widget.sponsor;
 
+    debugPrint(sponsor);
   }
 
   @override
@@ -144,10 +143,7 @@ class _ReferEarnPaymentMethodState extends State<ReferEarnPaymentMethod> {
                               child: Column(
                                 children: [
                                   Text(
-                                      "Instant N500 Commission\nGet free N500 cash when your friends register and perform transactions on LuxPay using your Referral ID/link.\nThe more you refer, the more you earn.",
-                                      textAlign: TextAlign.center),
-                                  Text(
-                                      "Get 10% Instant Commission on Crowd365 Refer Program\nWhen your referrals subscribe to any of the packages on Crowd365, you immediately get a 10% bonus on your investments.\n(You can get up to N5000 on a N50,000 package on Crowd365 from referrals)",
+                                      "Get Free N500 Cash When Your Friends register and perform transactions on Refer and Earn using your Referral ID/Link. The More You refer, the more you earn",
                                       textAlign: TextAlign.center),
                                 ],
                               ),
@@ -206,7 +202,7 @@ class _ReferEarnPaymentMethodState extends State<ReferEarnPaymentMethod> {
   Future<bool> getWallets() async {
     try {
       var response = await dio.get(
-        "/v1/wallets/details/",
+        "/wallet/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {

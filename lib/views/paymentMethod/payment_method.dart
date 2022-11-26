@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:luxpay/models/get_account_details.dart';
 import 'package:luxpay/podos/payment_methods.dart';
+import 'package:luxpay/utils/colors.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/paymentMethod/ussd.dart';
@@ -22,19 +23,19 @@ class PaymentMethod extends StatefulWidget {
 
 class _PaymentMethodState extends State<PaymentMethod> {
   List<PaymentMethodObj> items = [
+    new PaymentMethodObj(2, "Debit Card", "Top up with a debit card",
+        "assets/paymentMethod/card.png", HexColor("#22B02E").withOpacity(.20)),
     new PaymentMethodObj(
         1,
         "Bank Transfer",
         "From bank app or internet banking",
         "assets/paymentMethod/bank.png",
         HexColor("#F4752E").withOpacity(.20)),
-    new PaymentMethodObj(2, "Debit Card", "Top up with a debit card",
-        "assets/paymentMethod/card.png", HexColor("#22B02E").withOpacity(.20)),
     new PaymentMethodObj(3, "USSD", "With your other bank’s USSD code",
         "assets/paymentMethod/hash.png", HexColor("#144DDE").withOpacity(.20)),
   ];
 
-  var errors;
+  var errors, check, statusCode;
 
   String? accountNumber, accountName, bankName;
 
@@ -106,7 +107,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
     return InkWell(
       onTap: () async {
         if (paymentMethodObj.id == 1) {
-          _fetchBank(context);
+          _fetchBankTransfer(context);
         } else if (paymentMethodObj.id == 2) {
           Navigator.push(
               context,
@@ -115,8 +116,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
                         channel: "CARD",
                       )));
         } else {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => UssdTransfer()));
+          fetchUSSD(context);
         }
       },
       child: Container(
@@ -142,14 +142,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("${paymentMethodObj.title}"),
+                  Text("${paymentMethodObj.title}",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black)),
                   SizedBox(
                     height: 8,
                   ),
                   Text(
                     "${paymentMethodObj.subTitle}",
                     style: TextStyle(
-                        color: HexColor("#8D9091"),
+                        color: black,
                         fontSize: 14,
                         fontWeight: FontWeight.w500),
                   )
@@ -176,14 +178,15 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   Future<bool> accountDetails() async {
     try {
-      var response = await dio.get("/v1/finances/deposit/details/");
+      var response = await dio.get("/finances/deposit/details/");
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
         var data = response.data;
         var accDetails = await GetAccountDetails.fromJson(data);
-        bankName = accDetails.data.bankName;
-        accountNumber = accDetails.data.accountNumber;
-        accountName = accDetails.data.accountName;
+        check = accDetails.data;
+        bankName = accDetails.data[0].bankName;
+        accountNumber = accDetails.data[0].accountNumber;
+        accountName = accDetails.data[0].accountName;
         return true;
       } else {
         return false;
@@ -192,6 +195,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         if (e.response?.statusCode == 401) {
+          statusCode = 401;
           showExpiredsessionDialog(
               context, "Please Login again\nThanks", "Expired Session");
           return false;
@@ -220,7 +224,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
     }
   }
 
-  void _fetchBank(BuildContext context) async {
+  void _fetchBankTransfer(BuildContext context) async {
     // show the loading dialog
     showDialog(
         // The user CANNOT close this dialog  by pressing outsite it
@@ -251,8 +255,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
     Future.delayed(const Duration(milliseconds: 100), () async {
 // Here you can write your code
 
-      var res = await accountDetails();
-      if (res) {
+      await accountDetails();
+      if (check.isNotEmpty) {
         Navigator.of(context).pop();
         Navigator.push(
             context,
@@ -261,6 +265,73 @@ class _PaymentMethodState extends State<PaymentMethod> {
                     accountNumber: accountNumber,
                     accountName: accountNumber,
                     bankName: bankName)));
+      } else if (statusCode == 401) {
+        Navigator.of(context).pop();
+        showExpiredsessionDialog(
+            context, "Please Login again\nThanks", "Expired Session");
+      } else {
+        Navigator.of(context).pop();
+        showErrorDialog(
+            context,
+            "Upgrade your Account with a Valid ID Card to enable your Bank Transfer\nThanks",
+            "Luxpay");
+      }
+    });
+  }
+
+  void fetchUSSD(BuildContext context) async {
+    // show the loading dialog
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  // The loading indicator
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  // Some text
+                  Text('Loading...')
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(const Duration(milliseconds: 100), () async {
+// Here you can write your code
+
+      await accountDetails();
+      if (check.isNotEmpty) {
+        Navigator.pop(context);
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => UssdTransfer(
+                      bankName: accountName,
+                      bankNumber: accountNumber,
+                    )));
+        Navigator.pop(context);
+      } else if (statusCode == 401) {
+        Navigator.of(context).pop();
+        showExpiredsessionDialog(
+            context, "Please Login again\nThanks", "Expired Session");
+      } else {
+        Navigator.pop(context);
+        showErrorDialog(
+            context,
+            "Upgrade your Account with a Valid ID Card to enable your Bank USSD Transfer\nThanks",
+            "Luxpay");
       }
     });
   }

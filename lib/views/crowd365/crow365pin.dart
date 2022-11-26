@@ -2,13 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/errors/authError.dart';
+import '../../models/successfullWallet.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/colors.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
 import '../../widgets/methods/showDialog.dart';
-import 'crowd356_success.dart';
+import 'crowd365_dashboard.dart';
 import 'numberic_pad.dart';
 
 class Crowd365Pin extends StatefulWidget {
@@ -23,12 +24,14 @@ class Crowd365Pin extends StatefulWidget {
 }
 
 class _Crowd365PinState extends State<Crowd365Pin> {
-  String phoneNumber = "";
+  String codePinNumber = "";
   var errors, namePackage;
+  String? successfullAmount, from, to, status, fee;
+  DateTime? date;
 
   @override
   void initState() {
-    phoneNumber = '';
+    codePinNumber = '';
     namePackage = widget.name;
     super.initState();
   }
@@ -89,14 +92,18 @@ class _Crowd365PinState extends State<Crowd365Pin> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                buildCodeNumberBox(
-                    phoneNumber.length > 0 ? phoneNumber.substring(0, 1) : ""),
-                buildCodeNumberBox(
-                    phoneNumber.length > 1 ? phoneNumber.substring(1, 2) : ""),
-                buildCodeNumberBox(
-                    phoneNumber.length > 2 ? phoneNumber.substring(2, 3) : ""),
-                buildCodeNumberBox(
-                    phoneNumber.length > 3 ? phoneNumber.substring(3, 4) : ""),
+                buildCodeNumberBox(codePinNumber.length > 0
+                    ? codePinNumber.substring(0, 1)
+                    : ""),
+                buildCodeNumberBox(codePinNumber.length > 1
+                    ? codePinNumber.substring(1, 2)
+                    : ""),
+                buildCodeNumberBox(codePinNumber.length > 2
+                    ? codePinNumber.substring(2, 3)
+                    : ""),
+                buildCodeNumberBox(codePinNumber.length > 3
+                    ? codePinNumber.substring(3, 4)
+                    : ""),
               ],
             ),
           ),
@@ -105,17 +112,19 @@ class _Crowd365PinState extends State<Crowd365Pin> {
               setState(() {
                 if (value != -1) {
                   if (value.toString().length != 4) {
-                    phoneNumber = phoneNumber + value.toString();
+                    codePinNumber = codePinNumber + value.toString();
 
-                    if (phoneNumber.toString().length == 4) {
-                      debugPrint("Complte");
+                    if (codePinNumber.toString().length == 4) {
+                      debugPrint("Complete $codePinNumber");
+
                       comfirmPayment(context,
-                          packageName: namePackage, pin: phoneNumber);
+                          packageName: namePackage, pin: codePinNumber);
+                      codePinNumber = '';
                     }
                   }
                 } else {
-                  phoneNumber =
-                      phoneNumber.substring(0, phoneNumber.length - 1);
+                  codePinNumber =
+                      codePinNumber.substring(0, codePinNumber.length - 1);
                 }
               });
             },
@@ -135,18 +144,11 @@ class _Crowd365PinState extends State<Crowd365Pin> {
           decoration: BoxDecoration(
             color: Color(0xFFF6F5FA),
             border: Border.all(
-              color: HexColor("#415CA0"),
+              color: grey8,
             ),
             borderRadius: BorderRadius.all(
               Radius.circular(15),
             ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 2.0,
-                  spreadRadius: 2,
-                  offset: Offset(0.0, 0.3))
-            ],
           ),
           child: Center(
             child: Text(
@@ -179,16 +181,20 @@ class _Crowd365PinState extends State<Crowd365Pin> {
     debugPrint("Package Selected : $body");
     try {
       var response = await dio.post(
-        "/v1/crowd365/subscribe/",
+        "/crowd365/subscribe/",
         data: body,
       );
       //GCLV9M
       debugPrint("${response.statusCode}");
-      if (response.statusCode == 200) {
-        // var data = response.data;
-        // debugPrint("Crow365 Data : ${data}");
-        // await storage.delete(key: 'Crowd365ReferalCode');
-        // print('Referrer Name delete');
+      if (response.statusCode == 201) {
+        var data = response.data;
+        var transDetals = await SuccesfullWalletTransfer.fromJson(data);
+        from = transDetals.data.data.from;
+        to = transDetals.data.data.to;
+        successfullAmount = transDetals.data.amount;
+        date = transDetals.data.createdAt;
+        fee = transDetals.data.fee;
+        status = transDetals.data.status;
         return true;
       } else {
         return false;
@@ -257,8 +263,8 @@ class _Crowd365PinState extends State<Crowd365Pin> {
       showErrorDialog(context, errors, "Crowd365");
     } else {
       Navigator.of(context).pop();
-      Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => Crowd365SuccessfullSub()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => Crowd365Dashboard()));
       //Navigator.of(context).pop();
     }
   }

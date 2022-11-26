@@ -24,7 +24,6 @@ class _AddNewAddressState extends State<AddNewAddress> {
             alignment: Alignment.topCenter,
             child: Container(
               height: 80,
-              decoration: BoxDecoration(color: Colors.white),
               child: Container(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -65,9 +64,12 @@ class _AddNewAddressState extends State<AddNewAddress> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => MyAddress()));
+
+                        //  Navigator.push(context,
+                        //       SizeTransition4(MyAddress()));
                       },
                       child: luxButton(HexColor("#D70A0A"), Colors.white,
-                          "Add New Address", width,
+                          "Add Your Address", width,
                           fontSize: 16),
                     ),
                   ],

@@ -133,7 +133,7 @@ class _BankTransferState extends State<BankTransfer> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: Text(
-                          "Note: This is an expample format to transfer with bank",
+                          "Note: This is an example format to transfer with bank",
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 15,

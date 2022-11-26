@@ -15,9 +15,9 @@ class Crowd365 extends StatefulWidget {
 
 class _Crowd365State extends State<Crowd365> {
   List<String> list = [
-    "The My Profit system offers three packages with different incentives and registration fees.",
+    "The Crowd365 system offers three packages with different incentives and registration fees.",
     "Your invitees can only subscribe to your package; i.e., the Starter package accepts only Starter package referees.",
-    "The My Profit system is a short-term campaign that requires only two-level, i.e., six partners. "
+    "The Crowd365 system is a short-term campaign that requires only two-level, i.e., six partners. "
   ];
 
   @override

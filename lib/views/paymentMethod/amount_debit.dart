@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:luxpay/models/errors/authError.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
-import 'package:luxpay/views/payment_page.dart';
+import 'package:luxpay/views/paymentMethod/webview_debitCard.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 import '../../models/debitcard_url.dart';
@@ -24,9 +24,11 @@ class _DebitAmountState extends State<DebitAmount> {
   bool _isLoading = false;
   TextEditingController controller = TextEditingController();
 
-  String? fullname, encryption_key, public_key, amountp, email, tx_ref, phone;
+  //String? fullname, encryption_key, public_key, amountp, email, tx_ref, phone;
 
   String? errors, channel;
+
+  String? urlLink;
 
   @override
   void initState() {
@@ -74,29 +76,34 @@ class _DebitAmountState extends State<DebitAmount> {
                   Center(
                       child: InkWell(
                           onTap: () async {
+                            setState(() {
+                              _isLoading = true;
+                            });
                             var amount = controller.text.trim();
-                            var validators;
-                            validators = [
+
+                            var ego = int.parse(amount);
+                            var validators = [
                               Validators.isValidAmount(amount),
+                              ego <= 999
+                                  ? "Ensure this amount is greater than or equal to 1000."
+                                  : null
                             ];
                             if (validators.any((element) => element != null)) {
                               setState(() {
                                 _isLoading = false;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(validators.firstWhere(
-                                              (element) => element != null) ??
-                                          "")));
+                              showErrorDialog(
+                                  context,
+                                  validators.firstWhere(
+                                          (element) => element != null) ??
+                                      "",
+                                  "Fund Luxpay Account");
                               return;
                             }
-                            setState(() {
-                              _isLoading = true;
-                            });
 
                             var response = await debitAmount(amount);
 
-                            debugPrint("SignUp: $response");
+                            debugPrint("payment: $response");
                             if (response) {
                               setState(() {
                                 _isLoading = false;
@@ -104,23 +111,24 @@ class _DebitAmountState extends State<DebitAmount> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => PaymentWidget(
-                                          encryption_key: encryption_key,
-                                          public_key: public_key,
-                                          email: email,
-                                          tx_ref: tx_ref,
-                                          phone: phone,
-                                          channel: channel,
-                                          fullname: fullname,
-                                          amount: amountp)));
+                                      builder: (context) =>
+                                          WebViewDebitCardTransfer(debitUrl:urlLink)));
+
+                              // beginPayment(
+                              //     encryption_key: encryption_key,
+                              //     public_key: public_key,
+                              //     email: email,
+                              //     tx_ref: tx_ref,
+                              //     phone: phone,
+                              //     context: context,
+                              //     fullname: fullname,
+                              //     amount: amountp);
                             } else {
                               setState(() {
                                 _isLoading = false;
                               });
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          errors ?? "something went wrong")));
+                              showErrorDialog(
+                                  context, errors!, "Fund Luxpay Account");
                             }
                           },
                           child: _isLoading
@@ -140,20 +148,13 @@ class _DebitAmountState extends State<DebitAmount> {
   Future<bool> debitAmount(amount) async {
     Map<String, dynamic> body = {"amount": amount, 'channel': channel};
     try {
-      var response = await dio.post("/v1/finances/deposit/", data: body);
+      var response = await dio.post("/finances/deposit/", data: body);
       debugPrint('${response.statusCode}');
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         var data = response.data;
         var debitData = await Deposit.fromJson(data);
         setState(() {
-          encryption_key = debitData.data.encryptionKey;
-          public_key = debitData.data.publicKey;
-          email = debitData.data.email;
-          tx_ref = debitData.data.txRef;
-          phone = debitData.data.phone;
-          fullname = debitData.data.fullName;
-          amountp = debitData.data.amount;
-          channel = debitData.data.metaData.channel;
+          urlLink = debitData.data.link;
         });
 
         return true;

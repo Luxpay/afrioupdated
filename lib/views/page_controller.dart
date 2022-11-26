@@ -65,7 +65,7 @@ class _AppPageControllerState extends State<AppPageController> {
           break;
         case rewards:
           //currentPage = const RewardsPage();
-          currentPage = const ReferreAndEarn();
+          currentPage = const ReferAndEarn();
           break;
         case account:
           currentPage = const AccountPage();
@@ -89,7 +89,7 @@ class _AppPageControllerState extends State<AppPageController> {
     items.add(BottomNavigationBarItem(
         icon:
             Icon(_currentIndex == rewards ? IconlyBold.bag2 : IconlyLight.bag2),
-        label: "Rewards"));
+        label: "Refer&Earn"));
     items.add(BottomNavigationBarItem(
         icon: Icon(_currentIndex == account
             ? IconlyBold.profile

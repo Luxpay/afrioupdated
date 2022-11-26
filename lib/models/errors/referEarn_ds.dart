@@ -19,51 +19,75 @@ class ReferEarnDs {
     String status;
     int code;
     String message;
-    Data data;
+    List<Datum> data;
 
     factory ReferEarnDs.fromJson(Map<String, dynamic> json) => ReferEarnDs(
         status: json["status"],
         code: json["code"],
         message: json["message"],
-        data: Data.fromJson(json["data"]),
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
         "status": status,
         "code": code,
         "message": message,
-        "data": data.toJson(),
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
 }
 
-class Data {
-    Data({
+class Datum {
+    Datum({
         required this.totalEarnings,
         required this.weeklyEarnings,
-        required this.weeklyReferrals,
-        required this.totalReferrals,
-        required this.crowd365Referrals,
+        required this.referEarn,
+        required this.feature,
     });
 
     String totalEarnings;
     String weeklyEarnings;
-    int weeklyReferrals;
-    int totalReferrals;
-    int crowd365Referrals;
+    Feature referEarn;
+    Feature feature;
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         totalEarnings: json["total_earnings"],
         weeklyEarnings: json["weekly_earnings"],
-        weeklyReferrals: json["weekly_referrals"],
-        totalReferrals: json["total_referrals"],
-        crowd365Referrals: json["crowd365_referrals"],
+        referEarn: Feature.fromJson(json["refer_earn"]),
+        feature: Feature.fromJson(json["feature"]),
     );
 
     Map<String, dynamic> toJson() => {
         "total_earnings": totalEarnings,
         "weekly_earnings": weeklyEarnings,
-        "weekly_referrals": weeklyReferrals,
+        "refer_earn": referEarn.toJson(),
+        "feature": feature.toJson(),
+    };
+}
+
+class Feature {
+    Feature({
+        required this.totalReferrals,
+        required this.totalEarnings,
+        required this.weeklyReferrals,
+        required this.weeklyEarnings,
+    });
+
+    int totalReferrals;
+    String totalEarnings;
+    int weeklyReferrals;
+    String weeklyEarnings;
+
+    factory Feature.fromJson(Map<String, dynamic> json) => Feature(
+        totalReferrals: json["total_referrals"],
+        totalEarnings: json["total_earnings"],
+        weeklyReferrals: json["weekly_referrals"],
+        weeklyEarnings: json["weekly_earnings"],
+    );
+
+    Map<String, dynamic> toJson() => {
         "total_referrals": totalReferrals,
-        "crowd365_referrals": crowd365Referrals,
+        "total_earnings": totalEarnings,
+        "weekly_referrals": weeklyReferrals,
+        "weekly_earnings": weeklyEarnings,
     };
 }

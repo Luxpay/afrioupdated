@@ -3,16 +3,13 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:intl/intl.dart';
 
 import 'package:luxpay/networking/DioServices/dio_errors.dart';
-import 'package:luxpay/views/accountSettings/transaction_statement.dart';
 
 import '../../models/trans_history.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../utils/colors.dart';
-import '../../utils/constants.dart';
 import '../../utils/sizeConfig.dart';
 import '../../widgets/methods/showDialog.dart';
 import '../../widgets/transfer_card.dart';
@@ -91,17 +88,17 @@ class _AccountTransactionsState extends State<AccountTransactions> {
                         ],
                       ),
                     ),
-                    Container(
-                        margin: EdgeInsets.only(right: 15),
-                        child: IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          TransactionStatement()));
-                            },
-                            icon: Icon(IconlyLight.download)))
+                    // Container(
+                    //     margin: EdgeInsets.only(right: 15),
+                    //     child: IconButton(
+                    //         onPressed: () {
+                    //           Navigator.push(
+                    //               context,
+                    //               MaterialPageRoute(
+                    //                   builder: (context) =>
+                    //                       TransactionStatement()));
+                    //         },
+                    //         icon: Icon(IconlyLight.download)))
                   ],
                 ),
               ),
@@ -157,7 +154,7 @@ class _AccountTransactionsState extends State<AccountTransactions> {
                         transferList: transferList,
                         header: "All Transactions",
                       ),
-                      SizedBox(height: 20)
+                      SizedBox(height: 50)
                     ]),
                   ),
                 ),
@@ -343,10 +340,10 @@ class _AccountTransactionsState extends State<AccountTransactions> {
                               child: Column(
                                 children: [
                                   cate(
-                                      cateName: 'Electricity',
+                                      cateName: 'Request Money',
                                       boderColor: grey9),
                                   cate(
-                                      cateName: 'Electricity',
+                                      cateName: 'Withdrawal',
                                       boderColor: grey9),
                                 ],
                               ),
@@ -355,23 +352,22 @@ class _AccountTransactionsState extends State<AccountTransactions> {
                               child: Column(
                                 children: [
                                   cate(
-                                      cateName: 'Electricity',
+                                      cateName: 'Luxpay Tag',
                                       boderColor: grey9),
                                   cate(
-                                      cateName: 'Electricity',
-                                      boderColor: grey9),
+                                      cateName: 'Add Money', boderColor: grey9),
                                 ],
                               ),
                             ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  cate(
-                                      cateName: 'Electricity',
-                                      boderColor: grey9),
-                                ],
-                              ),
-                            )
+                            // Expanded(
+                            //   child: Column(
+                            //     children: [
+                            //       cate(
+                            //           cateName: 'Electricity',
+                            //           boderColor: grey9),
+                            //     ],
+                            //   ),
+                            // )
                           ],
                         ),
                       ),
@@ -403,7 +399,7 @@ class _AccountTransactionsState extends State<AccountTransactions> {
   Future<bool> getTransactionHistory() async {
     try {
       var response = await dio.get(
-        base_url + "/v1/wallets/history/",
+        "/wallet/history/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
@@ -445,10 +441,13 @@ class _AccountTransactionsState extends State<AccountTransactions> {
 
 class MultipleItemsWidget extends StatefulWidget {
   final String header;
+
   final List<Result> transferList;
-  const MultipleItemsWidget(
-      {Key? key, required this.header, required this.transferList})
-      : super(key: key);
+  const MultipleItemsWidget({
+    Key? key,
+    required this.header,
+    required this.transferList,
+  }) : super(key: key);
 
   @override
   _MultipleItemsWidgetState createState() => _MultipleItemsWidgetState();
@@ -468,7 +467,7 @@ class _MultipleItemsWidgetState extends State<MultipleItemsWidget>
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: grey1,
+      color: white,
       child: ExpansionTile(
         title: Text(
           widget.header,
@@ -498,43 +497,49 @@ class _MultipleItemsWidgetState extends State<MultipleItemsWidget>
             }),
         children: <Widget>[
           Container(
-              height: MediaQuery.of(context).size.height,
-              child: ListView.separated(
-                itemCount: widget.transferList.length,
-                itemBuilder: (context, index) {
-                  var transfers = widget.transferList[index];
-                  var arr = transfers.amount.split('.');
-                  var amount = arr[0];
-                  var ref = transfers.reference;
-                  // DateFormat("h:mma");
-                  var dateValue = new DateFormat("yyyy-MM-dd HH:mm:ss")
-                      .parse("${transfers.createdAt}", true)
-                      .toLocal();
-                  String formattedDate =
-                      DateFormat("MMMd h:mma").format(dateValue);
+              height: 570,
+              child: Container(
+                  child: widget.transferList.isEmpty
+                      ? Center(
+                          child: Text("Please wait..."),
+                        )
+                      : ListView.separated(
+                          itemCount: widget.transferList.length,
+                          itemBuilder: (context, index) {
+                            var transfers = widget.transferList[index];
+                            var arr = transfers.amount.split('.');
+                            var amount = arr[0];
+                            var ref = transfers.id;
+                            // DateFormat("h:mma");
+                            var dateValue =
+                                new DateFormat("yyyy-MM-dd HH:mm:ss")
+                                    .parse("${transfers.createdAt}", true)
+                                    .toLocal();
+                            String formattedDate =
+                                DateFormat("MMMd h:mma").format(dateValue);
 
-                  return TransferHistoryCard(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TransactionDetailsPage(
-                                      reference: ref,
-                                    )));
-                      },
-                      amount: amount,
-                      //channel: transfers.channel,
-                      status: transfers.status,
-                      date: formattedDate,
-                      type: transfers.type);
-                },
-                separatorBuilder: (context, index) {
-                  return Divider(color: Colors.black45);
-                },
-              ))
+                            return TransferHistoryCard(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              TransactionDetailsPage(
+                                                reference: ref,
+                                              )));
+                                },
+                                amount: amount,
+                                //channel: transfers.channel,
+                                status: transfers.status,
+                                date: formattedDate,
+                                type: transfers.type);
+                          },
+                          separatorBuilder: (context, index) {
+                            return Divider(color: Colors.black45);
+                          },
+                        )))
         ],
       ),
     );
   }
 }
-

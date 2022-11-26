@@ -386,7 +386,7 @@ class PhoneNumberField extends StatelessWidget {
             height: 12,
           ),
           Container(
-            height: 48,
+            height: 50,
             width: double.infinity,
             // margin: EdgeInsets.only(top: 2),
             decoration: BoxDecoration(
@@ -414,7 +414,7 @@ class PhoneNumberField extends StatelessWidget {
                             color: HexColor("#333333").withOpacity(0.25),
                             fontWeight: FontWeight.w300),
                         contentPadding: suffixIcon != null
-                            ? EdgeInsets.only(left: 17, top: 12)
+                            ? EdgeInsets.only(left: 17, top: 15)
                             : EdgeInsets.only(
                                 left: 17, top: multiline ? 10 : 0),
                         enabledBorder: OutlineInputBorder(

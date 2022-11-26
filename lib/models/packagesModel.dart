@@ -19,13 +19,13 @@ class Packages {
   String status;
   int code;
   String message;
-  List<Datum> data;
+  List<Packs> data;
 
   factory Packages.fromJson(Map<String, dynamic> json) => Packages(
         status: json["status"],
         code: json["code"],
         message: json["message"],
-        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+        data: List<Packs>.from(json["data"].map((x) => Packs.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -36,34 +36,54 @@ class Packages {
       };
 }
 
-class Datum {
-  Datum({
+class Packs {
+  Packs({
     required this.name,
     required this.price,
-    required this.welcomeBonus,
-    required this.reward,
-    required this.eachCycle,
+    required this.rewards,
   });
 
   String name;
   String price;
-  String welcomeBonus;
-  String reward;
-  String eachCycle;
+  Rewards rewards;
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory Packs.fromJson(Map<String, dynamic> json) => Packs(
         name: json["name"],
         price: json["price"],
-        welcomeBonus: json["welcome_bonus"],
-        reward: json["reward"],
-        eachCycle: json["each_cycle"],
+        rewards: Rewards.fromJson(json["rewards"]),
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "price": price,
+        "rewards": rewards.toJson(),
+      };
+}
+
+class Rewards {
+  Rewards({
+    required this.welcomeBonus,
+    required this.perReferralEarning,
+    required this.maxReferralEarning,
+    required this.totalEarnings,
+  });
+
+  String welcomeBonus;
+  String perReferralEarning;
+  String maxReferralEarning;
+  String totalEarnings;
+
+  factory Rewards.fromJson(Map<String, dynamic> json) => Rewards(
+        welcomeBonus: json["welcome_bonus"],
+        perReferralEarning: json["per_referral_earning"],
+        maxReferralEarning: json["max_referral_earning"],
+        totalEarnings: json["total_earnings"],
+      );
+
+  Map<String, dynamic> toJson() => {
         "welcome_bonus": welcomeBonus,
-        "reward": reward,
-        "each_cycle": eachCycle,
+        "per_referral_earning": perReferralEarning,
+        "max_referral_earning": maxReferralEarning,
+        "total_earnings": totalEarnings,
       };
 }

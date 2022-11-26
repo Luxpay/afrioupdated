@@ -26,7 +26,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
   String selected_gender = 'Male';
   TextEditingController controllerFirstName = TextEditingController();
   TextEditingController controllerLastName = TextEditingController();
-
+  TextEditingController controllerMiddleName = TextEditingController();
   bool _isLoading = false;
   var errors;
   bool imagePicked = false;
@@ -95,13 +95,17 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                           Text("STEP 1 OF 3",
                               style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.w100)),
-                          SizedBox(height: 20),
+                          SizedBox(
+                            height: SizeConfig.safeBlockVertical! * 1.5,
+                          ),
                           Text(
                             "Provide Personal Details",
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(
+                            height: SizeConfig.safeBlockVertical! * 2.1,
+                          ),
                           Container(
                             child: Row(
                               children: [
@@ -119,23 +123,50 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                   child: Container(
                     margin: EdgeInsets.only(top: 180, left: 30, right: 30),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(height: 13),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.5,
+                        ),
                         LuxTextField(
                           hint: "First Name",
                           controller: controllerFirstName,
                           innerHint: "eg john",
                           boaderColor: HexColor("#D70A0A"),
                         ),
-                        SizedBox(height: 10),
+                        Text(
+                          "* first name can contain only letters",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
+                        LuxTextField(
+                          hint: "Middle Name",
+                          controller: controllerMiddleName,
+                          innerHint: "eg green",
+                          boaderColor: HexColor("#D70A0A"),
+                        ),
+                        Text(
+                          "* middle name can contain only letters",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
                         LuxTextField(
                           hint: "Last Name",
                           controller: controllerLastName,
                           innerHint: "eg blak",
                           boaderColor: HexColor("#D70A0A"),
                         ),
-                        SizedBox(height: 10),
+                        Text(
+                          "* last name can contain only letters",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -189,7 +220,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 15),
+                            SizedBox(
+                              height: SizeConfig.safeBlockVertical! * 2.2,
+                            ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -201,7 +234,9 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                                       fontWeight: FontWeight.w600,
                                       color: HexColor("#1E1E1E")),
                                 )),
-                                SizedBox(height: 8),
+                                SizedBox(
+                                  height: SizeConfig.safeBlockVertical! * 1.0,
+                                ),
                                 Container(
                                     height: 55,
                                     color:
@@ -249,24 +284,33 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                                             )
                                           ],
                                         ))),
+                                Text(
+                                  "* User must be 18 years or older",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
                               ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 50),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 4.0,
+                        ),
                         InkWell(
                             onTap: () async {
                               var first_name = controllerFirstName.text.trim();
                               var last_name = controllerLastName.text.trim();
                               var gender = selected_gender;
+                              var middle_name =
+                                  controllerMiddleName.text.trim();
                               String birthDate = dateOfBirth.toString();
 
                               setState(() {
                                 _isLoading = true;
                               });
                               var validators = [
-                                Validators.forBank(first_name),
-                                Validators.forBank(last_name),
+                                Validators.forEmptyField(first_name),
+                                Validators.forEmptyField(last_name),
+                                Validators.forEmptyField(middle_name),
                                 //Validators.forBank(gender),
                                 gender.isEmpty ? "select gender" : null,
                                 birthDate == nothing
@@ -287,6 +331,7 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                                   firstName: first_name,
                                   lastName: last_name,
                                   gender: gender,
+                                  middleName : middle_name,
                                   dateOfBirth: birthDate);
 
                               if (!response) {
@@ -295,10 +340,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
                                 });
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(errors)));
-                                setState(() {
-                                  _isLoading = false;
-                                });
                               } else {
+                                //        Navigator.push(
+                                // context,
+                                // MaterialPageRoute(
+                                //     builder: (context) =>
+                                //         CreateUserProfileData()));
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -337,10 +384,12 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
     required String? lastName,
     required String? dateOfBirth,
     required String? gender,
+    required String? middleName,
   }) async {
     Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
+      'middle_name': middleName,
       'gender': gender,
       'date_of_birth': dateOfBirth,
     };
@@ -356,11 +405,19 @@ class _CreateUserProfileState extends State<CreateUserProfile> {
         debugPrint('${data}');
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
+        setState(() {
+          _isLoading = false;
+        });
+        handleStatusCode(e.response?.statusCode, context);
+
         var errorData = e.response?.data;
         var errorMessage = await AuthError.fromJson(errorData);
         errors = errorMessage.message;

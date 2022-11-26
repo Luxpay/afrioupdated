@@ -27,7 +27,7 @@ class Crowd365Refere extends StatefulWidget {
 
 class _Crowd365RefereState extends State<Crowd365Refere> {
   TextEditingController controllerRefere = TextEditingController();
-  List<Datum> packageItems = [];
+  List<Packs> packageItems = [];
   bool _isLoading = false;
   bool _isLoadingPackage = false;
   var errors;
@@ -191,10 +191,9 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
     await storage.delete(key: 'Crowd365ReferalCode');
     debugPrint("Sponsor ReferalCode: $referalName");
     await storage.write(key: 'Crowd365ReferalCode', value: referalName);
-   
+
     try {
-      var response =
-          await dio.get("/v1/crowd365/packages/?username=$referalName");
+      var response = await dio.get("/crowd365/packages/?username=$referalName");
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
@@ -207,7 +206,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
         return false;
       }
     } on DioError catch (e) {
-       final errorMessage = DioException.fromDioError(e).toString();
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
         setState(() {
           _isLoading = false;
@@ -249,17 +248,16 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
     await storage.delete(key: 'Crowd365ReferalCode');
     try {
       var response = await dio.get(
-        "/v1/crowd365/packages/",
+        "/crowd365/packages/?username=",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
-        
         var data = response.data;
-       
+
         var packageData = Packages.fromJson(data);
-     
+
         packageItems = packageData.data;
-       
+
         return true;
       } else {
         return false;
@@ -280,7 +278,7 @@ class _Crowd365RefereState extends State<Crowd365Refere> {
         }
       } else {
         errors = errorMessage;
-         showErrorDialog(context, errors, "Crowd365");
+        showErrorDialog(context, errors, "Crowd365");
         return false;
       }
     } catch (e) {

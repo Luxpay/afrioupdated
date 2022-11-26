@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 
+import '../../models/crowd36model.dart';
 import '../../utils/reused_widgets.dart';
 
 class HistoryofReferral extends StatefulWidget {
-  final List<dynamic>? direct = [];
+  final List<History> direct = [];
   HistoryofReferral({Key? key, direct}) : super(key: key);
 
   @override
@@ -12,11 +13,11 @@ class HistoryofReferral extends StatefulWidget {
 }
 
 class _HistoryofReferralState extends State<HistoryofReferral> {
-  int? refCount;
+  List<History> refCount = [];
 
   @override
   void initState() {
-    refCount = widget.direct!.length;
+    refCount = widget.direct;
     super.initState();
   }
 
@@ -41,15 +42,16 @@ class _HistoryofReferralState extends State<HistoryofReferral> {
         elevation: 0,
         centerTitle: false,
       ),
-      body: widget.direct == null
+      body: refCount.isNotEmpty
           ? Container(
               height: MediaQuery.of(context).size.height,
               child: ListView.separated(
                   separatorBuilder: (context, index) => buildDivider,
-                  itemCount: refCount ?? 0,
+                  itemCount: refCount.length,
                   itemBuilder: (context, index) {
+                    var ref = refCount[index];
                     return ListTile(
-                      title: Text('${widget.direct![index]}'),
+                      title: Text('${ref.username}'),
                     );
                   }))
           : Center(

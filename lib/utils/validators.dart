@@ -31,6 +31,9 @@ class Validators {
       print(newpassword);
       print(confirmpassword);
       return "Password are not the same";
+    } else if (!RegExp(r".*[0-9].*").hasMatch(confirmpassword) ||
+        !RegExp(r".*[A-Za-z].*").hasMatch(confirmpassword)) {
+      return "Your password must be up to 8 characters or more characters long & contain a mix of upper & lower case letters, numbers & symbols";
     } else {
       return null;
     }
@@ -43,7 +46,7 @@ class Validators {
       return 'Your password is too short at least 8 characters';
     } else if (!RegExp(r".*[0-9].*").hasMatch(value) ||
         !RegExp(r".*[A-Za-z].*").hasMatch(value)) {
-      return "Your password must be 8 or more characters long & contain a mix of upper & lower case letters, numbers & symbols";
+      return "Your password must be up to 8 characters or more characters long & contain a mix of upper & lower case letters, numbers & symbols";
     } else {
       return null;
     }
@@ -67,8 +70,6 @@ class Validators {
     }
   }
 
-  
-
   static String? forBank(String value) {
     if (value.isEmpty) {
       return "Please select a bank";
@@ -77,7 +78,7 @@ class Validators {
     }
   }
 
-    static String? forEmptyField(String value) {
+  static String? forEmptyField(String value) {
     if (value.isEmpty) {
       return "Feild cannot be empty";
     } else {

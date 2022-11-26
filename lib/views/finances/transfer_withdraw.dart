@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:luxpay/utils/constants.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/finances/selectBeneficiary_withdrawal.dart';
 import 'package:luxpay/views/finances/select_bank.dart';
@@ -43,11 +42,11 @@ class _WithdrawalState extends State<Withdrawal> {
   var beneBankCode;
   var beneBankName;
   var beneAccountNumber;
+
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       getWallets();
     });
   }
@@ -124,17 +123,12 @@ class _WithdrawalState extends State<Withdrawal> {
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 2,
                         ),
-                        Container(
-                          child: InkWell(
-                            onTap: () {},
-                            child: Text(
-                              "Select Your Bank",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: HexColor("#1E1E1E")),
-                            ),
-                          ),
+                        Text(
+                          "Select Your Bank",
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: HexColor("#1E1E1E")),
                         ),
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 1,
@@ -194,9 +188,10 @@ class _WithdrawalState extends State<Withdrawal> {
                                 });
                               } else {
                                 var amount = int.parse(v);
-                                if (amount < 100) {
+                                if (amount <= 499) {
                                   setState(() {
-                                    warning = 'amount most be more than 100';
+                                    warning =
+                                        'Ensure this amount is greater than or equal to N500';
                                   });
                                 } else {
                                   setState(() {
@@ -269,15 +264,41 @@ class _WithdrawalState extends State<Withdrawal> {
                                   benefiaryAccController.text.trim();
                               var amount = luxpayAmountController.text.trim();
                               var reasons = reasonController.text.trim();
-                              var validators;
-                              var ego = int.parse(amount);
+
+                              int ego;
+                              //cLimit;
+                              //double limit;
+                              var validators, validators1;
+
+                              if (amount.isNotEmpty) {
+                                ego = int.parse(amount);
+                                //limit = double.parse(walletBalance!);
+                                //cLimit = limit.toInt();
+                                ego = int.parse(amount);
+                                validators1 = [
+                                  ego < 499
+                                      ? "Amount can't be less than N500"
+                                      : null,
+                                  // ego > cLimit
+                                  //     ? "Upgrade your account to be able to make bigger amount transaction\nAmount exceeds single limit Thanks "
+                                  //     : null
+                                ];
+                                if (validators1
+                                    .any((element) => element != null)) {
+                                  showErrorDialog(
+                                      context,
+                                      validators1.firstWhere(
+                                              (element) => element != null) ??
+                                          "",
+                                      "Request Money");
+                                  return;
+                                }
+                              }
+
                               validators = [
                                 selectedBank == null ? "Select a bank" : null,
                                 Validators.isValidAmount(amount),
                                 Validators.forWithdrawal(beneficiaryAccountNum),
-                                ego < 100
-                                    ? "Amount Can't be less than N100"
-                                    : null
                               ];
 
                               if (validators
@@ -325,10 +346,9 @@ class _WithdrawalState extends State<Withdrawal> {
     String? accountNumber,
     String? bankCode,
   ) async {
- 
     try {
-      var response =
-          await dio.get("/v1/finances/withdraw/resolve/$accountName&&$bankCode/");
+      var response = await dio.get(
+          "/finances/withdraw/resolve/?account_number=$accountNumber&bank_code=$bankCode");
       if (response.statusCode == 200) {
         var data = response.data;
         var user = await GetAccountName.fromJson(data);
@@ -418,7 +438,7 @@ class _WithdrawalState extends State<Withdrawal> {
 
   Future<bool> getWallets() async {
     var response = await dio.get(
-      base_url + "/v1/wallets/details/",
+      "/wallet/",
     );
     debugPrint('${response.statusCode}');
     try {

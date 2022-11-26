@@ -10,20 +10,21 @@ import '../../widgets/lux_buttons.dart';
 import '../../widgets/methods/showDialog.dart';
 import 'crow365pin.dart';
 
-
 class Crowd365PaymentMethod extends StatefulWidget {
   final String packageName,
       packagePrice,
       packageWelcomeBonus,
-      packageReward,
-      packageEachCycle;
+      packageMaxRefEarning,
+      packagePerRefEarning,
+      packageTotalEarning;
   Crowd365PaymentMethod(
       {Key? key,
       required this.packageName,
       required this.packagePrice,
       required this.packageWelcomeBonus,
-      required this.packageReward,
-      required this.packageEachCycle})
+      required this.packageMaxRefEarning,
+      required this.packagePerRefEarning,
+      required this.packageTotalEarning})
       : super(key: key);
 
   @override
@@ -38,7 +39,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
 
   bool _isLoading = false;
   var errors;
-  String? price, welcomeBonus, reward, eachCycle, name;
+  String? price, welcomeBonus, maxRef, totalEarning, preRefEarning, name;
 
   @override
   void initState() {
@@ -48,8 +49,9 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
       price = widget.packagePrice;
       name = widget.packageName;
       welcomeBonus = widget.packageWelcomeBonus;
-      reward = widget.packageReward;
-      eachCycle = widget.packageEachCycle;
+      maxRef = widget.packageMaxRefEarning;
+      preRefEarning = widget.packagePerRefEarning;
+      totalEarning = widget.packageTotalEarning;
       debugPrint(price);
       debugPrint(name);
     });
@@ -202,7 +204,15 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                               ),
                                             ),
                                             Text(
-                                              "Reward",
+                                              "Rewards:",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "Per referral earning",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color: HexColor("#8D9091"),
@@ -210,7 +220,15 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                               ),
                                             ),
                                             Text(
-                                              "Each Cycle",
+                                              "Maximum referral earning",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: HexColor("#8D9091"),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              "Total earning",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color: HexColor("#8D9091"),
@@ -232,7 +250,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                               ),
                                             ),
                                             Text(
-                                              "N${reward}",
+                                              "",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color: HexColor("#8D9091"),
@@ -240,7 +258,23 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
                                               ),
                                             ),
                                             Text(
-                                              "N${eachCycle}",
+                                              "N${preRefEarning}",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: HexColor("#8D9091"),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              "N${maxRef}",
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                color: HexColor("#8D9091"),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            Text(
+                                              "N${totalEarning}",
                                               style: TextStyle(
                                                 fontSize: 13,
                                                 color: HexColor("#8D9091"),
@@ -309,7 +343,7 @@ class _Crowd365PaymentMethodState extends State<Crowd365PaymentMethod> {
   Future<bool> getWallets() async {
     try {
       var response = await dio.get(
-        base_url + "/v1/wallets/details/",
+        base_url + "/wallet/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
@@ -397,7 +431,7 @@ class WalletCard extends StatelessWidget {
                               fontSize: 15, fontWeight: FontWeight.bold)),
                       SizedBox(height: 5),
                       Text(
-                        "${balance}",
+                        "${balance.replaceAllMapped(reg, mathFunc)}",
                         style: TextStyle(fontSize: 15),
                       )
                     ],

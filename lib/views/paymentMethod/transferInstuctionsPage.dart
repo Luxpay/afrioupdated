@@ -67,7 +67,8 @@ class TransferInstructions extends StatelessWidget {
                             SizedBox(
                               height: 20,
                             ),
-                            Text(" 1.   Login to your UBA Mobile Application "),
+                            Text(
+                                " 1.   Login to your ${bank.name} Mobile Application "),
                             SizedBox(
                               height: 20,
                             ),
@@ -80,22 +81,12 @@ class TransferInstructions extends StatelessWidget {
                             SizedBox(
                               height: 20,
                             ),
-                            Text(" 4.   Select ‘’ WEMA Bank “  "),
+                            Text(" 4.   Select ‘’ Sterling Bank “  "),
                             SizedBox(
                               height: 20,
                             ),
-                            RichText(
-                              text: TextSpan(
-                                text: ' 5.    Input your Luxpay account no e.g',
-                                style: DefaultTextStyle.of(context).style,
-                                children: const <TextSpan>[
-                                  TextSpan(
-                                      text: ' 7010589059',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.red)),
-                                ],
-                              ),
+                            Text(
+                              ' 5.    Input your Luxpay account no e.g 0795093009',
                             ),
                             SizedBox(
                               height: 20,

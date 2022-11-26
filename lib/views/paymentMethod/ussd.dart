@@ -8,7 +8,8 @@ import 'package:luxpay/widgets/payment/lux_account.dart';
 import 'package:luxpay/widgets/ussd/processing_ussd.dart';
 
 class UssdTransfer extends StatefulWidget {
-  const UssdTransfer({Key? key}) : super(key: key);
+  final String? bankName, bankNumber;
+  const UssdTransfer({Key? key, required this.bankName,required this.bankNumber}) : super(key: key);
 
   @override
   _UssdTransferState createState() => _UssdTransferState();
@@ -121,7 +122,10 @@ class _UssdTransferState extends State<UssdTransfer> {
                     SizedBox(
                       height: SizeConfig.safeBlockVertical! * 1.6,
                     ),
-                    LuxAccount(),
+                    LuxAccount(
+                      bankName: widget.bankName,
+                      bankNumber: widget.bankNumber,
+                    ),
                     //amount
                     Padding(
                       padding: const EdgeInsets.only(top: 28.0),

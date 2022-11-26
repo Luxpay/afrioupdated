@@ -21,8 +21,9 @@ class _LuxpayBeneficiaryState extends State<LuxpayBeneficiary> {
   @override
   void initState() {
     super.initState();
-
-    getLuxpayBeneficiary();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getLuxpayBeneficiary();
+    });
   }
 
   @override
@@ -30,7 +31,7 @@ class _LuxpayBeneficiaryState extends State<LuxpayBeneficiary> {
     return Padding(
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
-        height: 300,
+        height: 500,
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.only(
@@ -40,7 +41,7 @@ class _LuxpayBeneficiaryState extends State<LuxpayBeneficiary> {
           color: Colors.white,
         ),
         child: beneList.isEmpty
-            ? Center(child: Text("Loading....."))
+            ? Center(child: Text("please wait..."))
             : SingleChildScrollView(
                 child: Container(
                   height: MediaQuery.of(context).size.height,
@@ -115,7 +116,7 @@ class _LuxpayBeneficiaryState extends State<LuxpayBeneficiary> {
   Future<bool> getLuxpayBeneficiary() async {
     try {
       var response = await dio.get(
-        "/v1/wallets/transfer/beneficiaries/",
+        "/wallet/transfer/beneficiaries/?limit&offset",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {

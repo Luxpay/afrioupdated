@@ -19,7 +19,7 @@ class WalletLuxpay extends StatelessWidget {
       child: Container(
         height: 100,
         decoration: BoxDecoration(
-            color: HexColor('ff0000'),
+            color: HexColor("#D70A0A"),
             boxShadow: [
               BoxShadow(
                 color: Colors.grey.withOpacity(0.5),
@@ -52,7 +52,7 @@ class WalletLuxpay extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontFamily: "Montserrat",
-                    fontSize: 30),
+                    fontSize: 23),
               ),
             ),
             SizedBox(
@@ -62,14 +62,15 @@ class WalletLuxpay extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "LuxPay ID :",
+                  "LuxPay",
+                  textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white, fontSize: 13),
                 ),
-                Text("7010589059",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13))
+                // Text("7010589059",
+                //     style: TextStyle(
+                //         color: Colors.black,
+                //         fontWeight: FontWeight.w600,
+                //         fontSize: 13))
               ],
             ),
             SizedBox(

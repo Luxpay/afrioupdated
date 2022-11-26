@@ -6,6 +6,7 @@ import '../../models/transaction_details.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/colors.dart';
+import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../widgets/methods/showDialog.dart';
 
@@ -20,13 +21,24 @@ class TransactionDetailsPage extends StatefulWidget {
 
 class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
   var errors;
-  String? from, to, fee, channel, references, type, status, amount, description;
+  String? from,
+      to,
+      fee,
+      actualAmount,
+      channel,
+      references,
+      type,
+      status,
+      amount,
+      description;
   String? date;
 
   @override
   void initState() {
     super.initState();
-    detailsOfTransaction(widget.reference);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      detailsOfTransaction(widget.reference);
+    });
   }
 
   @override
@@ -46,7 +58,7 @@ class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
                           child: Align(
                             alignment: Alignment.topCenter,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 IconButton(
                                     onPressed: () {
@@ -61,11 +73,11 @@ class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
                                       color: white,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                IconButton(
-                                    onPressed: () =>
-                                        {Navigator.maybePop(context)},
-                                    icon: const Icon(Icons.library_books,
-                                        color: Colors.white)),
+                                // IconButton(
+                                //     onPressed: () =>
+                                //         {Navigator.maybePop(context)},
+                                //     icon: const Icon(Icons.library_books,
+                                //         color: Colors.white)),
                               ],
                             ),
                           ),
@@ -111,11 +123,14 @@ class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
                                       to: "${to ?? 'N/A'}",
                                       from: "$from",
                                       fee: '$fee',
-                                      amount: "$amount",
+                                      amount:
+                                          "${amount!.replaceAllMapped(reg, mathFunc)}",
                                       description: "$description",
                                       channel: "$channel",
                                       reference: "$references",
                                       type: "$type",
+                                      actual_amount:
+                                          "${actualAmount!.replaceAllMapped(reg, mathFunc)}",
                                       status: "$status",
                                       date: '$date')
                                 ],
@@ -130,19 +145,16 @@ class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
     );
   }
 
-  Future<bool> detailsOfTransaction(String reference) async {
+  Future<bool> detailsOfTransaction(String uId) async {
     try {
       var response = await dio.get(
-        "/v1/wallets/history/$reference/",
+        "/wallet/history/$uId/",
       );
 
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
-
         var transDetals = await TransactionDetails.fromJson(data);
-        var arr = transDetals.data.amount.split('.');
-        var amounts = arr[0];
         var dateValue = new DateFormat("yyyy-MM-dd HH:mm:ss")
             .parse("${transDetals.data.createdAt}", true)
             .toLocal();
@@ -156,7 +168,8 @@ class _TransactionDetailsPageState extends State<TransactionDetailsPage> {
           references = transDetals.data.reference;
           type = transDetals.data.type;
           status = transDetals.data.status;
-          amount = amounts;
+          amount = transDetals.data.amount;
+          actualAmount = transDetals.data.actualAmount;
           description = transDetals.data.data.description;
           date = formattedDate;
         });
@@ -200,6 +213,7 @@ class TransDetails extends StatelessWidget {
       status,
       amount,
       description,
+      actual_amount,
       date;
   TransDetails(
       {Key? key,
@@ -209,6 +223,7 @@ class TransDetails extends StatelessWidget {
       required this.date,
       this.from,
       this.reference,
+      this.actual_amount,
       this.status,
       this.amount,
       this.description,
@@ -298,6 +313,29 @@ class TransDetails extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
+                      "Actual Amount",
+                      style: TextStyle(),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    child: Text(
+                      "$actual_amount",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              margin: EdgeInsets.only(left: 10, right: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
                       "Description",
                       style: TextStyle(),
                     ),
@@ -372,7 +410,7 @@ class TransDetails extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Container(
+                  Expanded(
                     child: Text(
                       "${reference}",
                       style:

@@ -181,11 +181,18 @@ class _CreateNewPasswordState extends State<CreateNewPassword> {
         // debugPrint('${data}');
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
+        setState(() {
+          _isLoading = false;
+        });
+        handleStatusCode(e.response?.statusCode, context);
         debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await ErrorMessages.fromJson(errorData);

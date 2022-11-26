@@ -57,7 +57,7 @@ class _FinancesPageState extends State<FinancesPage> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       getTransactionHistory();
       getWithdrawalBeneficiary();
     });
@@ -201,7 +201,7 @@ class _FinancesPageState extends State<FinancesPage> {
                                       var transfers = transferList[index];
                                       var arr = transfers.amount.split('.');
                                       var amount = arr[0];
-                                      var ref = transfers.reference;
+                                      var id = transfers.id;
                                       var dateValue = new DateFormat(
                                               "yyyy-MM-dd HH:mm:ss")
                                           .parse("${transfers.createdAt}", true)
@@ -218,7 +218,7 @@ class _FinancesPageState extends State<FinancesPage> {
                                                 MaterialPageRoute(
                                                     builder: (context) =>
                                                         TransactionDetailsPage(
-                                                          reference: ref,
+                                                          reference: id,
                                                         )));
                                           },
                                           amount: amount,
@@ -314,7 +314,7 @@ class _FinancesPageState extends State<FinancesPage> {
   Future<bool> getWithdrawalBeneficiary() async {
     try {
       var response = await dio.get(
-        "/v1/finances/withdraw/beneficiaries/",
+        "/finances/withdraw/beneficiaries/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
@@ -322,7 +322,6 @@ class _FinancesPageState extends State<FinancesPage> {
         var accountData = await WithdrawalBeneficiary.fromJson(data);
         setState(() {
           beneficiaryList = accountData.data.results;
-
           fetchwithdrawalbene = true;
         });
 
@@ -357,7 +356,7 @@ class _FinancesPageState extends State<FinancesPage> {
   Future<bool> getTransactionHistory() async {
     try {
       var response = await dio.get(
-        "/v1/finances/withdraw/history/?start=&stop=&status=SUCCESS&limit=10&offset=",
+        "/finances/withdraw/history/?limit=&offset&start=&stop=&status=",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {

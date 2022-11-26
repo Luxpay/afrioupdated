@@ -163,7 +163,7 @@ class _SelectBeneficiaryWithdrawalState
   Future<bool> getWithdrawalBeneficiary() async {
     try {
       var response = await dio.get(
-        "/v1/finances/withdraw/beneficiaries",
+        "/finances/withdraw/beneficiaries",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {

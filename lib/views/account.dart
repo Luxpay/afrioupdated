@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
+import 'package:luxpay/views/accountSettings/add_address.dart';
 import 'package:luxpay/views/accountSettings/helpSupport.dart';
-import 'package:luxpay/views/accountSettings/my_address.dart';
 import 'package:luxpay/views/accountSettings/transaction_details.dart';
 import 'package:luxpay/views/accounts_subviews/settings.dart';
 import 'package:luxpay/views/refer&earn/invitecode.dart';
 import 'package:luxpay/widgets/logout_popup.dart';
 
+import '../widgets/navigate_route.dart';
 import '../widgets/touchUp.dart';
 import 'accountSettings/account_profile.dart';
 import 'accountSettings/bio_auth.dart';
@@ -54,10 +55,7 @@ class _AccountPageState extends State<AccountPage> {
                 title: "My Profile",
                 icon: IconlyLight.profile,
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AccountProfile()));
+                  Navigator.push(context, SizeTransition4(AccountProfile()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -65,10 +63,7 @@ class _AccountPageState extends State<AccountPage> {
                 title: "Luxpay Tag",
                 icon: IconlyLight.addUser,
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => InvitationCode()));
+                  Navigator.push(context, SizeTransition4(InvitationCode()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -77,9 +72,7 @@ class _AccountPageState extends State<AccountPage> {
                 icon: IconlyLight.chart,
                 onTap: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AccountTransactions()));
+                      context, SizeTransition4(AccountTransactions()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -87,8 +80,7 @@ class _AccountPageState extends State<AccountPage> {
                 title: "Address Management",
                 icon: IconlyLight.location,
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => MyAddress()));
+                  Navigator.push(context, SizeTransition4(AddNewAddress()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -96,8 +88,7 @@ class _AccountPageState extends State<AccountPage> {
                 title: "Authentication",
                 icon: IconlyLight.shieldDone,
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => BioAuth()));
+                  Navigator.push(context, SizeTransition4(BioAuth()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
@@ -105,22 +96,18 @@ class _AccountPageState extends State<AccountPage> {
                 title: "Help & Support",
                 icon: Icons.help_outline,
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => HelpandSupport()));
+                  Navigator.push(context, SizeTransition4(HelpandSupport()));
                 },
               ),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(title: "Contacts", icon: IconlyLight.user3),
               SizedBox(height: SizeConfig.blockSizeVertical! * 3),
               ProfileAction(
-                title: "Settings",
-                icon: IconlyLight.setting,
-                onTap: () => Navigator.of(context).pushNamed(
-                  SettingsPage.path,
-                ),
-              ),
+                  title: "Settings",
+                  icon: IconlyLight.setting,
+                  onTap: () {
+                    Navigator.push(context, SizeTransition4(SettingsPage()));
+                  }),
               SizedBox(height: SizeConfig.blockSizeVertical! * 4),
               LogoutButton(onTap: () {
                 showDialog(

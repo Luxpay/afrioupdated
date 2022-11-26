@@ -142,45 +142,6 @@ class _CreateUserProfileDataState extends State<CreateUserProfileData> {
                           ),
                         ],
                       )),
-                      SizedBox(height: 1),
-                      InkWell(
-                          onTap: () {
-                            _openCamera(context);
-                          },
-                          child: Text(
-                            "Tap to take a selfie",
-                            style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w100),
-                          )),
-                      SizedBox(height: 15),
-                      SizedBox(height: 15),
-                      // LuxTextField(
-                      //   hint: "Email Address",
-                      //   controller: controllerEmail,
-                      //   innerHint: "eg johnson@gmail.com",
-                      // ),
-                      SizedBox(height: 15),
-                      // Container(
-                      //   child: Stack(children: [
-                      //     Align(
-                      //       alignment: Alignment.bottomLeft,
-                      //       child: Container(
-                      //         margin: EdgeInsets.only(left: 90),
-                      //         child: InkWell(
-                      //           onTap: () {
-                      //             _luxTagBottomSheet(context);
-                      //           },
-                      //           child: Image.asset(
-                      //             "assets/exclamation.png",
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-
-                      //   ]),
-                      // ),
                       SizedBox(height: 50),
                       InkWell(
                           onTap: () async {
@@ -356,7 +317,11 @@ class _CreateUserProfileDataState extends State<CreateUserProfileData> {
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
+      handleStatusCode(e.response?.statusCode, context);
       if (e.response != null) {
+        setState(() {
+          _isLoading = false;
+        });
         debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         var errorMessage = await AuthError.fromJson(errorData);

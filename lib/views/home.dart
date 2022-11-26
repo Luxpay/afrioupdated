@@ -20,6 +20,7 @@ import '../services/local_notification_service.dart';
 import '../utils/colors.dart';
 import '../utils/constants.dart';
 import '../utils/sizeConfig.dart';
+import '../widgets/methods/getDeviceInfo.dart';
 import '../widgets/methods/showDialog.dart';
 import '../widgets/touchUp.dart';
 import '../widgets/wallet_balance.dart';
@@ -49,10 +50,13 @@ class _HomePageState extends State<HomePage> {
       dailyIncome,
       username,
       userAvatar,
+      singleLimit,
       packageName;
 
   String? statusCode;
   var crowd365Data;
+
+  var checkCrowd365Sub;
 
   String greeting() {
     var hour = DateTime.now().hour;
@@ -84,11 +88,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
     // });
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      crowd365_dashBoard();
       getWallets();
       aboutUser();
       greeting();
-     //crowd365_dashBoard();
     });
 
     LocalNotificationService.initialize(context);
@@ -150,18 +154,6 @@ class _HomePageState extends State<HomePage> {
             );
           });
       return true; // return true if the route to be popped
-    }
-
-    String capitalizeAllWord(String value) {
-      var result = value[0].toUpperCase();
-      for (int i = 1; i < value.length; i++) {
-        if (value[i - 1] == " ") {
-          result = result + value[i].toUpperCase();
-        } else {
-          result = result + value[i];
-        }
-      }
-      return result;
     }
 
     String usernameCapital = capitalizeAllWord(username ?? "loading...");
@@ -257,13 +249,7 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 14,
                                           color: Colors.white),
                                     ),
-                                    // Text(
-                                    //   usernameCapital,
-                                    //   style: TextStyle(
-                                    //       fontWeight: FontWeight.w500,
-                                    //       fontSize: 15,
-                                    //       color: white),
-                                    // )
+                                   
                                   ],
                                 ),
                               ),
@@ -289,6 +275,7 @@ class _HomePageState extends State<HomePage> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const NotificationPage()));
+
                                       setState(() {
                                         notify = false;
                                       });
@@ -357,7 +344,7 @@ class _HomePageState extends State<HomePage> {
                                                 const TransferToLuxpayAccount()))
                                   },
                                   child: MenuWidget(
-                                      menuName: "Lux Tag",
+                                      menuName: "LuxPay Tag",
                                       imageName: "assets/fund-tag.png"),
                                 ),
                                 GestureDetector(
@@ -551,7 +538,7 @@ class _HomePageState extends State<HomePage> {
                                     underConstruction(context),
                                   },
                                   child: MenuWidget(
-                                    menuName: "Airtime",
+                                    menuName: "Electriciy",
                                     imageName:
                                         "assets/homeIcons/electricity.png",
                                   ),
@@ -636,7 +623,7 @@ class _HomePageState extends State<HomePage> {
                                       underConstruction(context);
                                     },
                                     child: MenuWidget(
-                                      menuName: "Educatiom",
+                                      menuName: "Education",
                                       imageName: "assets/homeIcons/edu.png",
                                     ),
                                   ),
@@ -729,13 +716,16 @@ class _HomePageState extends State<HomePage> {
           checkPin = "${walletData.data.hasPin}";
           dailyIncome = walletData.data.dailySummary.income;
           dailyExpense = walletData.data.dailySummary.expense;
+          singleLimit = walletData.data.limits.singleLimit;
         });
+
+        await storage.write(key: singleLimitTransfer, value: singleLimit);
+        debugPrint("balance stored $walletBalance}");
 
         if (checkPin == 'false') {
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => const CreatePinPage()));
         }
-
         debugPrint("wallet balance $walletBalance}");
         debugPrint("wCheck Pin $checkPin}");
 
@@ -814,6 +804,9 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         var data = response.data;
         crowd365Data = await Crowd365Db.fromJson(data);
+        setState(() {
+          checkCrowd365Sub = crowd365Data.data;
+        });
 
         return true;
       } else {
@@ -877,7 +870,7 @@ class _HomePageState extends State<HomePage> {
 // Here you can write your code
 
       await crowd365_dashBoard();
-      if (crowd365Data.data.isEmpty) {
+      if (checkCrowd365Sub.isEmpty) {
         Navigator.of(context).pop();
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => const Crowd365()));

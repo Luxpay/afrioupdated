@@ -331,6 +331,9 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
       if (response.statusCode == 200) {
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {

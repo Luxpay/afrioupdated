@@ -19,25 +19,25 @@ class GetAccountDetails {
     String status;
     int code;
     String message;
-    Data data;
+    List<Datum> data;
 
     factory GetAccountDetails.fromJson(Map<String, dynamic> json) => GetAccountDetails(
         status: json["status"],
         code: json["code"],
         message: json["message"],
-        data: Data.fromJson(json["data"]),
+        data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
         "status": status,
         "code": code,
         "message": message,
-        "data": data.toJson(),
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
     };
 }
 
-class Data {
-    Data({
+class Datum {
+    Datum({
         required this.accountName,
         required this.accountNumber,
         required this.bankName,
@@ -47,7 +47,7 @@ class Data {
     String accountNumber;
     String bankName;
 
-    factory Data.fromJson(Map<String, dynamic> json) => Data(
+    factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         accountName: json["account_name"],
         accountNumber: json["account_number"],
         bankName: json["bank_name"],

@@ -16,6 +16,7 @@ import '../../utils/hexcolor.dart';
 import '../../utils/validators.dart';
 import '../../widgets/lux_textfield.dart';
 import '../../widgets/methods/getDeviceInfo.dart';
+import '../../widgets/navigate_route.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({Key? key}) : super(key: key);
@@ -121,12 +122,20 @@ class _CreateAccountState extends State<CreateAccount> {
                 ),
                 Container(
                   margin: EdgeInsets.only(left: 30, right: 30),
-                  child: LuxTextField(
-                    hint: "UserName",
-                    controller: controllerUsername,
-                    innerHint: "eg johnson",
-                    // prefixIcon: Icon(Icons.person),
-                    boaderColor: HexColor("#D70A0A"),
+                  child: Column(
+                    children: [
+                      LuxTextField(
+                        hint: "UserName",
+                        controller: controllerUsername,
+                        innerHint: "eg johnson",
+                        // prefixIcon: Icon(Icons.person),
+                        boaderColor: HexColor("#D70A0A"),
+                      ),
+                      Text(
+                        "* username can container only letters and underscores minimum of two letters",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -152,7 +161,6 @@ class _CreateAccountState extends State<CreateAccount> {
                     controller: passwordController,
                   ),
                 ),
-                SizedBox(height: 20),
                 Container(
                   margin: EdgeInsets.only(left: 30, right: 30),
                   child: Container(
@@ -202,19 +210,22 @@ class _CreateAccountState extends State<CreateAccount> {
 
                     var response = await createUser(
                         password, phoneNumber, username, email);
-                    setState(() {
-                      _isLoading = false;
-                    });
+
                     debugPrint("SignUp: $response");
                     if (response) {
+                      setState(() {
+                        _isLoading = false;
+                      });
+
                       Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => OTPVerification(
-                                  recipientAddressEmail: obscureEmail(email),
-                                  recipientAddress:
-                                      obscureEmail(phoneNumber))));
+                          SizeTransition4(OTPVerification(
+                              recipientAddressEmail: obscureEmail(email),
+                              recipientAddress: obscureEmail(phoneNumber))));
                     } else {
+                      setState(() {
+                        _isLoading = false;
+                      });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(errors ?? "something went wrong")));
                     }
@@ -243,9 +254,7 @@ class _CreateAccountState extends State<CreateAccount> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()));
+                                    context, SizeTransition4(LoginPage()));
                               })
                       ]),
                 ),
@@ -286,16 +295,24 @@ class _CreateAccountState extends State<CreateAccount> {
         await storage.write(key: phoneNumber, value: phone);
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
+        setState(() {
+          _isLoading = false;
+        });
+        handleStatusCode(e.response?.statusCode, context);
         debugPrint(' Error Error: ${e.response?.data}');
         var errorData = e.response?.data;
         debugPrint(' Error Error: ${errorData}');
         var errorMessage = await AuthError.fromJson(errorData);
         errors = errorMessage.message;
+
         return false;
       } else {
         errors = errorMessage;

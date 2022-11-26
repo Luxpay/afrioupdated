@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:luxpay/views/accountSettings/verifyEmail.dart';
 import '../../models/aboutUser.dart';
 import '../../models/errors/authError.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/colors.dart';
 import '../../utils/hexcolor.dart';
+import '../../utils/sizeConfig.dart';
 import '../../widgets/lux_buttons.dart';
 import '../../widgets/lux_textfield.dart';
 import '../../widgets/methods/showDialog.dart';
@@ -26,6 +28,8 @@ class _EditProfileState extends State<EditProfile> {
   String selected_gender = 'Male';
   TextEditingController controllerFirstName = TextEditingController();
   TextEditingController controllerLastName = TextEditingController();
+  TextEditingController controllerEmail = TextEditingController();
+  TextEditingController controllerMiddleName = TextEditingController();
   bool _isLoading = false;
   var errors;
   DateTime dateTime = DateTime.now();
@@ -38,10 +42,12 @@ class _EditProfileState extends State<EditProfile> {
 
   String checkImage = 'false';
 
+  bool verifyEmail = true;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       aboutUser();
     });
   }
@@ -69,9 +75,9 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     )),
                     child: Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: EdgeInsets.only(top: 10, right: 15),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
                               onPressed: () => {Navigator.pop(context)},
@@ -80,6 +86,26 @@ class _EditProfileState extends State<EditProfile> {
                             "Profile Details",
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                          Container(
+                            child: verifyEmail == true
+                                ? null
+                                : InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  VerifyEmail()));
+                                    },
+                                    child: const Text(
+                                      "Verify Email",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.red,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -97,8 +123,8 @@ class _EditProfileState extends State<EditProfile> {
                             child: Stack(
                           children: [
                             Container(
-                              width: 128,
-                              height: 128,
+                              width: 100,
+                              height: 100,
                               decoration: BoxDecoration(
                                 color: grey4,
                                 shape: BoxShape.circle,
@@ -127,7 +153,7 @@ class _EditProfileState extends State<EditProfile> {
                             ),
                             Positioned(
                               bottom: 0,
-                              right: 4,
+                              right: 1,
                               child: InkWell(
                                   onTap: () {
                                     _showChoiceDialog(context);
@@ -136,29 +162,64 @@ class _EditProfileState extends State<EditProfile> {
                             ),
                           ],
                         )),
-                        SizedBox(height: 1),
-                        InkWell(
-                            onTap: () {
-                              _openCamera(context);
-                            },
-                            child: Text(
-                              "Tap to take a selfie",
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w100),
-                            )),
-                        SizedBox(height: 20),
-                        LuxTextField(
-                          hint: "First Name",
-                          controller: controllerFirstName,
-                          innerHint: "eg john",
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
                         ),
-                        SizedBox(height: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LuxTextField(
+                              hint: "First Name",
+                              controller: controllerFirstName,
+                              innerHint: "eg john",
+                            ),
+                            Text(
+                              "* first name can contain only letters",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LuxTextField(
+                                hint: "Middle Name",
+                                controller: controllerMiddleName,
+                                innerHint: "eg green",
+                                onChanged: (v) {}),
+                            Text(
+                              "* middle name can contain only letters",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LuxTextField(
+                                hint: "Last Name",
+                                controller: controllerLastName,
+                                innerHint: "eg blak",
+                                onChanged: (v) {}),
+                            Text(
+                              "* last name can contain only letters",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 2.2,
+                        ),
                         LuxTextField(
-                            hint: "Last Name",
-                            controller: controllerLastName,
-                            innerHint: "eg blak",
+                            hint: "Email",
+                            controller: controllerEmail,
+                            innerHint: "eg johnson@gmail.com",
                             onChanged: (v) {}),
                         SizedBox(height: 20),
                         Column(
@@ -214,7 +275,9 @@ class _EditProfileState extends State<EditProfile> {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(
+                              height: SizeConfig.safeBlockVertical! * 2.2,
+                            ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -274,29 +337,36 @@ class _EditProfileState extends State<EditProfile> {
                                             )
                                           ],
                                         ))),
+                                Text(
+                                  "* User must be 18 years or older",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
                               ],
                             ),
                           ],
                         ),
                         SizedBox(
-                          height: 40,
+                          height: SizeConfig.safeBlockVertical! * 4.0,
                         ),
                         InkWell(
                             onTap: () async {
                               var first_name = controllerFirstName.text.trim();
                               var last_name = controllerLastName.text.trim();
+                              var middle_name =
+                                  controllerMiddleName.text.trim();
                               var gender = selected_gender;
                               var birthDate = dateOfBirth.toString();
+                              var email = controllerEmail.text.trim();
 
-                              setState(() {
-                                _isLoading = true;
-                              });
                               var validators = [
                                 //imagePicked == false ? "Upload your image" : null,
                                 first_name.isEmpty
                                     ? "Please Enter your first name"
                                     : null,
                                 last_name.isEmpty
+                                    ? "Please Enter your last name"
+                                    : null,
+                                middle_name.isEmpty
                                     ? "Please Enter your last name"
                                     : null,
                                 gender.isEmpty ? "select gender" : null,
@@ -311,15 +381,22 @@ class _EditProfileState extends State<EditProfile> {
                                             "")));
                                 return;
                               }
-
+                              setState(() {
+                                _isLoading = true;
+                              });
                               var response = await updateAccount(
                                   firstName: first_name,
                                   lastName: last_name,
                                   gender: gender,
+                                  middleName: middle_name,
                                   dateOfBirth: birthDate);
 
                               updateUserAvatar(
                                 image: fileImage,
+                              );
+
+                              updateUserEmail(
+                                email,
                               );
 
                               if (!response) {
@@ -328,15 +405,12 @@ class _EditProfileState extends State<EditProfile> {
                                 });
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(errors)));
-                                setState(() {
-                                  _isLoading = false;
-                                });
                               } else {
                                 setState(() {
                                   _isLoading = false;
                                 });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Profile Updated")));
+                                showErrorDialog(context,
+                                    "Profile Successfully Updated", "Profile");
                               }
                             },
                             child: _isLoading
@@ -344,7 +418,10 @@ class _EditProfileState extends State<EditProfile> {
                                     HexColor("#D70A0A"), double.infinity)
                                 : luxButton(HexColor("#D70A0A"), Colors.white,
                                     "Save", double.infinity,
-                                    fontSize: 16))
+                                    fontSize: 16)),
+                        SizedBox(
+                          height: SizeConfig.safeBlockVertical! * 3.0,
+                        ),
                       ],
                     ),
                   ),
@@ -395,7 +472,7 @@ class _EditProfileState extends State<EditProfile> {
           child: Icon(
             Icons.camera_alt,
             color: Colors.white,
-            size: 20,
+            size: 12,
           ),
         ),
       );
@@ -459,15 +536,16 @@ class _EditProfileState extends State<EditProfile> {
         ),
       );
 
-  Future<bool> updateAccount({
-    required String? firstName,
-    required String? lastName,
-    required String? dateOfBirth,
-    required String? gender,
-  }) async {
+  Future<bool> updateAccount(
+      {required String? firstName,
+      required String? lastName,
+      required String? dateOfBirth,
+      required String? gender,
+      required String? middleName}) async {
     Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
+      'middle_name': middleName,
       'gender': gender,
       'date_of_birth': dateOfBirth,
     };
@@ -483,16 +561,24 @@ class _EditProfileState extends State<EditProfile> {
         debugPrint('${data}');
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
+
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
+        handleStatusCode(e.response?.statusCode, context);
         if (e.response?.statusCode == 401) {
           showExpiredsessionDialog(
               context, "Please Login again\nThanks", "Expired Session");
           return false;
         } else {
+          setState(() {
+            _isLoading = false;
+          });
           var errorData = e.response?.data;
           var errorMessage = await AuthError.fromJson(errorData);
           errors = errorMessage.message;
@@ -535,11 +621,16 @@ class _EditProfileState extends State<EditProfile> {
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error Error: ${e.response?.data}');
-        var errorData = e.response?.data;
-        var errorMessage = await AuthError.fromJson(errorData);
-        errors = errorMessage.message;
-        return false;
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
+          return false;
+        }
       } else {
         errors = errorMessage;
         return false;
@@ -551,11 +642,11 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<bool> aboutUser() async {
-    var response = await dio.get(
-      "/user/profile/",
-    );
-    debugPrint('Data Code ${response.statusCode}');
     try {
+      var response = await dio.get(
+        "/user/profile/",
+      );
+      debugPrint('Data Code ${response.statusCode}');
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
@@ -566,8 +657,11 @@ class _EditProfileState extends State<EditProfile> {
         setState(() {
           controllerFirstName.text = user.data.firstName;
           controllerLastName.text = user.data.lastName;
+          controllerEmail.text = user.data.email;
+          controllerMiddleName.text = user.data.middleName ?? "N/A";
           //selected_gender = user.data.gender;
           userAvatar = user.data.avatar;
+          verifyEmail = user.data.emailVerified;
         });
 
         return true;
@@ -575,10 +669,53 @@ class _EditProfileState extends State<EditProfile> {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
-        return false;
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
+          return false;
+        }
       } else {
+        errors = errorMessage;
+        return false;
+      }
+    } catch (e) {
+      debugPrint('${e}');
+      return false;
+    }
+  }
+
+  Future<bool> updateUserEmail(email) async {
+    Map<String, dynamic> body = {"email": email};
+    var response = await dio.patch("/user/email/", data: body);
+    debugPrint('Data Code ${response.statusCode}');
+    try {
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
+      if (e.response != null) {
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
+          return false;
+        }
+      } else {
+        errors = errorMessage;
         return false;
       }
     } catch (e) {

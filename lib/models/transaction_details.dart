@@ -41,46 +41,54 @@ class TransactionDetails {
 
 class TransactionDetailsData {
   TransactionDetailsData({
-    required this.data,
+    required this.id,
     required this.amount,
-    required this.fee,
-    required this.channel,
-    required this.reference,
     required this.type,
     required this.status,
+    required this.reference,
+    required this.data,
+    required this.channel,
+    required this.fee,
     required this.createdAt,
+    required this.actualAmount,
   });
 
-  DataData data;
+  String id;
   String amount;
-  String fee;
-  String channel;
-  String reference;
   String type;
   String status;
+  String reference;
+  DataData data;
+  String channel;
+  String fee;
   DateTime createdAt;
+  String actualAmount;
 
   factory TransactionDetailsData.fromJson(Map<String, dynamic> json) =>
       TransactionDetailsData(
-        data: DataData.fromJson(json["data"]),
+        id: json["id"],
         amount: json["amount"],
-        fee: json["fee"],
-        channel: json["channel"],
-        reference: json["reference"],
         type: json["type"],
         status: json["status"],
+        reference: json["reference"],
+        data: DataData.fromJson(json["data"]),
+        channel: json["channel"],
+        fee: json["fee"],
         createdAt: DateTime.parse(json["created_at"]),
+        actualAmount: json["actual_amount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "data": data.toJson(),
+        "id": id,
         "amount": amount,
-        "fee": fee,
-        "channel": channel,
-        "reference": reference,
         "type": type,
         "status": status,
+        "reference": reference,
+        "data": data.toJson(),
+        "channel": channel,
+        "fee": fee,
         "created_at": createdAt.toIso8601String(),
+        "actual_amount": actualAmount,
       };
 }
 
@@ -88,12 +96,12 @@ class DataData {
   DataData({
     required this.to,
     required this.from,
-    required this.description,
+    this.description,
   });
 
   String to;
   String from;
-  String description;
+  String? description;
 
   factory DataData.fromJson(Map<String, dynamic> json) => DataData(
         to: json["to"],

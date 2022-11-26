@@ -21,9 +21,9 @@ import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/constants.dart';
 import '../../widgets/methods/getDeviceInfo.dart';
+import '../../widgets/navigate_route.dart';
 import '../../widgets/touchUp.dart';
 import '../page_controller.dart';
-import 'create_pin_page.dart';
 import 'deviceCheck/changeDeviceOtp.dart';
 
 final loginProvider = ChangeNotifierProvider<LoginViewModel>((ref) {
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 3.0,
+                              height: SizeConfig.safeBlockVertical! * 4.0,
                             ),
                             InkWell(
                               onTap: () async {
@@ -251,21 +251,25 @@ class _LoginPageState extends State<LoginPage> {
                                 if (email.isNotEmpty) {
                                   var response =
                                       await loginUser(password, "", email);
-                                  print('login:$response');
+                                  debugPrint('login:$response');
                                   if (!response) {
-                                    if (errors == "email not verified") {
+                                    if (errors == "User not verified") {
+                                      Navigator.push(
+                                          context,
+                                          SizeTransition4(OTPVerification(
+                                              recipientAddressEmail: email,
+                                              recipientAddress: phone)));
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                              content: Text(errors ??
-                                                  "Please check your Email, or login with phone number")));
+                                          .showSnackBar(
+                                              SnackBar(content: Text(errors)));
                                     }
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(errors ??
-                                                "something went wrong")));
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
                                   } else {
                                     if ((first_name == null ||
                                         last_name == null)) {
@@ -277,16 +281,12 @@ class _LoginPageState extends State<LoginPage> {
                                         _isLoading = false;
                                         Navigator.push(
                                             context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CreateUserProfile()));
+                                            SizeTransition4(
+                                                CreateUserProfile()));
                                       });
                                     } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AppPageController()));
+                                      Navigator.push(context,
+                                          SizeTransition4(AppPageController()));
                                       setState(() {
                                         _isLoading = false;
                                       });
@@ -300,24 +300,21 @@ class _LoginPageState extends State<LoginPage> {
                                     if (errors == "User not verified") {
                                       Navigator.push(
                                           context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  OTPVerification(
-                                                      recipientAddressEmail:
-                                                          email,
-                                                      recipientAddress:
-                                                          phone)));
+                                          SizeTransition4(OTPVerification(
+                                              recipientAddressEmail: email,
+                                              recipientAddress: phone)));
+
                                       setState(() {
                                         _isLoading = false;
                                       });
+                                    } else {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                              SnackBar(content: Text(errors)));
                                     }
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                            content: Text(errors ??
-                                                "something went wrong")));
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
                                   } else {
                                     if ((first_name == null ||
                                         last_name == null)) {
@@ -327,28 +324,15 @@ class _LoginPageState extends State<LoginPage> {
                                                   "Complete your registration Thanks.")));
                                       setState(() {
                                         _isLoading = false;
+
                                         Navigator.push(
                                             context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    CreateUserProfile()));
-                                      });
-                                    } else if (checkPin == 'false') {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CreatePinPage()));
-
-                                      setState(() {
-                                        _isLoading = false;
+                                            SizeTransition4(
+                                                CreateUserProfile()));
                                       });
                                     } else {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AppPageController()));
+                                      Navigator.push(context,
+                                          SizeTransition4(AppPageController()));
                                       setState(() {
                                         _isLoading = false;
                                       });
@@ -368,8 +352,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             Center(
                               child: InkWell(
-                                onTap: () => Navigator.of(context)
-                                    .pushNamed(ResetPassword.path),
+                                onTap: () => Navigator.push(
+                                    context, SizeTransition4(ResetPassword())),
                                 child: Text(
                                   "Forgot password ?",
                                   style: TextStyle(
@@ -382,59 +366,59 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 20,
                             ),
-                            Center(
-                                child: Container(
-                              decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    blurRadius: 5.0,
-                                    spreadRadius: 1.0,
-                                    offset: Offset(
-                                      0.0,
-                                      1.0,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              child: InkWell(
-                                onTap: () async {
-                                  // debugPrint("Biometric Check");
-                                  // final prefs =
-                                  //     await SharedPreferences.getInstance();
-                                  // String? checkData =
-                                  //     prefs.getString(completeSignUp);
-                                  // debugPrint("Biometric: $checkData");
-                                  // if (checkData == 'done') {
-                                  //   checkBiometrics();
-                                  // } else {
-                                  //   // errors =
-                                  //   //     'Login with your phoneNumber and Password';
-                                  //   // ScaffoldMessenger.of(context).showSnackBar(
-                                  //   //     SnackBar(content: Text("$errors")));
-                                  // }
-                                },
-                                child: Image.asset(
-                                  "assets/fprint.png",
-                                  height: 45,
-                                  width: 45,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            )),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 1.8,
-                            ),
-                            Center(
-                              child: Text(
-                                "Login with Touch ID",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color:
-                                        HexColor("#333333").withOpacity(0.9)),
-                              ),
-                            ),
+                            // Center(
+                            //     child: Container(
+                            //   decoration: BoxDecoration(
+                            //     boxShadow: [
+                            //       BoxShadow(
+                            //         color: Colors.grey.withOpacity(0.5),
+                            //         blurRadius: 5.0,
+                            //         spreadRadius: 1.0,
+                            //         offset: Offset(
+                            //           0.0,
+                            //           1.0,
+                            //         ),
+                            //       )
+                            //     ],
+                            //   ),
+                            // child: InkWell(
+                            //   onTap: () async {
+                            // debugPrint("Biometric Check");
+                            // final prefs =
+                            //     await SharedPreferences.getInstance();
+                            // String? checkData =
+                            //     prefs.getString(completeSignUp);
+                            // debugPrint("Biometric: $checkData");
+                            // if (checkData == 'done') {
+                            //   checkBiometrics();
+                            // } else {
+                            //   // errors =
+                            //   //     'Login with your phoneNumber and Password';
+                            //   // ScaffoldMessenger.of(context).showSnackBar(
+                            //   //     SnackBar(content: Text("$errors")));
+                            // }
+                            // },
+                            // child: Image.asset(
+                            //   "assets/fprint.png",
+                            //   height: 45,
+                            //   width: 45,
+                            //   fit: BoxFit.cover,
+                            // ),
+                            // ),
+                            //)),
+                            // SizedBox(
+                            //   height: SizeConfig.safeBlockVertical! * 1.8,
+                            // ),
+                            // Center(
+                            //   child: Text(
+                            //     "Login with Touch ID",
+                            //     style: TextStyle(
+                            //         fontSize: 14,
+                            //         fontWeight: FontWeight.w500,
+                            //         color:
+                            //             HexColor("#333333").withOpacity(0.9)),
+                            //   ),
+                            // ),
                             SizedBox(
                               height: SizeConfig.safeBlockVertical! * 2.8,
                             ),
@@ -451,11 +435,8 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 InkWell(
                                   onTap: () => {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const CreateAccount()))
+                                    Navigator.push(context,
+                                        SizeTransition4(const CreateAccount()))
                                   },
                                   child: Text(
                                     " Create New account",
@@ -504,7 +485,7 @@ class _LoginPageState extends State<LoginPage> {
         url,
         data: body,
       );
-     
+
       if (response.statusCode == 200) {
         var data = response.data;
         var userData = await UserData.fromJson(data);
@@ -516,31 +497,35 @@ class _LoginPageState extends State<LoginPage> {
         await storage.write(key: authToken, value: token);
         debugPrint("PhoneNumber Stored: ${phone}");
         await storage.write(key: phoneNumber, value: phone);
-        
+
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
+      handleStatusCode(e.response?.statusCode, context);
       if (e.response != null) {
         if (e.response?.statusCode == 422) {
+          Navigator.push(
+              context,
+              SizeTransition4(ChangeDeviceOtp(
+                recipientAddresEmail: email,
+                recipientAddress: phone,
+              )));
+          return false;
+        } else {
           setState(() {
             _isLoading = false;
           });
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => ChangeDeviceOtp(
-                        recipientAddresEmail: email,
-                        recipientAddress: phone,
-                      )));
-          return false;
-        } else {
           debugPrint(' Error Error: ${e.response?.data}');
           var errorData = e.response?.data;
           var errorMessage = await AuthError.fromJson(errorData);
           errors = errorMessage.message;
+
           return false;
         }
       } else {

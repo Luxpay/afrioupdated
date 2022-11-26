@@ -5,6 +5,7 @@ import 'package:luxpay/models/get_banks.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/colors.dart';
+import '../../utils/sizeConfig.dart';
 import '../../widgets/lux_textfield.dart';
 import '../../widgets/methods/showDialog.dart';
 import '../../widgets/touchUp.dart';
@@ -46,86 +47,81 @@ class _SelectBankState extends State<SelectBank> {
         child: fetchBank == false
             ? Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          Align(
-                            alignment: Alignment.topCenter,
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                              height: 6,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: grey4,
+                              ),
+                              margin: const EdgeInsets.only(top: 10)),
+                        ),
+                        Align(
+                            alignment: Alignment.topRight,
                             child: Container(
-                                height: 6,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: grey4,
-                                ),
-                                margin: const EdgeInsets.only(top: 10)),
-                          ),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Container(
-                                  margin: EdgeInsets.only(right: 20, top: 20),
-                                  child: CircleButton(
-                                      onTap: () => Navigator.pop(context),
-                                      iconData: Icons.close))),
-                          Container(
-                            margin:
-                                EdgeInsets.only(top: 60, right: 40, left: 40),
-                            child: Align(
-                              alignment: Alignment.topCenter,
-                              child: Column(
-                                children: <Widget>[
-                                  LuxTextField(
-                                    hint: "Select a Bank",
-                                    //controller: controllerRefere,
-                                    innerHint: "Search for a Bank",
-                                    //onChanged: searchBook,
-                                    onChanged: (v) async {
-                                      searchBank(v);
-                                      if (v.isEmpty) {
-                                        setState(() {
-                                          getBanks();
-                                        });
-                                      }
-                                    },
-                                  ),
-                                  SingleChildScrollView(
-                                    child: Container(
-                                      height:
-                                          MediaQuery.of(context).size.height -
-                                              290,
-                                      child: ListView.separated(
-                                        separatorBuilder:
-                                            (BuildContext context, int index) =>
-                                                Divider(height: 1),
-                                        itemCount: bankList.length,
-                                        itemBuilder: (context, index) {
-                                          var banks = bankList[index];
-                                          return ListTile(
-                                              title: Text("${banks.bankName}"),
-                                              subtitle: Text(banks.bankCode),
-                                              onTap: () async {
-                                                Map<String, dynamic> body = {
-                                                  "bank_code": banks.bankCode,
-                                                  "bank_name": banks.bankName
-                                                };
-                                                Navigator.pop(context, body);
-                                                //Navigator.pop(context);
-                                              });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                margin: EdgeInsets.only(right: 20, top: 20),
+                                child: CircleButton(
+                                    onTap: () => Navigator.pop(context),
+                                    iconData: Icons.close))),
+                      ],
+                    ),
+                    SizedBox(
+                      height: SizeConfig.safeBlockVertical! * 1,
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(right: 30, left: 30),
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: Column(
+                          children: <Widget>[
+                            LuxTextField(
+                              hint: "Select a Bank",
+                              //controller: controllerRefere,
+                              innerHint: "Search for a Bank",
+                              //onChanged: searchBook,
+                              onChanged: (v) async {
+                                searchBank(v);
+                                if (v.isEmpty) {
+                                  setState(() {
+                                    getBanks();
+                                  });
+                                }
+                              },
+                            ),
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height,
+                              child: ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext context, int index) =>
+                                        Divider(height: 1),
+                                itemCount: bankList.length,
+                                itemBuilder: (context, index) {
+                                  var banks = bankList[index];
+                                  return ListTile(
+                                      title: Text("${banks.bankName}"),
+                                      // subtitle: Text(banks.bankCode),
+                                      onTap: () async {
+                                        Map<String, dynamic> body = {
+                                          "bank_code": banks.bankCode,
+                                          "bank_name": banks.bankName
+                                        };
+                                        Navigator.pop(context, body);
+                                        //Navigator.pop(context);
+                                      });
+                                },
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
       ),
@@ -150,7 +146,7 @@ class _SelectBankState extends State<SelectBank> {
   Future<bool> getBanks() async {
     try {
       var response = await dio.get(
-        "/v1/finances/withdraw/banks/",
+        "/finances/withdraw/banks/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {

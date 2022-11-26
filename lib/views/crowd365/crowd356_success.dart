@@ -54,7 +54,7 @@ class _Crowd365SuccessfullSubState extends State<Crowd365SuccessfullSub> {
                         builder: (context) => Crowd365Dashboard()));
               },
               child: luxButton(
-                  HexColor("#415CA0"), Colors.white, "Open Dashboard", 350),
+                  HexColor("#415CA0"), Colors.white, "Open Dashboard", 150),
             ),
           ],
         )));

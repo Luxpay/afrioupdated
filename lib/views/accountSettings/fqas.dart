@@ -4,14 +4,14 @@ import 'package:flutter_iconly/flutter_iconly.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
 
-class FQAs extends StatefulWidget {
-  const FQAs({Key? key}) : super(key: key);
+class FAQ extends StatefulWidget {
+  const FAQ({Key? key}) : super(key: key);
 
   @override
-  State<FQAs> createState() => _FQAsState();
+  State<FAQ> createState() => _FAQState();
 }
 
-class _FQAsState extends State<FQAs> {
+class _FAQState extends State<FAQ> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +22,7 @@ class _FQAsState extends State<FQAs> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  height: 80,
+                  height: 60,
                   decoration: BoxDecoration(
                       border: Border(
                     bottom: BorderSide(
@@ -31,7 +31,6 @@ class _FQAsState extends State<FQAs> {
                     ),
                   )),
                   child: Container(
-                    margin: EdgeInsets.only(top: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -42,7 +41,7 @@ class _FQAsState extends State<FQAs> {
                           width: SizeConfig.safeBlockHorizontal! * 2,
                         ),
                         const Text(
-                          "FQAs",
+                          "FAQ",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w600),
                         ),
@@ -54,7 +53,7 @@ class _FQAsState extends State<FQAs> {
               Align(
                   alignment: Alignment.topCenter,
                   child: Container(
-                    margin: EdgeInsets.only(top: 100),
+                    margin: EdgeInsets.only(top: 80),
                     child: SingleChildScrollView(
                       child: Container(
                         height: MediaQuery.of(context).size.height,

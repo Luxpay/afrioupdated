@@ -19,10 +19,11 @@ import '../../utils/functions.dart';
 import '../../widgets/methods/getDeviceInfo.dart';
 
 class OTPVerification extends StatefulWidget {
- 
-  final String recipientAddress,recipientAddressEmail;
+  final String recipientAddress, recipientAddressEmail;
   const OTPVerification(
-      {Key? key, required this.recipientAddressEmail, required this.recipientAddress})
+      {Key? key,
+      required this.recipientAddressEmail,
+      required this.recipientAddress})
       : super(key: key);
 
   @override
@@ -35,7 +36,7 @@ class _OTPVerificationState extends State<OTPVerification> {
   String otp = "";
   late Timer timer;
   String? errors;
-  late String showPhone, phone, email;
+  String? showPhone, phone, email;
   TextEditingController textEditingController = TextEditingController();
   var event_id;
 
@@ -62,15 +63,15 @@ class _OTPVerificationState extends State<OTPVerification> {
     super.initState();
 
     if (widget.recipientAddress != '') {
-    phone = widget.recipientAddress;
-    showPhone = widget.recipientAddress
-        .replaceRange(2, widget.recipientAddress.length - 5, "****");
-     sendOTP(widget.recipientAddress, "");
+      phone = widget.recipientAddress;
+      showPhone = widget.recipientAddress
+          .replaceRange(2, widget.recipientAddress.length - 5, "****");
+      sendOTP(widget.recipientAddress, "");
     } else {
-          email = widget.recipientAddressEmail;
-    showPhone = widget.recipientAddressEmail
-        .replaceRange(2, widget.recipientAddress.length - 5, "****");
-     sendOTP("", widget.recipientAddressEmail);
+      email = widget.recipientAddressEmail;
+      showPhone = widget.recipientAddressEmail
+          .replaceRange(2, widget.recipientAddress.length - 5, "****");
+      sendOTP("", widget.recipientAddressEmail);
     }
 
     setState(() {
@@ -212,8 +213,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                               return;
                             }
 
-                            bool response =
-                                await verifyOTP(otp);
+                            bool response = await verifyOTP(otp);
                             setState(() {
                               _isLoading = false;
                             });
@@ -255,9 +255,7 @@ class _OTPVerificationState extends State<OTPVerification> {
                     ),
                     InkWell(
                       onTap: () async {
-                        
-                        bool response =
-                            await verifyOTP(otp);
+                        bool response = await verifyOTP(otp);
                         _isLoading = false;
                         if (mounted) {
                           setState(() {});
@@ -350,7 +348,7 @@ class _OTPVerificationState extends State<OTPVerification> {
     print("otp: $otp");
     try {
       var response = await unAuthDio.post(
-        "/auth/devices/verify/",
+        "/auth/device/verify/",
         data: body,
       );
 
@@ -385,12 +383,12 @@ class _OTPVerificationState extends State<OTPVerification> {
   }
 
   Future<bool> sendOTP(phone, email) async {
- String url;
+    String url;
     final storage = new FlutterSecureStorage();
     try {
       Map<String, dynamic> body = {
         "phone": phone,
-        "email":email,
+        "email": email,
         "token": await storage.read(key: 'fcmToken'),
         "platform": await storage.read(key: "DeviceName")
       };

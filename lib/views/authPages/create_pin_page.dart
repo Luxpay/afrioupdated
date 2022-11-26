@@ -8,6 +8,7 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/widgets/pin_entry.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
+import '../crowd365/numberic_pad.dart';
 import '../page_controller.dart';
 
 class CreatePinPage extends StatefulWidget {
@@ -23,11 +24,15 @@ class _CreatePinPageState extends State<CreatePinPage> {
   int? confirmPin;
   int? pin;
   String? errors, tag;
+  String? newPinCode, oldPinCode;
+  String number1 = "";
+  String number2 = "";
 
   get grey1 => null;
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
+
     return AnnotatedRegion(
       // Reset SystemUiOverlayStyle for PageOne.
       // If this is not set, the status bar will use the style applied from another route.
@@ -109,29 +114,120 @@ you'll have to make a request"""
                           height: SizeConfig.safeBlockVertical! * 8,
                         ),
                         !confirm
-                            ? PinEntry(
-                                tag: "pin",
-                                onPinChanged: (v) {
-                                  pin = v;
-                                  if (v?.toString().split("").length == 4) {
-                                    setState(() {
-                                      confirm = true;
-                                    });
-                                  }
-                                  if (mounted) {
-                                    setState(() {});
-                                  }
-                                },
+                            ? Column(
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        buildCodeNumberBox(number1.length > 0
+                                            ? number1.substring(0, 1)
+                                            : ""),
+                                        buildCodeNumberBox(number1.length > 1
+                                            ? number1.substring(1, 2)
+                                            : ""),
+                                        buildCodeNumberBox(number1.length > 2
+                                            ? number1.substring(2, 3)
+                                            : ""),
+                                        buildCodeNumberBox(number1.length > 3
+                                            ? number1.substring(3, 4)
+                                            : ""),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          SizeConfig.blockSizeVertical! * 10),
+                                  Container(
+                                    child: NumericPad(
+                                      onNumberSelected: (value) {
+                                        setState(() {
+                                          if (value != -1) {
+                                            if (value.toString().length != 4) {
+                                              number1 =
+                                                  number1 + value.toString();
+
+                                              if (number1.toString().length ==
+                                                  4) {
+                                                newPinCode = number1;
+                                                debugPrint(
+                                                    "Complete NewPin ${newPinCode}");
+
+                                                number1 = '';
+                                                confirm = true;
+                                              }
+                                            }
+                                          } else {
+                                            number1 = number1.substring(
+                                                0, number1.length - 1);
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
                               )
-                            : PinEntry(
-                                tag: "confirm",
-                                onPinChanged: (v) async {
-                                  confirmPin = v;
-                                  if (v.toString().split("").length == 4) {
-                                    fetchPin(context, pin, confirmPin);
-                                  }
-                                },
-                              ),
+                            : Column(
+                                children: [
+                                  Container(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        buildCodeNumberBox(number2.length > 0
+                                            ? number2.substring(0, 1)
+                                            : ""),
+                                        buildCodeNumberBox(number2.length > 1
+                                            ? number2.substring(1, 2)
+                                            : ""),
+                                        buildCodeNumberBox(number2.length > 2
+                                            ? number2.substring(2, 3)
+                                            : ""),
+                                        buildCodeNumberBox(number2.length > 3
+                                            ? number2.substring(3, 4)
+                                            : ""),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                      height:
+                                          SizeConfig.blockSizeVertical! * 10),
+                                  Container(
+                                    child: NumericPad(
+                                      onNumberSelected: (value) {
+                                        setState(() {
+                                          if (value != -1) {
+                                            if (value.toString().length != 4) {
+                                              number2 =
+                                                  number2 + value.toString();
+
+                                              if (number2.toString().length ==
+                                                  4) {
+                                                oldPinCode = number2;
+                                                debugPrint(
+                                                    "Complete OldPin ${oldPinCode}");
+
+                                                fetchPin(context, newPinCode,
+                                                    oldPinCode);
+                                                number2 = '';
+                                                confirm = true;
+                                              }
+                                            }
+                                          } else {
+                                            number1 = number1.substring(
+                                                0, number1.length - 1);
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )
                       ],
                     ),
                   )
@@ -144,11 +240,11 @@ you'll have to make a request"""
     );
   }
 
-  Future<bool> setPin(int? pin, int? confirmPin) async {
+  Future<bool> setPin(pin, confirmPin) async {
     if (pin != confirmPin) {
       errors = "Pin does not match";
     }
-    Map<String, dynamic> body = {"new_pin": "$pin", "old_pin": "$pin"};
+    Map<String, dynamic> body = {"new_pin": "$pin", "old_pin": "$confirmPin"};
     try {
       var response = await dio.patch(
         "/wallet/pin/",

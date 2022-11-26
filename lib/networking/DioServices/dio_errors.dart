@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+import '../../widgets/methods/showDialog.dart';
+
 class DioException implements Exception {
   late String errorMessage;
 
@@ -36,7 +38,7 @@ class DioException implements Exception {
   String _handleStatusCode(int? statusCode) {
     switch (statusCode) {
       case 400:
-        return 'Bad request.';
+        return 'Bad request. ';
       case 401:
         return 'Authentication failed.';
       case 403:
@@ -60,4 +62,53 @@ class DioException implements Exception {
 
   @override
   String toString() => errorMessage;
+}
+
+handleStatusCode(int? statusCode, context) {
+  String? errorMessage;
+  switch (statusCode) {
+    case 400:
+      errorMessage = 'Bad request. Check your credentials';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 401:
+      errorMessage = 'Authentication failed.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+
+    case 403:
+      errorMessage =
+          'The authenticated user is not allowed to access the specified API endpoint.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+
+    case 404:
+      errorMessage = 'The requested resource does not exist.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 405:
+      errorMessage =
+          'Method not allowed. Please check the Allow header for the allowed HTTP methods.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 415:
+      errorMessage =
+          'Unsupported media type.\nThe requested content type or version number is invalid.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 422:
+      errorMessage = 'Data validation failed.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 429:
+      errorMessage = 'Too many requests.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    case 500:
+      errorMessage = 'Internal server error.';
+      showErrorDialog(context, errorMessage, "Luxpay");
+      break;
+    default:
+      errorMessage = 'Oops something went wrong!';
+  }
 }

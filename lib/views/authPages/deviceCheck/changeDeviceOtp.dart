@@ -16,7 +16,6 @@ import '../../../utils/constants.dart';
 import '../../../utils/functions.dart';
 import '../../../widgets/methods/getDeviceInfo.dart';
 import '../../page_controller.dart';
-import 'change_device_otp.dart';
 
 class ChangeDeviceOtp extends StatefulWidget {
   final String recipientAddress;
@@ -346,9 +345,8 @@ class _ChangeDeviceOtpState extends State<ChangeDeviceOtp> {
         "/auth/device/verify/",
         data: body,
       );
-       ;
+      ;
       if (response.statusCode == 200) {
-
         var data = response.data;
         debugPrint('${response.statusCode}');
         var userData = await UserData.fromJson(data);

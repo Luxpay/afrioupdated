@@ -32,7 +32,7 @@ class _InvitationCodeState extends State<InvitationCode> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       aboutUser();
     });
   }
@@ -46,10 +46,10 @@ class _InvitationCodeState extends State<InvitationCode> {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              height: 80,
+              height: 60,
               decoration: BoxDecoration(color: Colors.white),
               child: Container(
-                margin: EdgeInsets.only(top: 20),
+                // margin: EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -82,7 +82,8 @@ class _InvitationCodeState extends State<InvitationCode> {
                         child: Center(
                           child: Text(
                             username ?? "Loading...",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),
                       ),
@@ -93,7 +94,7 @@ class _InvitationCodeState extends State<InvitationCode> {
                             Expanded(
                                 child: button(
                                     title: "Copy",
-                                    hexColor: "#333333",
+                                    hexColor: "#D70A0A",
                                     onTap: () {
                                       debugPrint("copied");
                                       Fluttertoast.showToast(
@@ -113,7 +114,7 @@ class _InvitationCodeState extends State<InvitationCode> {
                             Expanded(
                                 child: button(
                                     title: "Share",
-                                    hexColor: "#144DDE",
+                                    hexColor: "#D70A0A",
                                     onTap: () {
                                       share(username);
                                     }))
@@ -173,7 +174,7 @@ class _InvitationCodeState extends State<InvitationCode> {
     Dio _dio = Dio();
     _dio.interceptors.add(dioCacheManager.interceptor);
     var response = await _dio.get(
-      base_url + "/v1/user/profile/",
+      base_url + "/user/profile/",
       options: _cacheOptions,
     );
     debugPrint('Data Code ${response.statusCode}');

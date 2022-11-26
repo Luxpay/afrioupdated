@@ -18,7 +18,6 @@ class AboutLuxPay extends StatelessWidget {
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          margin: EdgeInsets.only(top: 20),
           child: Column(
             children: [
               Container(
@@ -30,7 +29,7 @@ class AboutLuxPay extends StatelessWidget {
                         onPressed: () => {Navigator.maybePop(context)},
                         icon: const Icon(Icons.arrow_back_ios_new)),
                     SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 5,
+                      width: SizeConfig.safeBlockHorizontal! * 2,
                     ),
                     const Text(
                       "About LuxPay",
@@ -68,11 +67,11 @@ class AboutLuxPay extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Divider(
-                      color: HexColor("#FBFBFB"),
-                      thickness: 3,
-                    ),
-                    SettingsItem(title: "To Store"),
+                    // Divider(
+                    //   color: HexColor("#FBFBFB"),
+                    //   thickness: 3,
+                    // ),
+                    // SettingsItem(title: "To Store"),
                     Divider(
                       color: HexColor("#FBFBFB"),
                       thickness: 3,

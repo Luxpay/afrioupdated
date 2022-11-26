@@ -7,6 +7,7 @@ import '../../models/errors/authError.dart';
 import '../../models/packagesModel.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
+import '../../utils/constants.dart';
 import '../../widgets/methods/showDialog.dart';
 import 'crowd365_payment.dart';
 
@@ -27,8 +28,8 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
   ];
 
   int selectedIndex = -1;
-  List<Datum> itemPackage = [];
-  List<Datum> filter = [];
+  List<Packs> itemPackage = [];
+  List<Packs> filter = [];
   bool checkPackage = false;
   bool _isLoading = false;
   bool selectPackageCheck = false;
@@ -39,7 +40,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       getPackage();
     });
   }
@@ -49,7 +50,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
     return Scaffold(
       body: SafeArea(
           child: itemPackage.isEmpty
-              ? Center(child: Text("No Package Found"))
+              ? Center(child: Text("No Package Found yet loading....."))
               : Stack(
                   children: [
                     Container(
@@ -97,7 +98,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                     ListView.separated(
                                       shrinkWrap: true,
                                       itemBuilder: (context, index) {
-                                        //var item = items[index];
+                                        var item = filter[index];
                                         return Container(
                                           decoration: BoxDecoration(
                                             borderRadius:
@@ -174,8 +175,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                     .spaceBetween,
                                                             children: [
                                                               Text(
-                                                                filter[index]
-                                                                    .name,
+                                                                item.name,
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 15,
@@ -185,7 +185,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                 ),
                                                               ),
                                                               Text(
-                                                                "N${filter[index].price}",
+                                                                "N${item.price.replaceAllMapped(reg, mathFunc)}",
                                                                 style:
                                                                     TextStyle(
                                                                   fontSize: 15,
@@ -226,7 +226,20 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "Reward",
+                                                                    "Rewards:",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Per referral earning",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -239,7 +252,20 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "Each Cycle",
+                                                                    "Maximum referral earning",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "Total earning",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -259,7 +285,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                         .start,
                                                                 children: [
                                                                   Text(
-                                                                    "N${filter[index].welcomeBonus}",
+                                                                    "N${item.rewards.welcomeBonus.replaceAllMapped(reg, mathFunc)}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -272,7 +298,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N${filter[index].reward}",
+                                                                    "",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -285,7 +311,33 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                                                     ),
                                                                   ),
                                                                   Text(
-                                                                    "N${filter[index].eachCycle}",
+                                                                    "N${item.rewards.perReferralEarning.replaceAllMapped(reg, mathFunc)}",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N${item.rewards.maxReferralEarning.replaceAllMapped(reg, mathFunc)}",
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                      color: HexColor(
+                                                                          "#8D9091"),
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                  Text(
+                                                                    "N${item.rewards.totalEarnings.replaceAllMapped(reg, mathFunc)}",
                                                                     style:
                                                                         TextStyle(
                                                                       fontSize:
@@ -358,12 +410,20 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                               String namePage =
                                   await filter[selectedIndex].name;
                               String price = await filter[selectedIndex].price;
-                              String welcomeBonus =
-                                  await filter[selectedIndex].welcomeBonus;
-                              String reward =
-                                  await filter[selectedIndex].reward;
-                              String eachCycle =
-                                  await filter[selectedIndex].eachCycle;
+                              String welcomeBonus = await filter[selectedIndex]
+                                  .rewards
+                                  .welcomeBonus;
+                              String maxReferralEarning =
+                                  await filter[selectedIndex]
+                                      .rewards
+                                      .maxReferralEarning;
+                              String perReferralEarning =
+                                  await filter[selectedIndex]
+                                      .rewards
+                                      .perReferralEarning;
+                              String totalEarning = await filter[selectedIndex]
+                                  .rewards
+                                  .totalEarnings;
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -371,9 +431,12 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
                                           Crowd365PaymentMethod(
                                             packageName: namePage,
                                             packagePrice: price,
-                                            packageEachCycle: eachCycle,
+                                            packageTotalEarning: totalEarning,
                                             packageWelcomeBonus: welcomeBonus,
-                                            packageReward: reward,
+                                            packageMaxRefEarning:
+                                                maxReferralEarning,
+                                            packagePerRefEarning:
+                                                perReferralEarning,
                                           )));
 
                               debugPrint(
@@ -395,7 +458,7 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
   Future<bool> getPackage() async {
     try {
       var response = await dio.get(
-        "/v1/crowd365/packages/",
+        "/crowd365/packages/",
       );
       debugPrint('${response.statusCode}');
       if (response.statusCode == 200) {
@@ -406,9 +469,9 @@ class _Crowd365PackagesUpgradeState extends State<Crowd365PackagesUpgrade> {
         setState(() {
           itemPackage = packageData.data;
           filter.addAll(itemPackage);
-
           filter.retainWhere((element) {
             if (double.parse('${widget.price}') == 1000.00) {
+              debugPrint('${element.price}');
               return double.parse('${element.price}') >
                   1000.00; // return every package greater than 1000
             } else if (double.parse('${widget.price}') == 3000.00) {

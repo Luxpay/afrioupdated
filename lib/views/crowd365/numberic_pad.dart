@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-class NumericPad extends StatelessWidget {
+import '../../utils/hexcolor.dart';
 
+class NumericPad extends StatelessWidget {
   final Function(int) onNumberSelected;
 
   NumericPad({required this.onNumberSelected});
@@ -9,12 +10,11 @@ class NumericPad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFFF5F4F9),
+      color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-
           Container(
             height: MediaQuery.of(context).size.height * 0.11,
             child: Row(
@@ -27,7 +27,6 @@ class NumericPad extends StatelessWidget {
               ],
             ),
           ),
-
           Container(
             height: MediaQuery.of(context).size.height * 0.11,
             child: Row(
@@ -40,7 +39,6 @@ class NumericPad extends StatelessWidget {
               ],
             ),
           ),
-
           Container(
             height: MediaQuery.of(context).size.height * 0.11,
             child: Row(
@@ -53,7 +51,6 @@ class NumericPad extends StatelessWidget {
               ],
             ),
           ),
-
           Container(
             height: MediaQuery.of(context).size.height * 0.11,
             child: Row(
@@ -66,7 +63,6 @@ class NumericPad extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -81,20 +77,18 @@ class NumericPad extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(10),
           child: Container(
+            height: 60,
+            width: 60,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(
-                Radius.circular(15),
-              ),
+              color: HexColor("#E8E8E8").withOpacity(0.35),
+              borderRadius: BorderRadius.circular(30),
             ),
-            child: Center(
-              child: Text(
-                number.toString(),
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F1F1F),
-                ),
+            alignment: Alignment.center,
+            child: Text(
+              number.toString(),
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -136,5 +130,4 @@ class NumericPad extends StatelessWidget {
       child: Container(),
     );
   }
-
 }

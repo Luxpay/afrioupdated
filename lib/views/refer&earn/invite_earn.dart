@@ -30,7 +30,7 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       aboutUser();
     });
   }
@@ -249,7 +249,7 @@ class _InviteAndEarnState extends State<InviteAndEarn> {
 
   Future<bool> aboutUser() async {
     var response = await dio.get(
-      base_url + "/v1/user/profile/",
+      base_url + "/user/profile/",
     );
     debugPrint('Data Code ${response.statusCode}');
     try {

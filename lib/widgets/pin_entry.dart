@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 
+import '../utils/colors.dart';
+
 final pinEntryProvier = StateNotifierProvider.family
     .autoDispose<PinEntryNotifier, List<String>, String>((ref, value) {
   return PinEntryNotifier([]);
@@ -224,3 +226,36 @@ class PinEntryNotifier extends StateNotifier<List<String>> {
     state = [...v.toString().split("")];
   }
 }
+
+
+
+  Widget buildCodeNumberBox(String codeNumber) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      child: SizedBox(
+        width: 55,
+        height: 55,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color(0xFFF6F5FA),
+            border: Border.all(
+              color: grey5,
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(10),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              codeNumber,
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1F1F1F),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }

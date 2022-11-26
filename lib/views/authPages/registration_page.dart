@@ -1,12 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:luxpay/utils/constants.dart';
-import 'package:luxpay/utils/functions.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/utils/validators.dart';
-import 'package:luxpay/views/authPages/create_pin_page.dart';
-import 'package:luxpay/views/authPages/otp_verification.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,7 +19,7 @@ class RegistrationPage extends StatefulWidget {
 }
 
 class _RegistrationPageState extends State<RegistrationPage> {
- // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   TextEditingController emailController = TextEditingController();
   TextEditingController fullNameController = TextEditingController();
@@ -33,7 +30,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     SizeConfig().init(context);
     final double width = MediaQuery.of(context).size.width;
-  //  final double height = MediaQuery.of(context).size.height;
+    //  final double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(

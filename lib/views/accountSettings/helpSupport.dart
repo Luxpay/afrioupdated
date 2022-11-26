@@ -4,6 +4,7 @@ import 'package:luxpay/views/accountSettings/fqas.dart';
 
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
+import '../../widgets/navigate_route.dart';
 import 'customer_service.dart';
 
 class HelpandSupport extends StatefulWidget {
@@ -33,7 +34,7 @@ class _HelpandSupportState extends State<HelpandSupport> {
                   // )
                   ),
               child: Container(
-                margin: EdgeInsets.only(top: 20),
+                //margin: EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -64,20 +65,17 @@ class _HelpandSupportState extends State<HelpandSupport> {
                     icon: IconlyLight.chat,
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CustomerService()));
+                          context, SizeTransition4(CustomerService()));
                     },
                   ),
                   SizedBox(
                     height: 15,
                   ),
                   ProfileAction(
-                    title: "FQAs",
+                    title: "FAQ",
                     icon: IconlyLight.infoSquare,
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => FQAs()));
+                      Navigator.push(context, SizeTransition4(FAQ()));
                     },
                   ),
                 ],

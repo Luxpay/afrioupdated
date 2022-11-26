@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:luxpay/networking/DioServices/dio_client.dart';
-import 'package:luxpay/views/refer&earn/successfull_payment.dart';
+import 'package:luxpay/views/refer&earn/referearn_dashboard.dart';
 import '../../models/errors/authError.dart';
+import '../../models/successfullWallet.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
+import '../../widgets/methods/showDialog.dart';
 import '../../widgets/pin_entry.dart';
+import '../crowd365/numberic_pad.dart';
 
 class ReferEarnPin extends StatefulWidget {
   final String? sponsor;
@@ -19,15 +22,15 @@ class ReferEarnPin extends StatefulWidget {
 }
 
 class _ReferEarnPinState extends State<ReferEarnPin> {
-  int? confirmPin;
-  int? pin;
-  String? errors, tag;
   String? sponsor;
+  String? successfullAmount, from, to, status, fee;
+  DateTime? date;
+  String number = "";
+  var errors;
 
   @override
   void initState() {
     super.initState();
-    tag = 'pin';
 
     sponsor = widget.sponsor;
   }
@@ -58,9 +61,6 @@ class _ReferEarnPinState extends State<ReferEarnPin> {
                           Navigator.pop(context);
                         },
                         icon: const Icon(Icons.arrow_back_ios_new)),
-                    SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 25,
-                    ),
                     const Text(
                       "Transaction Pin",
                       style:
@@ -97,16 +97,44 @@ class _ReferEarnPinState extends State<ReferEarnPin> {
                       height: SizeConfig.safeBlockVertical! * 8,
                     ),
                     Container(
-                      child: PinEntry(
-                        tag: '$tag',
-                        onPinChanged: (v) async {
-                          tag = 'confirm';
-                          confirmPin = v;
-                          if (v.toString().split("").length == 4) {
-                            _fetchSub(context,
-                                confirmPin: confirmPin, sponsor: sponsor);
-                            v = null;
-                          }
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          buildCodeNumberBox(
+                              number.length > 0 ? number.substring(0, 1) : ""),
+                          buildCodeNumberBox(
+                              number.length > 1 ? number.substring(1, 2) : ""),
+                          buildCodeNumberBox(
+                              number.length > 2 ? number.substring(2, 3) : ""),
+                          buildCodeNumberBox(
+                              number.length > 3 ? number.substring(3, 4) : ""),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: SizeConfig.blockSizeVertical! * 10),
+                    Container(
+                      child: NumericPad(
+                        onNumberSelected: (value) {
+                          setState(() {
+                            if (value != -1) {
+                              if (value.toString().length != 4) {
+                                number = number + value.toString();
+
+                                if (number.toString().length == 4) {
+                                  debugPrint("Complte");
+                                  String pinCode = number;
+                                  // comfirmPayment(context,
+                                  //     packageName: namePackage, pin: phoneNumber);
+                                  _fetchSub(context,
+                                      confirmPin: pinCode, sponsor: sponsor);
+                                  number = '';
+                                }
+                              }
+                            } else {
+                              number = number.substring(0, number.length - 1);
+                            }
+                          });
                         },
                       ),
                     ),
@@ -122,6 +150,7 @@ class _ReferEarnPinState extends State<ReferEarnPin> {
 
   void _fetchSub(BuildContext context, {confirmPin, sponsor}) async {
     // show the loading dialog
+
     showDialog(
         // The user CANNOT close this dialog  by pressing outsite it
         barrierDismissible: false,
@@ -150,19 +179,20 @@ class _ReferEarnPinState extends State<ReferEarnPin> {
 
     var res = await referearnSub(confirmPin, sponsor);
     // create a scaffold messenger that displays res as text
-    print(res);
+    debugPrint('$res');
     if (!res) {
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("$errors")));
+      showErrorDialog(context, errors, "LuxPay");
     } else {
       Navigator.of(context).pop();
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => PaymentSuccessfull()));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ReferrerEarningDashoard()));
     }
   }
 
-  Future<bool> referearnSub(int? confirmPin, sponsor) async {
+  Future<bool> referearnSub(confirmPin, sponsor) async {
     if (confirmPin == null) {
       errors = "Enter your pin";
     }
@@ -172,11 +202,19 @@ class _ReferEarnPinState extends State<ReferEarnPin> {
     }
     try {
       var response = await dio.post(
-        "/v1/refer-earn/subscribe/",
+        "/refer-earn/subscribe/",
         data: body,
       );
 
       if (response.statusCode == 201) {
+        var data = response.data;
+        var transDetals = await SuccesfullWalletTransfer.fromJson(data);
+        from = transDetals.data.data.from;
+        to = transDetals.data.data.to;
+        successfullAmount = transDetals.data.amount;
+        date = transDetals.data.createdAt;
+        fee = transDetals.data.fee;
+        status = transDetals.data.status;
         return true;
       } else {
         return false;

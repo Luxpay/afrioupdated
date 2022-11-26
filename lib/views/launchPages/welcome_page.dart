@@ -187,7 +187,7 @@ class _WelcomePageState extends State<WelcomePage>
                               );
                             },
                             child: luxButton(HexColor("#D70A0A"), Colors.white,
-                                "Get Started", 150)),
+                                "Get Started", 210)),
                         SizedBox(
                           height: SizeConfig.safeBlockVertical! * 4,
                         ),

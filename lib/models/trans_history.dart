@@ -74,32 +74,36 @@ class Data {
 
 class Result {
     Result({
+        required this.id,
         required this.amount,
         required this.reference,
-        required this.type,
         required this.status,
+        required this.type,
         required this.createdAt,
     });
 
+    String id;
     String amount;
     String reference;
-    String type;
     String status;
+    String type;
     DateTime createdAt;
 
     factory Result.fromJson(Map<String, dynamic> json) => Result(
+        id: json["id"],
         amount: json["amount"],
         reference: json["reference"],
-        type: json["type"],
         status: json["status"],
+        type: json["type"],
         createdAt: DateTime.parse(json["created_at"]),
     );
 
     Map<String, dynamic> toJson() => {
+        "id": id,
         "amount": amount,
         "reference": reference,
-        "type": type,
         "status": status,
+        "type": type,
         "created_at": createdAt.toIso8601String(),
     };
 }

@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/models/get_user.dart';
 import 'package:luxpay/views/finances/luxpay_confrim.dart';
 import '../../models/errors/authError.dart';
 import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
+import '../../utils/constants.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
 import '../../utils/validators.dart';
@@ -26,9 +28,10 @@ class _TransferToLuxpayAccountState extends State<TransferToLuxpayAccount> {
   var luxpayTagController = TextEditingController();
   var luxpayAmountController = TextEditingController();
   var reasonController = TextEditingController();
-  String? fullName, avatar, amount, reason, urname, warning;
+  String? fullName, avatar, amount, reason, urname, warning, singleLimit;
   var errors = 'something went wrong';
   String save = 'false';
+  final storage = new FlutterSecureStorage();
 
   Timer? searchOnStoppedTyping;
 
@@ -39,8 +42,7 @@ class _TransferToLuxpayAccountState extends State<TransferToLuxpayAccount> {
   _onChangeHandler(value) {
     print(value);
     const duration = Duration(
-        milliseconds:
-            800); // set the duration that you want call search() after that.
+        seconds: 3); // set the duration that you want call search() after that.
     setState(() => searchOnStoppedTyping?.cancel());
     setState(() => searchOnStoppedTyping = new Timer(duration, () async {
           var result = await getUserName(value);
@@ -51,6 +53,16 @@ class _TransferToLuxpayAccountState extends State<TransferToLuxpayAccount> {
             });
           }
         }));
+  }
+
+  Future checkBalance() async {
+    singleLimit = await storage.read(key: singleLimitTransfer);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkBalance();
   }
 
   @override
@@ -157,27 +169,51 @@ class _TransferToLuxpayAccountState extends State<TransferToLuxpayAccount> {
                         Container(
                           child: InkWell(
                             onTap: () {
+                              int ego, cLimit;
+                              double limit;
                               var amount = luxpayAmountController.text.trim();
                               var reasons = reasonController.text.trim();
                               username = luxpayTagController.text.trim();
-                              var validators;
-                              var ego = int.parse(amount);
+                              var validators, validators1;
+                              if (amount.isNotEmpty) {
+                                ego = int.parse(amount);
+                                limit = double.parse(singleLimit!);
+                                cLimit = limit.toInt();
+                                debugPrint("${ego} ${cLimit}");
+                                validators1 = [
+                                  ego < 100
+                                      ? "Amount Can't be less than N100"
+                                      : null,
+                                  ego > cLimit
+                                      ? "Upgrade your account to be able to make bigger amount transaction\nAmount exceeds single limit \nThanks "
+                                      : null
+                                ];
+                                if (validators1
+                                    .any((element) => element != null)) {
+                                  showErrorDialog(
+                                      context,
+                                      validators1.firstWhere(
+                                              (element) => element != null) ??
+                                          "",
+                                      "Luxpay");
+                                  return;
+                                }
+                              }
+
                               print("ego ${amount}");
                               validators = [
                                 Validators.forWithdrawal(username),
                                 Validators.isValidAmount(amount),
-                                ego < 100
-                                    ? "Amount Can't be less than N100"
-                                    : null
                               ];
 
                               if (validators
                                   .any((element) => element != null)) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(validators.firstWhere(
-                                                (element) => element != null) ??
-                                            "")));
+                                showErrorDialog(
+                                    context,
+                                    validators.firstWhere(
+                                            (element) => element != null) ??
+                                        "",
+                                    "Luxpay");
                                 return;
                               } else {
                                 luxpayToLuxpayBottomSheet(context,
@@ -214,7 +250,7 @@ class _TransferToLuxpayAccountState extends State<TransferToLuxpayAccount> {
     //"username": "08168768372",
     try {
       var response =
-          await dio.get("/v1/wallets/transfer/resolve/$luxTag/");
+          await dio.get("/wallet/transfer/resolve/?username=$luxTag");
       //debugPrint("Check User name ${luxTag}");
       if (response.statusCode == 200) {
         var data = response.data;

@@ -6,11 +6,13 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/authPages/login_page.dart';
 
 import '../networking/DioServices/dio_client.dart';
+import 'methods/showDialog.dart';
 
 class LogoutPopup extends StatelessWidget {
   LogoutPopup({Key? key}) : super(key: key);
 
   static String errors = 'something went wrong';
+  static String statusCode = '';
 
   @override
   Widget build(BuildContext context) {
@@ -84,29 +86,8 @@ class LogoutPopup extends StatelessWidget {
                   height: 25,
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    var data = await logout();
-
-                    print(data);
-                    if (!data) {
-                      Navigator.of(context, rootNavigator: true).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(errors),
-                        ),
-                      );
-                      return;
-                    } else {
-                      Navigator.of(context).pop();
-                      // final storage = new FlutterSecureStorage();
-                      // await storage.delete(key: authToken);
-
-                      // print("ALL Token Deleted");
-
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => LoginPage()));
-                      print("LogOut");
-                    }
+                  onTap: () {
+                    _fetchLogout(context);
                   },
                   child: Container(
                     height: 35,
@@ -137,21 +118,29 @@ class LogoutPopup extends StatelessWidget {
     );
   }
 
-  Future<bool> logout() async {
+  Future<bool> logout(context) async {
     try {
       var response = await dio.post(
-        "/v1/auth/logout/",
+        "/auth/logout/",
       );
       debugPrint('${response.statusCode}');
 
       return true;
     } on DioError catch (e) {
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
-        var errorData = e.response?.data;
-        var errorMessage = await ErrorMessages.fromJson(errorData);
-        errors = errorMessage.errors.message;
-        return false;
+        if (e.response?.statusCode == 401) {
+          statusCode = "401";
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+          debugPrint("LogOut");
+          return false;
+        } else {
+          debugPrint(' Error: ${e.response?.data}');
+          var errorData = e.response?.data;
+          var errorMessage = await ErrorMessages.fromJson(errorData);
+          errors = errorMessage.errors.message;
+          return false;
+        }
       } else {
         return false;
       }
@@ -159,5 +148,65 @@ class LogoutPopup extends StatelessWidget {
       debugPrint('${e}');
       return false;
     }
+  }
+
+  void _fetchLogout(BuildContext context) async {
+    // show the loading dialog
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  // The loading indicator
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  // Some text
+                  Text('Loading...')
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(const Duration(milliseconds: 100), () async {
+// Here you can write your code
+
+      var data = await logout(context);
+
+      debugPrint("$data");
+      if (!data) {
+        Navigator.of(context, rootNavigator: true).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errors),
+          ),
+        );
+        return;
+      } else if (statusCode == 401) {
+        Navigator.of(context).pop();
+        showExpiredsessionDialog(
+            context, "Please Login again\nThanks", "Expired Session");
+      } else {
+        Navigator.of(context).pop();
+        // final storage = new FlutterSecureStorage();
+        // await storage.delete(key: authToken);
+
+        // print("ALL Token Deleted");
+
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
+        debugPrint("LogOut");
+      }
+    });
   }
 }

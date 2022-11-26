@@ -23,11 +23,13 @@ class ReceiveMoneyFromOthers extends StatefulWidget {
 class _ReceiveMoneyFromOthersState extends State<ReceiveMoneyFromOthers> {
   bool _isLoading = false;
   TextEditingController controllerUsername = TextEditingController();
-  TextEditingController controllerAmount = TextEditingController();
+  TextEditingController luxpayAmountController = TextEditingController();
 
   var errors;
 
   var selectedUsername;
+
+  String? warning;
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +63,32 @@ class _ReceiveMoneyFromOthersState extends State<ReceiveMoneyFromOthers> {
               child: Column(
                 children: [
                   LuxTextField(
-                    hint: "Amount (N)",
-                    controller: controllerAmount,
-                    innerHint: "eg 1000",
+                      hint: "Amount *",
+                      innerHint: "Enter Amount",
+                      controller: luxpayAmountController,
+                      textInputType: TextInputType.number,
+                      onChanged: (v) {
+                        if (v.isEmpty) {
+                          setState(() {
+                            warning = '';
+                          });
+                        } else {
+                          var amount = int.parse(v);
+                          if (amount <= 499) {
+                            setState(() {
+                              warning =
+                                  'Ensure this amount is greater than or equal to N500';
+                            });
+                          } else {
+                            setState(() {
+                              warning = '';
+                            });
+                          }
+                        }
+                      }),
+                  Text(
+                    "${warning ?? " "}",
+                    style: TextStyle(color: Colors.red),
                   ),
                   SizedBox(
                     height: SizeConfig.safeBlockVertical! * 4,
@@ -109,17 +134,36 @@ class _ReceiveMoneyFromOthersState extends State<ReceiveMoneyFromOthers> {
                             setState(() {
                               _isLoading = true;
                             });
-                            var amount = controllerAmount.text.trim();
+                            var amount = luxpayAmountController.text.trim();
+                            var ego;
+                            var validators, validators1;
 
-                            var ego = int.parse(amount);
-                            var validators = [
+                            if (amount.isNotEmpty) {
+                              ego = int.parse(amount);
+                              validators1 = [
+                                ego <= 499
+                                    ? "Amount Can't be less than N500"
+                                    : null
+                              ];
+                              if (validators1
+                                  .any((element) => element != null)) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                showErrorDialog(
+                                    context,
+                                    validators1.firstWhere(
+                                            (element) => element != null) ??
+                                        "",
+                                    "Request Money");
+                                return;
+                              }
+                            }
+                            validators = [
                               Validators.isValidAmount(amount),
                               selectedUsername == null
                                   ? "Select a userName"
                                   : null,
-                              ego < 500
-                                  ? "Amount Can't be less than N500"
-                                  : null
                             ];
                             if (validators.any((element) => element != null)) {
                               setState(() {
@@ -173,7 +217,7 @@ class _ReceiveMoneyFromOthersState extends State<ReceiveMoneyFromOthers> {
     Map<String, dynamic> body = {"amount": amount, 'username': username};
     try {
       var response = await dio.post(
-        "/v1/wallets/request/",
+        "/wallet/request-money/",
         data: body,
       );
       if (response.statusCode == 200) {
@@ -190,9 +234,6 @@ class _ReceiveMoneyFromOthersState extends State<ReceiveMoneyFromOthers> {
         if (e.response?.statusCode == 401) {
           showExpiredsessionDialog(
               context, "Please Login again\nThanks", "Expired Session");
-          return false;
-        } else if (e.response?.statusCode == 400) {
-          errors = "Cannot transfer to self";
           return false;
         } else {
           var errorData = e.response?.data;

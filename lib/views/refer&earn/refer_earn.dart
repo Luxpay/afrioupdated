@@ -137,28 +137,41 @@ class _MembershipState extends State<Membership> {
                                 ? luxButtonLoading(
                                     HexColor("#D70A0A"), double.infinity)
                                 : luxButton(HexColor("#D70A0A"), Colors.white,
-                                    "Continue", 325,
+                                    "Continue", double.infinity,
                                     fontSize: 16, height: 50, radius: 8),
                           ),
                           SizedBox(height: 30),
-                          InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          ReferEarnPaymentMethod(
-                                            sponsor: '',
-                                          )));
-                            },
-                            child: Text(
-                              "BECOME A MEMEBER  NOW AND START EARNING ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: HexColor("#D70A0A"),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Don't have a referral username?,",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ReferEarnPaymentMethod(
+                                                sponsor: '',
+                                              )));
+                                },
+                                child: Text(
+                                  "CLICK HERE",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: HexColor("#D70A0A"),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       )),
@@ -172,9 +185,8 @@ class _MembershipState extends State<Membership> {
   }
 
   Future<bool> referrerSend(String referalName) async {
-
     try {
-      var response = await dio.get("/v1/refer-earn/check/?sponsor=$referalName");
+      var response = await dio.get("/refer-earn/check/?sponsor=$referalName");
       if (response.statusCode == 200) {
         return true;
       } else {

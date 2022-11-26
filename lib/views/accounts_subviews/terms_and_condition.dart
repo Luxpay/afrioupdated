@@ -16,7 +16,6 @@ class TermsAndConditions extends StatelessWidget {
           children: [
             Container(
               color: Colors.white,
-              margin: EdgeInsets.only(top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -24,7 +23,7 @@ class TermsAndConditions extends StatelessWidget {
                       onPressed: () => {Navigator.maybePop(context)},
                       icon: const Icon(Icons.arrow_back_ios_new)),
                   SizedBox(
-                    width: SizeConfig.safeBlockHorizontal! * 5,
+                    width: SizeConfig.safeBlockHorizontal! * 2,
                   ),
                   const Text(
                     "Terms And Condition",

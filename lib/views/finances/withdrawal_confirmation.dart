@@ -48,7 +48,7 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
   var errors;
   bool checkdata = false;
   DioCacheManager? _dioCacheManager;
-  String? walletBalance;
+  String walletBalance = '0.0';
 
   @override
   void initState() {
@@ -129,18 +129,20 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
                             WalletLuxpay(
                               balance: walletBalance,
                             ),
-                            //  SizedBox(height:5),
+                            SizedBox(height: 5),
                             earningStatus("ACCOUNT NAME",
                                 "${accountName ?? "Not found"}"),
                             earningStatus(
                                 "BANK NAME", "${bankName ?? "Not found"}"),
                             earningStatus("BENEFICIARY ACCOUNT NUMBER ",
                                 "${beneficiaryAccountNumber ?? "Not found"}"),
-                            earningStatus("AMOUNT", "${amount?.replaceAllMapped(reg, mathFunc) ?? "Not found"}"),
+                            earningStatus("AMOUNT",
+                                "${amount?.replaceAllMapped(reg, mathFunc) ?? "Not found"}"),
+                            earningStatus("Bank fee", "N100"),
                             earningStatus("REASON FOR WITHDRAWAL",
                                 "${reasons ?? "Not found"}"),
                             SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 4.3,
+                              height: SizeConfig.safeBlockVertical! * 9,
                             ),
                             Container(
                               child: Row(
@@ -148,17 +150,8 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
                                 children: [
                                   Expanded(
                                     child: InkWell(
-                                        onTap: () async {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => WithdrawalPin(
-                                                      beneficiaryAccountNumber:
-                                                          beneficiaryAccountNumber,
-                                                      amount: amount,
-                                                      reasons: reasons,
-                                                      save: save,
-                                                      bankCode: bankCode)));
+                                        onTap: () {
+                                          checkBalance(context);
                                         },
                                         child: luxButton(
                                             HexColor("#D70A0A"),
@@ -196,7 +189,7 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
 
   Widget earningStatus(status, value) {
     return Container(
-      margin: EdgeInsets.only(left: 20, right: 20, top: 30),
+      margin: EdgeInsets.only(left: 20, right: 20, top: 13),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -212,22 +205,24 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
   }
 
   Future<bool> getWallets() async {
-    final storage = new FlutterSecureStorage();
-    // aboutUser();
-    _dioCacheManager = DioCacheManager(CacheConfig());
-    Options _cacheOptions = buildCacheOptions(Duration(days: 7),
-        forceRefresh: true,
-        options: Options(headers: {
-          'Authorization': 'Bearer ${await storage.read(key: authToken) ?? ""}'
-        }));
-    Dio _dio = Dio();
-    _dio.interceptors.add(_dioCacheManager!.interceptor);
-    var response = await _dio.get(
-      base_url + "/v1/wallets/details/",
-      options: _cacheOptions,
-    );
-    debugPrint('${response.statusCode}');
     try {
+      final storage = new FlutterSecureStorage();
+      // aboutUser();
+      _dioCacheManager = DioCacheManager(CacheConfig());
+      Options _cacheOptions = buildCacheOptions(Duration(days: 7),
+          forceRefresh: true,
+          options: Options(headers: {
+            'Authorization':
+                'Bearer ${await storage.read(key: authToken) ?? ""}'
+          }));
+      Dio _dio = Dio();
+      _dio.interceptors.add(_dioCacheManager!.interceptor);
+      var response = await _dio.get(
+        base_url + "/wallet/",
+        options: _cacheOptions,
+      );
+      debugPrint('${response.statusCode}');
+
       if (response.statusCode == 200) {
         var data = response.data;
         debugPrint('${response.statusCode}');
@@ -267,5 +262,52 @@ class _WithdrawalConfirmationState extends State<WithdrawalConfirmation> {
       debugPrint('${e}');
       return false;
     }
+  }
+
+  void checkBalance(BuildContext context) async {
+    // show the loading dialog
+    showDialog(
+        // The user CANNOT close this dialog  by pressing outsite it
+        barrierDismissible: false,
+        context: context,
+        builder: (_) {
+          return Dialog(
+            // The background color
+            backgroundColor: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  // The loading indicator
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  // Some text
+                  Text('Loading...')
+                ],
+              ),
+            ),
+          );
+        });
+
+    Future.delayed(const Duration(milliseconds: 100), () async {
+// Here you can write your code
+
+      var response = await getWallets();
+      if (response) {
+        Navigator.of(context).pop();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => WithdrawalPin(
+                    beneficiaryAccountNumber: beneficiaryAccountNumber,
+                    amount: amount,
+                    reasons: reasons,
+                    save: save,
+                    bankCode: bankCode)));
+      }
+    });
   }
 }

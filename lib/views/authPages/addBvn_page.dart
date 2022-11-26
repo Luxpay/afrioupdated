@@ -11,6 +11,7 @@ import '../../networking/DioServices/dio_client.dart';
 import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/validators.dart';
+import '../../widgets/methods/showDialog.dart';
 
 class AddBvnPage extends StatefulWidget {
   const AddBvnPage({Key? key}) : super(key: key);
@@ -137,7 +138,7 @@ class _AddBvnPageState extends State<AddBvnPage> {
                         setState(() {
                           _isLoading = true;
                         });
-                        var response = await createBvn(bvn: bvnNumber);
+                        var response = await upgradeAccount("BVN", bvnNumber);
 
                         if (!response) {
                           setState(() {
@@ -217,35 +218,43 @@ class _AddBvnPageState extends State<AddBvnPage> {
     );
   }
 
-  Future<bool> createBvn({
-    required String? bvn,
-  }) async {
-    Map<String, dynamic> body = {
-      'bvn': bvn,
-    };
-
+  Future<bool> upgradeAccount(String idType, String idNumber) async {
+    Map<String, dynamic> body = {"id_type": idType, 'id_number': idNumber};
     try {
       var response = await dio.post(
-        "/v1/finance/profile/create/",
+        "/user/upgrade/",
         data: body,
       );
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         var data = response.data;
-        debugPrint('${response.statusCode}');
-        debugPrint('${data}');
+        var userData = await AuthError.fromJson(data);
+        errors = userData.message;
         return true;
       } else {
+        setState(() {
+          _isLoading = false;
+        });
         return false;
       }
     } on DioError catch (e) {
       final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        var errorData = e.response?.data;
-        var errorMessage = await AuthError.fromJson(errorData);
-        errors = errorMessage.message;
-        return false;
+        if (e.response?.statusCode == 401) {
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else if (e.response?.statusCode == 400) {
+          errors = "This field is required.";
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
+          errors = errorMessage.message;
+          return false;
+        }
       } else {
         errors = errorMessage;
+        showErrorDialog(context, errors, "Luxpay");
         return false;
       }
     } catch (e) {

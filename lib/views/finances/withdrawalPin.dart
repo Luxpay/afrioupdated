@@ -2,10 +2,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:luxpay/networking/DioServices/dio_client.dart';
 import '../../models/errors/authError.dart';
-import '../../models/succesfullBank.dart';
+import '../../models/successfullWallet.dart';
+import '../../networking/DioServices/dio_errors.dart';
 import '../../utils/hexcolor.dart';
 import '../../utils/sizeConfig.dart';
+import '../../widgets/methods/showDialog.dart';
 import '../../widgets/pin_entry.dart';
+import '../crowd365/numberic_pad.dart';
 import '../paymentMethod/congratulation_withdrawal.dart';
 
 class WithdrawalPin extends StatefulWidget {
@@ -24,17 +27,16 @@ class WithdrawalPin extends StatefulWidget {
 }
 
 class _WithdrawalPinState extends State<WithdrawalPin> {
-  int? confirmPin;
-  int? pin;
-  String? errors, tag;
-  String? beneficiaryAccountNumber, amount, reasons, save, bankCode;
+
+  String? errors;
+  String? beneficiaryAccountNumber, amount, reasons, save, status, bankCode;
   String? successfullAmount, from, to, fee, accountNumber, bankName;
   DateTime? date;
+   String number = "";
 
   @override
   void initState() {
     super.initState();
-    tag = 'pin';
 
     beneficiaryAccountNumber = widget.beneficiaryAccountNumber;
     amount = widget.amount;
@@ -69,9 +71,6 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
                           Navigator.pop(context);
                         },
                         icon: const Icon(Icons.arrow_back_ios_new)),
-                    SizedBox(
-                      width: SizeConfig.safeBlockHorizontal! * 25,
-                    ),
                     const Text(
                       "Transaction Pin",
                       style:
@@ -104,19 +103,47 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(
+                        SizedBox(
                       height: SizeConfig.safeBlockVertical! * 8,
                     ),
                     Container(
-                      child: PinEntry(
-                        tag: '$tag',
-                        onPinChanged: (v) async {
-                          tag = 'confirm';
-                          confirmPin = v;
-                          if (v.toString().split("").length == 4) {
-                            _fetchData(context, confirmPin: confirmPin);
-                            v = null;
-                          }
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          buildCodeNumberBox(
+                              number.length > 0 ? number.substring(0, 1) : ""),
+                          buildCodeNumberBox(
+                              number.length > 1 ? number.substring(1, 2) : ""),
+                          buildCodeNumberBox(
+                              number.length > 2 ? number.substring(2, 3) : ""),
+                          buildCodeNumberBox(
+                              number.length > 3 ? number.substring(3, 4) : ""),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: SizeConfig.blockSizeVertical! * 10),
+                    Container(
+                      child: NumericPad(
+                        onNumberSelected: (value) {
+                          setState(() {
+                            if (value != -1) {
+                              if (value.toString().length != 4) {
+                                number = number + value.toString();
+
+                                if (number.toString().length == 4) {
+                                  debugPrint("Complte");
+                                  String pinCode = number;
+                                  // comfirmPayment(context,
+                                  //     packageName: namePackage, pin: phoneNumber);
+                                   _fetchData(context, confirmPin: pinCode);
+                                  number = '';
+                                }
+                              }
+                            } else {
+                              number = number.substring(0, number.length - 1);
+                            }
+                          });
                         },
                       ),
                     ),
@@ -132,6 +159,7 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
 
   void _fetchData(BuildContext context, {confirmPin}) async {
     // show the loading dialog
+
     showDialog(
         // The user CANNOT close this dialog  by pressing outsite it
         barrierDismissible: false,
@@ -162,6 +190,7 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
     // create a scaffold messenger that displays res as text
     print(res);
     if (!res) {
+ 
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("$errors")));
@@ -175,32 +204,34 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
               fee: fee,
               accountNumber: accountNumber,
               bankName: bankName,
+              status: status,
               date: date)));
     }
   }
 
-  Future<bool> bankWithdrawal(int? confirmPin) async {
-    if (confirmPin == null) {
-      errors = "Enter your pin";
-    }
-    Map<String, dynamic> body = {
-      "account_number": beneficiaryAccountNumber,
-      "bank_code": bankCode,
-      "amount": amount,
-      "description": reasons ?? "",
-      "save": save ?? 'false',
-      "pin": confirmPin
-    };
+  Future<bool> bankWithdrawal(confirmPin) async {
     try {
+      if (confirmPin == null) {
+        errors = "Enter your pin";
+      }
+      Map<String, dynamic> body = {
+        "account_number": beneficiaryAccountNumber,
+        "bank_code": bankCode,
+        "amount": amount,
+        "description": reasons ?? "",
+        "save": save ?? 'false',
+        "pin": confirmPin
+      };
+
       var response = await dio.post(
-        "/v1/finances/withdraw/",
+        "/finances/withdraw/",
         data: body,
       );
 
       if (response.statusCode == 200) {
         var data = response.data;
 
-        var transDetals = await SuccessfullBankTransaction.fromJson(data);
+        var transDetals = await SuccesfullWalletTransfer.fromJson(data);
         var arr = transDetals.data.amount.split('.');
         var amount = arr[0];
         from = transDetals.data.data.from;
@@ -208,27 +239,35 @@ class _WithdrawalPinState extends State<WithdrawalPin> {
         successfullAmount = amount;
         date = transDetals.data.createdAt;
         fee = transDetals.data.fee;
-        accountNumber = transDetals.data.data.accountNumber;
-        bankName = transDetals.data.data.bankName;
+        accountNumber = "luxpay";
+        bankName = "luxpay";
+        status = transDetals.data.status;
         return true;
       } else {
         return false;
       }
     } on DioError catch (e) {
+      final errorMessage = DioException.fromDioError(e).toString();
       if (e.response != null) {
-        debugPrint(' Error: ${e.response?.data}');
-        var errorData = e.response?.data;
-        var errorMessage = await AuthError.fromJson(errorData);
-        debugPrint(' Error: ${errorMessage.message}');
-        setState(() {
+        if (e.response?.statusCode == 401) {
+          Navigator.of(context).pop();
+          showExpiredsessionDialog(
+              context, "Please Login again\nThanks", "Expired Session");
+          return false;
+        } else {
+          var errorData = e.response?.data;
+          var errorMessage = await AuthError.fromJson(errorData);
           errors = errorMessage.message;
-        });
-        return false;
+          return false;
+        }
       } else {
+        Navigator.of(context).pop();
+        errors = errorMessage;
+        showErrorDialog(context, errors!, "Luxpay");
+
         return false;
       }
     } catch (e) {
-      debugPrint('${e}');
       return false;
     }
   }
