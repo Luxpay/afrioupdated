@@ -17,7 +17,7 @@ class WalletLuxpay extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       child: Container(
-        height: 100,
+        height: 110,
         decoration: BoxDecoration(
             color: HexColor("#D70A0A"),
             boxShadow: [

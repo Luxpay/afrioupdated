@@ -87,7 +87,7 @@ class _WelcomePageState extends State<WelcomePage>
                 child:
                     Column(mainAxisAlignment: MainAxisAlignment.end, children: [
                   Expanded(
-                    flex: 6,
+                    flex: 7,
                     child: Column(
                       children: [
                         Spacer(),
