@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
+import 'package:luxpay/main.dart';
 import 'package:luxpay/views/account.dart';
 import 'package:luxpay/views/finances.dart';
 import 'package:luxpay/views/home.dart';
+import 'package:luxpay/views/paymentMethod/payment_method.dart';
 import 'package:luxpay/views/referrer.dart';
+
 import '../utils/hexcolor.dart';
 
 class AppPageController extends StatefulWidget {
@@ -44,7 +47,8 @@ class _AppPageControllerState extends State<AppPageController> {
               IconlyBold.scan,
               size: 30.32,
             ),
-            onPressed: () => {},
+            onPressed: () =>
+                {Navigator.of(context).push(PaymentMethod().getRoute())},
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

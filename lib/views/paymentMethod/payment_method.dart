@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:luxpay/models/get_account_details.dart';
@@ -23,11 +25,17 @@ class PaymentMethod extends StatefulWidget {
 
 class _PaymentMethodState extends State<PaymentMethod> {
   List<PaymentMethodObj> items = [
-    new PaymentMethodObj(2, "Debit Card", "Top up with a debit card",
-        "assets/paymentMethod/card.png", HexColor("#22B02E").withOpacity(.20)),
+    if (Platform.isAndroid) ...{
+      new PaymentMethodObj(
+          2,
+          "Quick TopUp",
+          "Top up with a debit card",
+          "assets/paymentMethod/card.png",
+          HexColor("#22B02E").withOpacity(.20)),
+    },
     new PaymentMethodObj(
         1,
-        "Bank Transfer",
+        "LuxPay Account",
         "From bank app or internet banking",
         "assets/paymentMethod/bank.png",
         HexColor("#F4752E").withOpacity(.20)),

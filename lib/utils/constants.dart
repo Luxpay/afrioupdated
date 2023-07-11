@@ -1,7 +1,8 @@
 String authToken = "token";
 String userPref = "user";
 String singleLimitTransfer = "user";
-String base_url = "https://luxpay-prod.herokuapp.com/v1";
+String base_url = "https://api.luxpay.ng/v1";
+// String base_url = "https://luxpay-staging.herokuapp.com/v1";
 String bankCode = "codeBank";
 String bankName = "nameBank";
 String completeSignUp = "complete";

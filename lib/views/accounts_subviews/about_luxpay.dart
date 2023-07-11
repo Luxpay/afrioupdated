@@ -4,8 +4,6 @@ import 'package:luxpay/utils/sizeConfig.dart';
 import 'package:luxpay/views/accounts_subviews/terms_and_condition.dart';
 import 'package:luxpay/widgets/settings_item.dart';
 
-import 'luxpay_rate_social.dart';
-
 class AboutLuxPay extends StatelessWidget {
   static const String path = "/aboutLuxPay";
   const AboutLuxPay({Key? key}) : super(key: key);
@@ -86,14 +84,14 @@ class AboutLuxPay extends StatelessWidget {
                       color: HexColor("#FBFBFB"),
                       thickness: 3,
                     ),
-                    SettingsItem(
-                        title: "Rate us",
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LuxPaySocial()));
-                        }),
+                    // SettingsItem(
+                    //     title: "Rate us",
+                    //     onTap: () {
+                    //       Navigator.push(
+                    //           context,
+                    //           MaterialPageRoute(
+                    //               builder: (context) => LuxPaySocial()));
+                    //     }),
                     Divider(
                       color: HexColor("#FBFBFB"),
                       thickness: 3,

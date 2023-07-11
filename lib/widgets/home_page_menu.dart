@@ -3,7 +3,12 @@ import 'package:flutter/material.dart';
 class MenuWidget extends StatelessWidget {
   final String menuName;
   final String imageName;
-  MenuWidget({Key? key, required this.menuName, required this.imageName})
+  final Color? backgroundColor;
+  MenuWidget(
+      {Key? key,
+      required this.menuName,
+      required this.imageName,
+      this.backgroundColor})
       : super(key: key);
 
   @override
@@ -12,7 +17,11 @@ class MenuWidget extends StatelessWidget {
       child: Column(
         children: [
           Container(
+            padding: backgroundColor != null ? EdgeInsets.all(2) : null,
             decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius:
+                  backgroundColor != null ? BorderRadius.circular(16) : null,
               boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.1),

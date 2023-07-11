@@ -15,6 +15,7 @@ import 'package:luxpay/views/authPages/otp_verification.dart';
 import 'package:luxpay/views/authPages/reset_password.dart';
 import 'package:luxpay/widgets/lux_buttons.dart';
 import 'package:luxpay/widgets/lux_textfield.dart';
+
 import '../../models/errors/authError.dart';
 import '../../models/userData.dart';
 import '../../networking/DioServices/dio_client.dart';
@@ -267,8 +268,9 @@ class _LoginPageState extends State<LoginPage> {
                                         _isLoading = false;
                                       });
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                              SnackBar(content: Text(errors)));
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  errors ?? "Unknown error")));
                                     }
                                   } else {
                                     if ((first_name == null ||
@@ -312,8 +314,9 @@ class _LoginPageState extends State<LoginPage> {
                                         _isLoading = false;
                                       });
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                              SnackBar(content: Text(errors)));
+                                          .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  errors ?? "Unknown error")));
                                     }
                                   } else {
                                     if ((first_name == null ||

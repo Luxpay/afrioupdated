@@ -55,5 +55,7 @@
 		<string>LuxPay needs this to record audio</string>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>

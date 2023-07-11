@@ -1,16 +1,21 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache/dio_http_cache.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_iconly/flutter_iconly.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:luxpay/investment/utils/navigator.dart';
 import 'package:luxpay/models/aboutUser.dart';
+import 'package:luxpay/routes.dart';
 import 'package:luxpay/utils/hexcolor.dart';
 import 'package:luxpay/views/authPages/create_pin_page.dart';
 import 'package:luxpay/views/finances/transfer_toLuxpay.dart';
 import 'package:luxpay/views/notifications/notificationsPage.dart';
 import 'package:luxpay/widgets/home_page_menu.dart';
+
 import '../models/about_wallet.dart';
 import '../models/crowd36model.dart';
 import '../models/errors/authError.dart';
@@ -249,7 +254,6 @@ class _HomePageState extends State<HomePage> {
                                           fontSize: 14,
                                           color: Colors.white),
                                     ),
-                                   
                                   ],
                                 ),
                               ),
@@ -374,6 +378,24 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             SizedBox(
+                              height: SizeConfig.safeBlockVertical! * 2.5,
+                            ),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => {
+                                    Nav.pushNamed(context, name: Routes.home)
+                                  },
+                                  child: MenuWidget(
+                                      menuName: "Avrio Hedge",
+                                      backgroundColor:
+                                          Color.fromRGBO(238, 238, 238, 1),
+                                      imageName:
+                                          "assets/investment/avrio_hedge.png"),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
                               height: SizeConfig.safeBlockVertical! * 3.5,
                             ),
                             // Row(
@@ -393,288 +415,291 @@ class _HomePageState extends State<HomePage> {
                       height: SizeConfig.safeBlockVertical! * 2,
                     ),
                     //Crowdfunding & Donations
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 3,
-                            blurRadius: 10,
-                            offset: Offset(0, 1), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.only(left: 33.0, right: 35),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 18,
-                            ),
-                            const Text(
-                              "Crowdfunding & Donations",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 2.9,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () async {
-                                    _fetchCrowd365(context);
-                                  },
-                                  child: MenuWidget(
-                                      menuName: "Crowd 365",
-                                      imageName: "assets/profits.png"),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(right: 16),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             const TransactionDetailsPage()));
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             const TopUpCongratulation()));
-                                      // DialogHelper.exit(context)
-                                      underConstruction(context);
-                                    },
-                                    child: MenuWidget(
-                                        menuName: "Raise Funds",
-                                        imageName: "assets/piggy.png"),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () => {underConstruction(context)},
-                                  child: MenuWidget(
-                                      menuName: "Epic",
-                                      imageName: "assets/epic.png"),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 3.5,
+                    if (Platform.isAndroid)
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              spreadRadius: 3,
+                              blurRadius: 10,
+                              offset:
+                                  Offset(0, 1), // changes position of shadow
                             ),
                           ],
                         ),
+                        child: Container(
+                          margin: const EdgeInsets.only(left: 33.0, right: 35),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 18,
+                              ),
+                              const Text(
+                                "Crowdfunding & Donations",
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w700),
+                              ),
+                              SizedBox(
+                                height: SizeConfig.safeBlockVertical! * 2.9,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    onTap: () async {
+                                      _fetchCrowd365(context);
+                                    },
+                                    child: MenuWidget(
+                                        menuName: "Crowd 365",
+                                        imageName: "assets/profits.png"),
+                                  ),
+                                  // Container(
+                                  //   margin: EdgeInsets.only(right: 16),
+                                  //   child: GestureDetector(
+                                  //     onTap: () {
+                                  //       // Navigator.push(
+                                  //       //     context,
+                                  //       //     MaterialPageRoute(
+                                  //       //         builder: (context) =>
+                                  //       //             const TransactionDetailsPage()));
+                                  //       // Navigator.push(
+                                  //       //     context,
+                                  //       //     MaterialPageRoute(
+                                  //       //         builder: (context) =>
+                                  //       //             const TopUpCongratulation()));
+                                  //       // DialogHelper.exit(context)
+                                  //       underConstruction(context);
+                                  //     },
+                                  //     child: MenuWidget(
+                                  //         menuName: "Raise Funds",
+                                  //         imageName: "assets/piggy.png"),
+                                  //   ),
+                                  // ),
+                                  // GestureDetector(
+                                  //   onTap: () => {underConstruction(context)},
+                                  //   child: MenuWidget(
+                                  //       menuName: "Epic",
+                                  //       imageName: "assets/epic.png"),
+                                  // ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: SizeConfig.safeBlockVertical! * 3.5,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
                     SizedBox(
                       height: SizeConfig.safeBlockVertical! * 2,
                     ),
                     //Recharge & Bill Payments
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            spreadRadius: 3,
-                            blurRadius: 10,
-                            offset: Offset(0, 1), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 35.0, right: 35),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(
-                              height: 18,
-                            ),
-                            const Text(
-                              "Recharge & Bill Payments",
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w700),
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 2.9,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                //Airtime
-                                InkWell(
-                                  onTap: () => {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             const Airtime()))
-                                    underConstruction(context),
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Airtime",
-                                    imageName: "assets/homeIcons/airtime.png",
-                                  ),
-                                ),
-                                //Electricity
-                                InkWell(
-                                  onTap: () => {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             const GenericBillPage(
-                                    //               title: "Electricity",
-                                    //               transactionIdHint:
-                                    //                   "Meter number",
-                                    //               transactionIdInnerHint:
-                                    //                   "Enter meter number",
-                                    //             )))
-                                    underConstruction(context),
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Electriciy",
-                                    imageName:
-                                        "assets/homeIcons/electricity.png",
-                                  ),
-                                ),
-                                //TV
-                                InkWell(
-                                  onTap: () => {
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             const GenericBillPage(
-                                    //               title: "TV",
-                                    //               transactionIdHint:
-                                    //                   "Decoder number",
-                                    //               transactionIdInnerHint:
-                                    //                   "Enter decoder number",
-                                    //             )))
-                                    underConstruction(context),
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "TV",
-                                    imageName: "assets/homeIcons/tv.png",
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 3.5,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Water",
-                                    imageName: "assets/homeIcons/water.png",
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Data Bundle",
-                                    imageName: "assets/homeIcons/data.png",
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Internet",
-                                    imageName: "assets/request.png",
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 3.5,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Betting",
-                                    imageName: "assets/homeIcons/betting.png",
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 10),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      underConstruction(context);
-                                    },
-                                    child: MenuWidget(
-                                      menuName: "Education",
-                                      imageName: "assets/homeIcons/edu.png",
-                                    ),
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Transport",
-                                    imageName: "assets/homeIcons/transport.png",
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 3.5,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Pay Ads",
-                                    imageName: "assets/homeIcons/ad.png",
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    underConstruction(context);
-                                  },
-                                  child: MenuWidget(
-                                    menuName: "Event & Ticketing",
-                                    imageName: "assets/homeIcons/event.png",
-                                  ),
-                                ),
-                                Container(
-                                  width: 46,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: SizeConfig.safeBlockVertical! * 9,
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                    // Container(
+                    //   width: MediaQuery.of(context).size.width,
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.white,
+                    //     boxShadow: [
+                    //       BoxShadow(
+                    //         color: Colors.grey.withOpacity(0.3),
+                    //         spreadRadius: 3,
+                    //         blurRadius: 10,
+                    //         offset: Offset(0, 1), // changes position of shadow
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.only(left: 35.0, right: 35),
+                    //     child: Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         const SizedBox(
+                    //           height: 18,
+                    //         ),
+                    //         const Text(
+                    //           "Recharge & Bill Payments",
+                    //           style: TextStyle(
+                    //               fontSize: 16, fontWeight: FontWeight.w700),
+                    //         ),
+                    //         SizedBox(
+                    //           height: SizeConfig.safeBlockVertical! * 2.9,
+                    //         ),
+                    //         Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             //Airtime
+                    //             InkWell(
+                    //               onTap: () => {
+                    //                 // Navigator.push(
+                    //                 //     context,
+                    //                 //     MaterialPageRoute(
+                    //                 //         builder: (context) =>
+                    //                 //             const Airtime()))
+                    //                 underConstruction(context),
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Airtime",
+                    //                 imageName: "assets/homeIcons/airtime.png",
+                    //               ),
+                    //             ),
+                    //             //Electricity
+                    //             InkWell(
+                    //               onTap: () => {
+                    //                 // Navigator.push(
+                    //                 //     context,
+                    //                 //     MaterialPageRoute(
+                    //                 //         builder: (context) =>
+                    //                 //             const GenericBillPage(
+                    //                 //               title: "Electricity",
+                    //                 //               transactionIdHint:
+                    //                 //                   "Meter number",
+                    //                 //               transactionIdInnerHint:
+                    //                 //                   "Enter meter number",
+                    //                 //             )))
+                    //                 underConstruction(context),
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Electriciy",
+                    //                 imageName:
+                    //                     "assets/homeIcons/electricity.png",
+                    //               ),
+                    //             ),
+                    //             //TV
+                    //             InkWell(
+                    //               onTap: () => {
+                    //                 // Navigator.push(
+                    //                 //     context,
+                    //                 //     MaterialPageRoute(
+                    //                 //         builder: (context) =>
+                    //                 //             const GenericBillPage(
+                    //                 //               title: "TV",
+                    //                 //               transactionIdHint:
+                    //                 //                   "Decoder number",
+                    //                 //               transactionIdInnerHint:
+                    //                 //                   "Enter decoder number",
+                    //                 //             )))
+                    //                 underConstruction(context),
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "TV",
+                    //                 imageName: "assets/homeIcons/tv.png",
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         SizedBox(
+                    //           height: SizeConfig.safeBlockVertical! * 3.5,
+                    //         ),
+                    //         Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Water",
+                    //                 imageName: "assets/homeIcons/water.png",
+                    //               ),
+                    //             ),
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Data Bundle",
+                    //                 imageName: "assets/homeIcons/data.png",
+                    //               ),
+                    //             ),
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Internet",
+                    //                 imageName: "assets/request.png",
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         SizedBox(
+                    //           height: SizeConfig.safeBlockVertical! * 3.5,
+                    //         ),
+                    //         Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Betting",
+                    //                 imageName: "assets/homeIcons/betting.png",
+                    //               ),
+                    //             ),
+                    //             Container(
+                    //               margin: EdgeInsets.only(left: 10),
+                    //               child: GestureDetector(
+                    //                 onTap: () {
+                    //                   underConstruction(context);
+                    //                 },
+                    //                 child: MenuWidget(
+                    //                   menuName: "Education",
+                    //                   imageName: "assets/homeIcons/edu.png",
+                    //                 ),
+                    //               ),
+                    //             ),
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Transport",
+                    //                 imageName: "assets/homeIcons/transport.png",
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         SizedBox(
+                    //           height: SizeConfig.safeBlockVertical! * 3.5,
+                    //         ),
+                    //         Row(
+                    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //           children: [
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Pay Ads",
+                    //                 imageName: "assets/homeIcons/ad.png",
+                    //               ),
+                    //             ),
+                    //             GestureDetector(
+                    //               onTap: () {
+                    //                 underConstruction(context);
+                    //               },
+                    //               child: MenuWidget(
+                    //                 menuName: "Event & Ticketing",
+                    //                 imageName: "assets/homeIcons/event.png",
+                    //               ),
+                    //             ),
+                    //             Container(
+                    //               width: 46,
+                    //             ),
+                    //           ],
+                    //         ),
+                    //         SizedBox(
+                    //           height: SizeConfig.safeBlockVertical! * 9,
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
               ),

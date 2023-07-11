@@ -1,13 +1,11 @@
 // create a class extending DioInterceptor implementing all fields and methods
 import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:luxpay/utils/constants.dart';
 
-
 class HeaderInterceptor extends Interceptor {
- 
- 
   @override
   Future onRequest(
       RequestOptions options, RequestInterceptorHandler handler) async {
@@ -19,6 +17,8 @@ class HeaderInterceptor extends Interceptor {
       });
     }
 
+    log(options.path, name: "Request");
+    log(options.queryParameters.toString(), name: "Request");
     log(options.headers.toString(), name: "Request");
     log(options.data.toString(), name: "Request");
     return handler.next(options);
@@ -47,10 +47,9 @@ class HeaderInterceptor extends Interceptor {
     //   var tokenError = await ExpiredToken.fromJson(err.response?.data);
     //   if (tokenError.errors.message.messages[0].message ==
     //       "Token is invalid or expired") {
-            
-  
+
     //         return handler.next(err);
-       
+
     //   }
     // }
 
@@ -59,7 +58,4 @@ class HeaderInterceptor extends Interceptor {
      */
     return handler.next(err);
   }
-
-
 }
-
